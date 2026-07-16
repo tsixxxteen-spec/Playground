@@ -2286,3 +2286,171 @@ body.viewer-open {
     opacity: 1;
   }
 }
+
+/* =========================================================
+   RELIABLE TILE PUSH + DOUBLE CLICK/TAP
+   ========================================================= */
+
+.post-tile {
+  touch-action: manipulation;
+}
+
+/* Metadata remains limited to username, caption and Push source. */
+.post-reveal {
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Small Push control fixed to the bottom-right of every tile. */
+.tile-push {
+  position: absolute !important;
+  z-index: 12 !important;
+  right: 12px !important;
+  bottom: 12px !important;
+
+  display: grid !important;
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  padding: 0 !important;
+  place-items: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.42) !important;
+  border-radius: 50% !important;
+  background: rgba(6, 6, 7, 0.34) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(7px) scale(0.92);
+  backdrop-filter: blur(18px) saturate(125%);
+  pointer-events: auto !important;
+
+  transition:
+    opacity 180ms ease,
+    visibility 180ms ease,
+    transform 300ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 180ms ease,
+    background 180ms ease,
+    color 180ms ease;
+}
+
+.tile-push > span {
+  display: block;
+  font-size: 15px;
+  line-height: 1;
+  transform: translate(-1px, 1px);
+  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Make the control visible whenever the tile is being explored. */
+.post-tile:hover .tile-push,
+.post-tile:focus .tile-push,
+.post-tile:focus-within .tile-push,
+.post-tile--revealed .tile-push {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.tile-push:hover {
+  border-color: #fff200 !important;
+  background: rgba(255, 242, 0, 0.13) !important;
+  color: #fff200 !important;
+  transform: scale(1.06) !important;
+}
+
+.tile-push:active {
+  transform: translate(3px, -2px) scale(0.94) !important;
+}
+
+.tile-push--active {
+  visibility: visible;
+  border-color: rgba(255, 242, 0, 0.86) !important;
+  background: rgba(255, 242, 0, 0.14) !important;
+  color: #fff200 !important;
+}
+
+.tile-push--active > span {
+  transform: translate(1px, -1px);
+}
+
+/* Keep a very subtle indication after the user has Pushed it. */
+.post-tile--pushed:not(:hover):not(:focus-within) .tile-push {
+  visibility: visible;
+  opacity: 0.52;
+  transform: scale(0.88);
+}
+
+/* Swing-like momentum from button, double-click or double-tap. */
+.post-tile--push-animating {
+  z-index: 15;
+  animation: tile-direct-push 680ms
+    cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.post-tile--push-animating::after {
+  position: absolute;
+  z-index: 10;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 22%,
+    rgba(255, 242, 0, 0.15) 50%,
+    transparent 78%
+  );
+  pointer-events: none;
+  content: "";
+  animation: tile-direct-push-light 680ms ease-out;
+}
+
+@keyframes tile-direct-push {
+  0% {
+    transform: translateX(0) scale(1);
+  }
+
+  26% {
+    transform: translateX(8px) scale(1.003);
+  }
+
+  58% {
+    transform: translateX(-2px) scale(1);
+  }
+
+  100% {
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes tile-direct-push-light {
+  0% {
+    opacity: 0;
+    transform: translateX(-52%);
+  }
+
+  28% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(52%);
+  }
+}
+
+/* Touchscreens have no hover, so keep the small control available. */
+@media (hover: none), (pointer: coarse) {
+  .tile-push {
+    visibility: visible;
+    opacity: 0.72;
+    transform: scale(0.92);
+  }
+
+  .post-tile:focus-within .tile-push,
+  .tile-push:active,
+  .tile-push--active {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
