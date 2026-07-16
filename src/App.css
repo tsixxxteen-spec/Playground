@@ -1246,3 +1246,720 @@ input:focus-visible {
     padding-left: 24px;
   }
 }
+
+
+/* =========================================================
+   SPRINT 1.4 — FULL-BLEED VISUAL WALL
+   ========================================================= */
+
+/* Let the artwork begin immediately beneath the navigation */
+.slide-intro {
+  display: none !important;
+}
+
+.content-shell {
+  padding-right: 4px !important;
+  padding-bottom: 60px;
+  padding-left: 18px !important;
+}
+
+.topbar {
+  min-height: 72px;
+  padding-right: 18px;
+}
+
+/* A tightly packed collage instead of a Pinterest-style column layout */
+.masonry-wall {
+  display: grid !important;
+  grid-auto-flow: dense;
+  grid-auto-rows: 10px;
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  gap: 4px !important;
+  column-count: initial !important;
+  width: 100%;
+}
+
+/* Every post becomes a visual tile */
+.masonry-post {
+  position: relative;
+  display: block !important;
+  width: 100% !important;
+  min-width: 0;
+  height: 100%;
+  margin: 0 !important;
+  overflow: hidden;
+  break-inside: initial !important;
+  background: var(--surface-soft);
+  transform: none !important;
+  vertical-align: initial;
+}
+
+/* Irregular editorial tile rhythm */
+.masonry-post--tile-1 {
+  grid-column: span 1;
+  grid-row: span 58;
+}
+
+.masonry-post--tile-2 {
+  grid-column: span 2;
+  grid-row: span 31;
+}
+
+.masonry-post--tile-3 {
+  grid-column: span 1;
+  grid-row: span 31;
+}
+
+.masonry-post--tile-4 {
+  grid-column: span 1;
+  grid-row: span 30;
+}
+
+.masonry-post--tile-5 {
+  grid-column: span 2;
+  grid-row: span 42;
+}
+
+.masonry-post--tile-6 {
+  grid-column: span 2;
+  grid-row: span 31;
+}
+
+.masonry-post--tile-7 {
+  grid-column: span 1;
+  grid-row: span 29;
+}
+
+.masonry-post--tile-8 {
+  grid-column: span 1;
+  grid-row: span 44;
+}
+
+.masonry-post--tile-9 {
+  grid-column: span 1;
+  grid-row: span 37;
+}
+
+.masonry-post--tile-10 {
+  grid-column: span 2;
+  grid-row: span 34;
+}
+
+/* Media occupies the full tile */
+.image-post,
+.diptych-post,
+.quote-post,
+.audio-post {
+  position: absolute !important;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  aspect-ratio: auto !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+
+.image-post img,
+.diptych-post img,
+.audio-post > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Diptych becomes a seamless two-panel tile */
+.diptych-post {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+}
+
+.diptych-post button {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto !important;
+  border-radius: 0;
+}
+
+/* Quote tile remains editorial, but fills its entire area */
+.quote-post {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 42px 34px 30px;
+}
+
+/* Creator identity becomes a floating overlay */
+.post-header {
+  position: absolute;
+  z-index: 15;
+  top: 0;
+  right: 0;
+  left: 0;
+  margin: 0 !important;
+  padding: 13px 14px 32px;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.68),
+    rgba(0, 0, 0, 0)
+  );
+  color: #fff;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition:
+    opacity 220ms ease,
+    transform 360ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.post-identity strong {
+  color: #fff;
+}
+
+.post-identity small,
+.more-button {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+/* Pushed attribution floats above the original creator */
+.push-context {
+  position: absolute;
+  z-index: 18;
+  top: 10px;
+  left: 12px;
+  margin: 0;
+  padding: 6px 8px;
+  background: rgba(0, 0, 0, 0.56);
+  color: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(14px);
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    opacity 220ms ease,
+    transform 340ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* When Push context exists, move creator identity down slightly */
+.masonry-post:has(.push-context) .post-header {
+  padding-top: 43px;
+}
+
+/* Caption floats at the bottom and appears only when requested */
+.post-caption {
+  position: absolute !important;
+  z-index: 14;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  max-height: none !important;
+  padding: 90px 16px 52px !important;
+  background: linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.88) 0%,
+    rgba(0, 0, 0, 0.56) 48%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  color: #fff;
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 220ms ease,
+    transform 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.post-caption > span {
+  color: var(--creator-accent);
+}
+
+.post-caption h2 {
+  color: #fff;
+  font-size: clamp(17px, 1.7vw, 28px);
+}
+
+.post-caption p {
+  max-width: 430px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Actions sit along the bottom edge */
+.post-actions {
+  position: absolute;
+  z-index: 20;
+  right: 13px;
+  bottom: 12px;
+  left: 13px;
+  margin: 0 !important;
+  color: #fff;
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 220ms ease,
+    transform 360ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.push-button,
+.enter-button {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.push-button:hover,
+.enter-button:hover {
+  color: #fff;
+}
+
+.push-button--active {
+  color: var(--creator-accent);
+}
+
+/* Reveal the post interface on hover, focus, or mobile tap */
+.masonry-post:hover .post-header,
+.masonry-post:hover .push-context,
+.masonry-post:hover .post-caption,
+.masonry-post:hover .post-actions,
+.masonry-post:focus .post-header,
+.masonry-post:focus .push-context,
+.masonry-post:focus .post-caption,
+.masonry-post:focus .post-actions,
+.masonry-post:focus-within .post-header,
+.masonry-post:focus-within .push-context,
+.masonry-post:focus-within .post-caption,
+.masonry-post:focus-within .post-actions {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Let the art subtly come forward */
+.masonry-post img {
+  transition:
+    transform 900ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 500ms ease;
+}
+
+.masonry-post:hover img,
+.masonry-post:focus-within img {
+  filter: brightness(0.82);
+  transform: scale(1.025);
+}
+
+/* Quote posts should not be darkened like photos */
+.masonry-post--quote:hover .quote-post,
+.masonry-post--quote:focus-within .quote-post {
+  filter: brightness(0.88);
+}
+
+/* Remove any lingering visual framing */
+.masonry-post,
+.image-post,
+.diptych-post,
+.quote-post,
+.audio-post {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Preserve a desktop canvas on phones */
+@media (max-width: 780px) {
+  html,
+  body {
+    overflow-x: auto;
+  }
+
+  .app-shell {
+    display: grid !important;
+    min-width: 1180px;
+    grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  }
+
+  .sidebar {
+    position: sticky !important;
+    top: 0 !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    display: flex !important;
+    width: auto !important;
+    height: 100vh !important;
+    padding: 42px 26px 28px 32px !important;
+    background: var(--background) !important;
+  }
+
+  .brand,
+  .create-button,
+  .account-chip {
+    display: flex !important;
+  }
+
+  .side-navigation {
+    display: flex !important;
+    flex-direction: column !important;
+    margin-top: 58px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .side-navigation button {
+    display: flex !important;
+    flex: initial !important;
+    justify-content: flex-start !important;
+    padding: 10px 0 !important;
+  }
+
+  .side-navigation button span {
+    display: inline !important;
+  }
+
+  .content-shell {
+    min-width: 920px;
+    padding-right: 4px !important;
+    padding-left: 18px !important;
+  }
+
+  .masonry-wall {
+    grid-template-columns: repeat(4, minmax(180px, 1fr));
+  }
+
+  .search-field {
+    display: flex !important;
+  }
+}
+
+
+/* =========================================================
+   TRUE BORDERLESS COLLAGE
+   ========================================================= */
+
+.content-shell {
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+}
+
+.topbar {
+  padding-right: 24px;
+  padding-left: 24px;
+}
+
+/* The wall is one uninterrupted visual surface */
+.masonry-wall {
+  display: grid !important;
+  width: 100%;
+  grid-auto-flow: dense;
+  grid-auto-rows: 8px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0 !important;
+  column-gap: 0 !important;
+  row-gap: 0 !important;
+  background: var(--background);
+}
+
+/* Every post becomes a flush collage tile */
+.masonry-post {
+  position: relative;
+  display: block !important;
+  width: 100% !important;
+  height: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  break-inside: auto !important;
+  transform: none !important;
+}
+
+/* Tile sizing */
+.masonry-post--tile-1 {
+  grid-column: span 1;
+  grid-row: span 72;
+}
+
+.masonry-post--tile-2 {
+  grid-column: span 2;
+  grid-row: span 46;
+}
+
+.masonry-post--tile-3 {
+  grid-column: span 1;
+  grid-row: span 46;
+}
+
+.masonry-post--tile-4 {
+  grid-column: span 1;
+  grid-row: span 44;
+}
+
+.masonry-post--tile-5 {
+  grid-column: span 1;
+  grid-row: span 58;
+}
+
+.masonry-post--tile-6 {
+  grid-column: span 2;
+  grid-row: span 46;
+}
+
+.masonry-post--tile-7 {
+  grid-column: span 1;
+  grid-row: span 44;
+}
+
+.masonry-post--tile-8 {
+  grid-column: span 1;
+  grid-row: span 62;
+}
+
+.masonry-post--tile-9 {
+  grid-column: span 1;
+  grid-row: span 56;
+}
+
+.masonry-post--tile-10 {
+  grid-column: span 2;
+  grid-row: span 44;
+}
+
+/* All media fills its tile edge to edge */
+.image-post,
+.diptych-post,
+.quote-post,
+.audio-post {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0;
+  overflow: hidden;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent;
+  box-shadow: none !important;
+  aspect-ratio: auto !important;
+}
+
+.image-post img,
+.audio-post > img,
+.diptych-post img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Diptych remains seamless */
+.diptych-post {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 !important;
+}
+
+.diptych-post button {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent;
+  aspect-ratio: auto !important;
+}
+
+.diptych-post button span {
+  display: none;
+}
+
+/* Quote becomes a visual tile without any surrounding card */
+.quote-post {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 46px 38px 34px !important;
+}
+
+/* Everything informational floats over the work */
+.post-header {
+  position: absolute !important;
+  z-index: 20;
+  top: 0;
+  right: 0;
+  left: 0;
+  margin: 0 !important;
+  padding: 14px 15px 40px !important;
+  border: 0 !important;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.72) 0%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  color: white;
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition:
+    opacity 200ms ease,
+    transform 340ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.post-header button {
+  pointer-events: auto;
+}
+
+.post-identity strong {
+  color: white;
+}
+
+.post-identity small,
+.more-button {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.push-context {
+  position: absolute !important;
+  z-index: 24;
+  top: 11px;
+  left: 12px;
+  margin: 0 !important;
+  padding: 6px 8px;
+  border: 0 !important;
+  background: rgba(0, 0, 0, 0.58);
+  color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(14px);
+  opacity: 0;
+  transform: translateY(-7px);
+  transition:
+    opacity 200ms ease,
+    transform 340ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.masonry-post:has(.push-context) .post-header {
+  padding-top: 46px !important;
+}
+
+/* Caption overlays the lower section only on hover */
+.post-caption {
+  position: absolute !important;
+  z-index: 18;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 110px 16px 52px !important;
+  overflow: visible !important;
+  border: 0 !important;
+  background: linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.58) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  color: white;
+  opacity: 0;
+  transform: translateY(14px);
+  pointer-events: none;
+  transition:
+    opacity 200ms ease,
+    transform 380ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.post-caption h2 {
+  color: white;
+}
+
+.post-caption p {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* Actions overlay the bottom of each visual */
+.post-actions {
+  position: absolute !important;
+  z-index: 22;
+  right: 14px;
+  bottom: 12px;
+  left: 14px;
+  margin: 0 !important;
+  padding: 0 !important;
+  opacity: 0;
+  transform: translateY(9px);
+  transition:
+    opacity 200ms ease,
+    transform 340ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.push-button,
+.enter-button {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* Reveal information only when interacting */
+.masonry-post:hover .post-header,
+.masonry-post:hover .push-context,
+.masonry-post:hover .post-caption,
+.masonry-post:hover .post-actions,
+.masonry-post:focus .post-header,
+.masonry-post:focus .push-context,
+.masonry-post:focus .post-caption,
+.masonry-post:focus .post-actions,
+.masonry-post:focus-within .post-header,
+.masonry-post:focus-within .push-context,
+.masonry-post:focus-within .post-caption,
+.masonry-post:focus-within .post-actions {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* The artwork stays completely clean when idle */
+.masonry-post img {
+  transform: scale(1.001);
+  transition:
+    transform 760ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 400ms ease;
+}
+
+.masonry-post:hover img,
+.masonry-post:focus-within img {
+  filter: brightness(0.78);
+  transform: scale(1.025);
+}
+
+/* Prevent any old responsive rules from restoring gaps */
+@media (max-width: 1120px) {
+  .masonry-wall {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 0 !important;
+  }
+}
+
+@media (max-width: 780px) {
+  html,
+  body {
+    overflow-x: auto;
+  }
+
+  .app-shell {
+    min-width: 1180px;
+  }
+
+  .content-shell {
+    min-width: 920px;
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+  }
+
+  .masonry-wall {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 0 !important;
+  }
+}
+
+@media (max-width: 580px) {
+  .masonry-wall {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 0 !important;
+  }
+}

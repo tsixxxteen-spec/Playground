@@ -406,7 +406,7 @@ function PostCard({ post }: { post: Post }) {
 
   return (
     <article
-      className={`masonry-post masonry-post--${post.type} ${
+      className={`masonry-post masonry-post--${post.type} masonry-post--tile-${post.id} ${
         animating ? "masonry-post--pushing" : ""
       }`}
       style={style}
