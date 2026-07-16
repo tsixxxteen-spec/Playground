@@ -541,8 +541,8 @@ function ImmersiveViewer({
   onPrevious: () => void;
   onNext: () => void;
 }) {
-  const touchStartX = useRef<number | null>(null);
-  const touchStartY = useRef<number | null>(null);
+  const swipeStartX = useRef<number | null>(null);
+  const swipeStartY = useRef<number | null>(null);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -560,56 +560,68 @@ function ImmersiveViewer({
     };
   }, [onClose, onPrevious, onNext]);
 
-  const handleBackdropClick = (
+  const handleOverlayClick = (
     event: React.MouseEvent<HTMLDivElement>,
   ) => {
-    if (event.target === event.currentTarget) {
-      onClose();
-    }
-  };
+    const target = event.target as HTMLElement;
 
-  const handleTouchStart = (
-    event: React.TouchEvent<HTMLDivElement>,
-  ) => {
-    const touch = event.touches[0];
-
-    touchStartX.current = touch.clientX;
-    touchStartY.current = touch.clientY;
-  };
-
-  const handleTouchEnd = (
-    event: React.TouchEvent<HTMLDivElement>,
-  ) => {
     if (
-      touchStartX.current === null ||
-      touchStartY.current === null
+      target.closest(".viewer-frame") ||
+      target.closest(".viewer-close") ||
+      target.closest(".viewer-arrow")
     ) {
       return;
     }
 
-    const touch = event.changedTouches[0];
-    const deltaX = touch.clientX - touchStartX.current;
-    const deltaY = touch.clientY - touchStartY.current;
+    onClose();
+  };
 
-    touchStartX.current = null;
-    touchStartY.current = null;
+  const handlePointerDown = (
+    event: React.PointerEvent<HTMLDivElement>,
+  ) => {
+    if (event.pointerType !== "touch") return;
 
-    const isHorizontal = Math.abs(deltaX) > Math.abs(deltaY);
-    const isRightSwipe = deltaX > 90;
+    swipeStartX.current = event.clientX;
+    swipeStartY.current = event.clientY;
+  };
 
-    if (isHorizontal && isRightSwipe) {
+  const handlePointerUp = (
+    event: React.PointerEvent<HTMLDivElement>,
+  ) => {
+    if (
+      event.pointerType !== "touch" ||
+      swipeStartX.current === null ||
+      swipeStartY.current === null
+    ) {
+      return;
+    }
+
+    const deltaX = event.clientX - swipeStartX.current;
+    const deltaY = event.clientY - swipeStartY.current;
+
+    swipeStartX.current = null;
+    swipeStartY.current = null;
+
+    const horizontalEnough =
+      Math.abs(deltaX) > Math.abs(deltaY) * 1.25;
+
+    const farEnough = deltaX >= 82;
+
+    if (horizontalEnough && farEnough) {
+      event.preventDefault();
       onClose();
     }
   };
 
   return (
     <div
-      className="immersive-viewer"
+      className="immersive-viewer immersive-viewer--repaired"
       role="dialog"
       aria-modal="true"
-      onClick={handleBackdropClick}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
+      aria-label={`Post by ${post.username}`}
+      onClick={handleOverlayClick}
+      onPointerDownCapture={handlePointerDown}
+      onPointerUpCapture={handlePointerUp}
     >
       <button
         className="viewer-close"
@@ -624,14 +636,17 @@ function ImmersiveViewer({
       <button
         className="viewer-arrow viewer-arrow--previous"
         type="button"
-        onClick={onPrevious}
+        onClick={(event) => {
+          event.stopPropagation();
+          onPrevious();
+        }}
         aria-label="Previous post"
       >
         ←
       </button>
 
       <figure
-        className="viewer-stage"
+        className="viewer-frame"
         onClick={(event) => event.stopPropagation()}
       >
         <img
@@ -647,13 +662,21 @@ function ImmersiveViewer({
           <div className="viewer-caption-copy">
             <strong>{post.username}</strong>
             <p>{post.caption}</p>
-            {post.pushedBy && <span>Pushed by {post.pushedBy}</span>}
+
+            {post.pushedBy && (
+              <span>Pushed by {post.pushedBy}</span>
+            )}
           </div>
 
           <button
-            className={`viewer-push ${pushed ? "viewer-push--active" : ""}`}
+            className={`viewer-push ${
+              pushed ? "viewer-push--active" : ""
+            }`}
             type="button"
-            onClick={onPush}
+            onClick={(event) => {
+              event.stopPropagation();
+              onPush();
+            }}
             aria-pressed={pushed}
             aria-label={pushed ? "Remove Push" : "Push this post"}
           >
@@ -666,7 +689,10 @@ function ImmersiveViewer({
       <button
         className="viewer-arrow viewer-arrow--next"
         type="button"
-        onClick={onNext}
+        onClick={(event) => {
+          event.stopPropagation();
+          onNext();
+        }}
         aria-label="Next post"
       >
         →
