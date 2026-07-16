@@ -364,11 +364,15 @@ function PostTile({
 
 function ImmersiveViewer({
   post,
+  pushed,
+  onPush,
   onClose,
   onPrevious,
   onNext,
 }: {
   post: Post;
+  pushed: boolean;
+  onPush: () => void;
   onClose: () => void;
   onPrevious: () => void;
   onNext: () => void;
@@ -426,9 +430,22 @@ function ImmersiveViewer({
         />
 
         <figcaption className="viewer-caption">
-          <strong>{post.username}</strong>
-          <p>{post.caption}</p>
-          {post.pushedBy && <span>Pushed by {post.pushedBy}</span>}
+          <div className="viewer-caption-copy">
+            <strong>{post.username}</strong>
+            <p>{post.caption}</p>
+            {post.pushedBy && <span>Pushed by {post.pushedBy}</span>}
+          </div>
+
+          <button
+            className={`viewer-push ${pushed ? "viewer-push--active" : ""}`}
+            type="button"
+            onClick={onPush}
+            aria-pressed={pushed}
+            aria-label={pushed ? "Remove Push" : "Push this post"}
+          >
+            <span className="viewer-push-arrow">↗</span>
+            <span>{pushed ? "Pushed" : "Push"}</span>
+          </button>
         </figcaption>
       </figure>
 
@@ -494,6 +511,15 @@ function Navigation({
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
+  const [pushedPostIds, setPushedPostIds] = useState<number[]>(() => {
+    try {
+      const stored = window.localStorage.getItem("playground-pushed-posts");
+      const parsed = stored ? JSON.parse(stored) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
   const [startupVisible, setStartupVisible] = useState(true);
   const [theme, setTheme] = useState<Theme>(() => {
     const stored = window.localStorage.getItem("playground-theme");
@@ -528,6 +554,21 @@ function App() {
     return () => media.removeEventListener("change", update);
   }, [theme]);
 
+  const togglePush = (postId: number) => {
+    setPushedPostIds((current) => {
+      const next = current.includes(postId)
+        ? current.filter((id) => id !== postId)
+        : [...current, postId];
+
+      window.localStorage.setItem(
+        "playground-pushed-posts",
+        JSON.stringify(next),
+      );
+
+      return next;
+    });
+  };
+
   const closeViewer = () => setSelectedPostIndex(null);
 
   const showPreviousPost = () => {
@@ -549,6 +590,8 @@ function App() {
       {selectedPostIndex !== null && (
         <ImmersiveViewer
           post={posts[selectedPostIndex]}
+          pushed={pushedPostIds.includes(posts[selectedPostIndex].id)}
+          onPush={() => togglePush(posts[selectedPostIndex].id)}
           onClose={closeViewer}
           onPrevious={showPreviousPost}
           onNext={showNextPost}

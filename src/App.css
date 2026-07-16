@@ -2019,3 +2019,129 @@ body.viewer-open {
     right: calc(50% - 54px);
   }
 }
+
+/* =========================================================
+   FUNCTIONAL PUSH ENDORSEMENT
+   ========================================================= */
+
+.viewer-caption {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+.viewer-caption-copy {
+  min-width: 0;
+}
+
+.viewer-caption-copy > span {
+  display: block;
+}
+
+.viewer-push {
+  display: inline-flex;
+  min-width: 94px;
+  height: 38px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 999px;
+  background: rgba(12, 12, 14, 0.28);
+  color: rgba(255, 255, 255, 0.78);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 600;
+  backdrop-filter: blur(18px);
+  transition:
+    color 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 180ms ease;
+  pointer-events: auto;
+}
+
+.viewer-push:hover {
+  border-color: rgba(255, 242, 0, 0.7);
+  color: #fff200;
+  transform: translateY(-1px);
+}
+
+.viewer-push:active {
+  transform: translateX(5px) scale(0.98);
+}
+
+.viewer-push--active {
+  border-color: rgba(255, 242, 0, 0.7);
+  background: rgba(255, 242, 0, 0.1);
+  color: #fff200;
+  animation: push-swing-momentum 680ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.viewer-push-arrow {
+  display: inline-block;
+  font-size: 14px;
+  transition: transform 360ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.viewer-push--active .viewer-push-arrow {
+  transform: translate(2px, -2px);
+}
+
+.viewer-stage:has(.viewer-push--active) > img {
+  animation: pushed-image-momentum 680ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes push-swing-momentum {
+  0% {
+    transform: translateX(0) rotate(0deg);
+  }
+
+  28% {
+    transform: translateX(7px) rotate(0.6deg);
+  }
+
+  58% {
+    transform: translateX(-2px) rotate(-0.2deg);
+  }
+
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+}
+
+@keyframes pushed-image-momentum {
+  0% {
+    transform: translateX(0) scale(1);
+    filter: brightness(1);
+  }
+
+  28% {
+    transform: translateX(8px) scale(1.002);
+    filter: brightness(1.035);
+  }
+
+  62% {
+    transform: translateX(-1px) scale(1);
+    filter: brightness(1.01);
+  }
+
+  100% {
+    transform: translateX(0) scale(1);
+    filter: brightness(1);
+  }
+}
+
+@media (max-width: 760px) {
+  .viewer-caption {
+    align-items: start;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .viewer-push {
+    align-self: flex-start;
+  }
+}
