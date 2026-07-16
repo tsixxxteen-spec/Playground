@@ -324,21 +324,31 @@ function ThemeControl({
   );
 }
 
-function PostTile({ post }: { post: Post }) {
-  const [revealed, setRevealed] = useState(false);
-
+function PostTile({
+  post,
+  onOpen,
+}: {
+  post: Post;
+  onOpen: () => void;
+}) {
   const style = {
     "--image-position": post.position ?? "center",
   } as CSSProperties;
 
   return (
     <article
-      className={`post-tile post-tile--${post.weight} ${
-        revealed ? "post-tile--revealed" : ""
-      }`}
+      className={`post-tile post-tile--${post.weight}`}
       style={style}
       tabIndex={0}
-      onClick={() => setRevealed((value) => !value)}
+      role="button"
+      aria-label={`Open post by ${post.username}`}
+      onClick={onOpen}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onOpen();
+        }
+      }}
     >
       <img src={post.image} alt="" draggable={false} />
 
@@ -348,6 +358,89 @@ function PostTile({ post }: { post: Post }) {
         {post.pushedBy && <span>Pushed by {post.pushedBy}</span>}
       </div>
     </article>
+  );
+}
+
+
+function ImmersiveViewer({
+  post,
+  onClose,
+  onPrevious,
+  onNext,
+}: {
+  post: Post;
+  onClose: () => void;
+  onPrevious: () => void;
+  onNext: () => void;
+}) {
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+      if (event.key === "ArrowLeft") onPrevious();
+      if (event.key === "ArrowRight") onNext();
+    };
+
+    document.body.classList.add("viewer-open");
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.classList.remove("viewer-open");
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [onClose, onPrevious, onNext]);
+
+  return (
+    <div className="immersive-viewer" role="dialog" aria-modal="true">
+      <button
+        className="viewer-backdrop"
+        type="button"
+        aria-label="Close post"
+        onClick={onClose}
+      />
+
+      <button
+        className="viewer-close"
+        type="button"
+        onClick={onClose}
+        aria-label="Close post"
+      >
+        <span />
+        <span />
+      </button>
+
+      <button
+        className="viewer-arrow viewer-arrow--previous"
+        type="button"
+        onClick={onPrevious}
+        aria-label="Previous post"
+      >
+        ←
+      </button>
+
+      <figure className="viewer-stage">
+        <img
+          src={post.image}
+          alt=""
+          draggable={false}
+          style={{ objectPosition: post.position ?? "center" }}
+        />
+
+        <figcaption className="viewer-caption">
+          <strong>{post.username}</strong>
+          <p>{post.caption}</p>
+          {post.pushedBy && <span>Pushed by {post.pushedBy}</span>}
+        </figcaption>
+      </figure>
+
+      <button
+        className="viewer-arrow viewer-arrow--next"
+        type="button"
+        onClick={onNext}
+        aria-label="Next post"
+      >
+        →
+      </button>
+    </div>
   );
 }
 
@@ -400,6 +493,7 @@ function Navigation({
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
   const [startupVisible, setStartupVisible] = useState(true);
   const [theme, setTheme] = useState<Theme>(() => {
     const stored = window.localStorage.getItem("playground-theme");
@@ -434,8 +528,33 @@ function App() {
     return () => media.removeEventListener("change", update);
   }, [theme]);
 
+  const closeViewer = () => setSelectedPostIndex(null);
+
+  const showPreviousPost = () => {
+    setSelectedPostIndex((current) => {
+      if (current === null) return null;
+      return current === 0 ? posts.length - 1 : current - 1;
+    });
+  };
+
+  const showNextPost = () => {
+    setSelectedPostIndex((current) => {
+      if (current === null) return null;
+      return current === posts.length - 1 ? 0 : current + 1;
+    });
+  };
+
   return (
     <main className="app">
+      {selectedPostIndex !== null && (
+        <ImmersiveViewer
+          post={posts[selectedPostIndex]}
+          onClose={closeViewer}
+          onPrevious={showPreviousPost}
+          onNext={showNextPost}
+        />
+      )}
+
       {startupVisible && (
         <div className="startup-title" aria-hidden="true">
           <div className="startup-vignette" />
@@ -514,8 +633,12 @@ function App() {
       <Navigation open={menuOpen} onClose={() => setMenuOpen(false)} />
 
       <section className="weighted-wall" aria-label="Slide">
-        {posts.map((post) => (
-          <PostTile post={post} key={post.id} />
+        {posts.map((post, index) => (
+          <PostTile
+            post={post}
+            key={post.id}
+            onOpen={() => setSelectedPostIndex(index)}
+          />
         ))}
       </section>
     </main>
