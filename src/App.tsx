@@ -1,39 +1,28 @@
-import { PointerEvent, WheelEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 
-type CanvasPost = {
+type Post = {
   id: number;
   creator: string;
   handle: string;
   medium: string;
   title: string;
+  caption: string;
   image: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  rotation: number;
-  type: "image" | "quote" | "audio";
-  quote?: string;
-  song?: string;
-  artist?: string;
+  pushedBy?: string;
 };
 
-const posts: CanvasPost[] = [
+const posts: Post[] = [
   {
     id: 1,
     creator: "Mara Solis",
     handle: "@mara.solis",
     medium: "Photography",
-    title: "A study in distance",
+    title: "Toward the quiet",
+    caption:
+      "A study of distance, heat, and the landscapes that make us feel small.",
     image:
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=90",
-    x: 180,
-    y: 130,
-    width: 520,
-    height: 690,
-    rotation: -1.2,
-    type: "image",
+      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1500&q=90",
   },
   {
     id: 2,
@@ -41,118 +30,100 @@ const posts: CanvasPost[] = [
     handle: "@kaeldoran",
     medium: "Film",
     title: "After the rain",
+    caption:
+      "An unfinished sequence about memory, waiting, and the places people leave behind.",
     image:
-      "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1600&q=90",
-    x: 770,
-    y: 80,
-    width: 620,
-    height: 410,
-    rotation: 0.8,
-    type: "image",
+      "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1500&q=90",
+    pushedBy: "Nia Vale",
   },
   {
     id: 3,
-    creator: "Nia Vale",
-    handle: "@niavale",
-    medium: "Writing",
-    title: "Untitled note",
-    image: "",
-    x: 860,
-    y: 550,
-    width: 410,
-    height: 300,
-    rotation: -0.7,
-    type: "quote",
-    quote:
-      "Make something honest enough that the right person recognizes themselves inside it.",
-  },
-  {
-    id: 4,
     creator: "Eli Grey",
     handle: "@eligrey",
     medium: "Fashion",
     title: "Soft machinery",
+    caption:
+      "Clothing treated as movement, shelter, and architecture for the body.",
     image:
-      "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1600&q=90",
-    x: 1410,
-    y: 240,
-    width: 480,
-    height: 640,
-    rotation: 1.4,
-    type: "image",
-  },
-  {
-    id: 5,
-    creator: "Iris Bloom",
-    handle: "@irisbloom",
-    medium: "Music",
-    title: "Blue hour",
-    image:
-      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1200&q=90",
-    x: 310,
-    y: 930,
-    width: 470,
-    height: 360,
-    rotation: 1,
-    type: "audio",
-    song: "Blue Hour",
-    artist: "Iris Bloom",
-  },
-  {
-    id: 6,
-    creator: "Noah Saint",
-    handle: "@noahsaint",
-    medium: "Architecture",
-    title: "Concrete silence",
-    image:
-      "https://images.unsplash.com/photo-1511818966892-d7d671e672a2?auto=format&fit=crop&w=1600&q=90",
-    x: 930,
-    y: 970,
-    width: 650,
-    height: 470,
-    rotation: -1.1,
-    type: "image",
+      "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1500&q=90",
   },
 ];
-
-function LogoMark() {
-  return (
-    <span className="logo-mark" aria-hidden="true">
-      <span />
-      <span />
-    </span>
-  );
-}
 
 function Icon({
   name,
 }: {
   name:
     | "slide"
-    | "search"
-    | "create"
-    | "message"
+    | "explore"
+    | "messages"
+    | "activity"
     | "you"
+    | "settings"
+    | "search"
+    | "text"
+    | "photo"
+    | "quote"
+    | "link"
+    | "audio"
+    | "video"
     | "push"
-    | "play"
-    | "minus"
-    | "plus"
-    | "reset";
+    | "more"
+    | "create";
 }) {
   const paths = {
-    slide: <path d="M4 7h16M4 12h11M4 17h7" />,
-    search: (
+    slide: <path d="M5 7h14M5 12h10M5 17h6" />,
+    explore: (
       <>
-        <circle cx="10.5" cy="10.5" r="5.8" />
-        <path d="m15 15 4.4 4.4" />
+        <circle cx="12" cy="12" r="8" />
+        <path d="m14.8 9.2-1.6 4-4 1.6 1.6-4 4-1.6Z" />
       </>
     ),
-    create: <path d="M12 4v16M4 12h16" />,
-    message: <path d="M5 6h14v9H9l-4 4V6Z" />,
+    messages: <path d="M5 6h14v9H9l-4 4V6Z" />,
+    activity: <path d="M12 3 9.5 10H15l-3 11 8-13h-5l2-5h-5Z" />,
     you: (
       <>
         <circle cx="12" cy="8" r="3" />
-        <path d="M6 19c.5-3.3 2.5-5 6-5s5.5 1.7 6 5" />
+        <path d="M6 19c.6-3.3 2.6-5 6-5s5.4 1.7 6 5" />
+      </>
+    ),
+    settings: (
+      <>
+        <circle cx="12" cy="12" r="3" />
+        <path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4" />
+      </>
+    ),
+    search: (
+      <>
+        <circle cx="10.5" cy="10.5" r="5.5" />
+        <path d="m14.7 14.7 4.6 4.6" />
+      </>
+    ),
+    text: <path d="M6 6h12M12 6v12M8 18h8" />,
+    photo: (
+      <>
+        <rect x="4" y="5" width="16" height="14" rx="2" />
+        <circle cx="9" cy="10" r="1.5" />
+        <path d="m6 17 4-4 3 3 2-2 3 3" />
+      </>
+    ),
+    quote: <path d="M6 9h5v5H7v3H5v-5c0-2 1-3 1-3ZM14 9h5v5h-4v3h-2v-5c0-2 1-3 1-3Z" />,
+    link: (
+      <>
+        <path d="m9 15 6-6" />
+        <path d="M7.5 17.5h-1a4 4 0 0 1 0-8h3M16.5 6.5h1a4 4 0 0 1 0 8h-3" />
+      </>
+    ),
+    audio: (
+      <>
+        <path d="M9 18V7l9-2v11" />
+        <circle cx="6.5" cy="18" r="2.5" />
+        <circle cx="15.5" cy="16" r="2.5" />
+      </>
+    ),
+    video: (
+      <>
+        <rect x="4" y="6" width="12" height="12" rx="2" />
+        <path d="m16 10 4-2v8l-4-2" />
       </>
     ),
     push: (
@@ -161,15 +132,14 @@ function Icon({
         <path d="M10 4h8v8" />
       </>
     ),
-    play: <path d="m9 7 8 5-8 5V7Z" />,
-    minus: <path d="M6 12h12" />,
-    plus: <path d="M12 6v12M6 12h12" />,
-    reset: (
+    more: (
       <>
-        <path d="M5 9a7 7 0 1 1 1 7" />
-        <path d="M5 4v5h5" />
+        <circle cx="6" cy="12" r="1" fill="currentColor" stroke="none" />
+        <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" />
+        <circle cx="18" cy="12" r="1" fill="currentColor" stroke="none" />
       </>
     ),
+    create: <path d="M12 5v14M5 12h14" />,
   };
 
   return (
@@ -187,45 +157,123 @@ function Icon({
   );
 }
 
+function BrandMark() {
+  return (
+    <span className="brand-mark" aria-hidden="true">
+      <span />
+      <span />
+    </span>
+  );
+}
+
 function LaunchScreen({ leaving }: { leaving: boolean }) {
   return (
     <div className={`launch ${leaving ? "launch--leaving" : ""}`}>
-      <div className="launch-aura" />
-      <LogoMark />
+      <div className="launch-light" />
+      <BrandMark />
       <span>playground</span>
     </div>
   );
 }
 
-function ContentCard({ post }: { post: CanvasPost }) {
+function Sidebar() {
+  const [active, setActive] = useState("Slide");
+
+  const navigation = [
+    ["Slide", "slide"],
+    ["Explore", "explore"],
+    ["Activity", "activity"],
+    ["Messages", "messages"],
+    ["Your Playground", "you"],
+    ["Settings", "settings"],
+  ] as const;
+
+  return (
+    <aside className="sidebar">
+      <button className="brand" type="button">
+        <BrandMark />
+        <span>playground</span>
+      </button>
+
+      <nav className="side-navigation" aria-label="Primary navigation">
+        {navigation.map(([label, icon]) => (
+          <button
+            type="button"
+            key={label}
+            className={active === label ? "side-item--active" : ""}
+            onClick={() => setActive(label)}
+          >
+            <Icon name={icon} />
+            <span>{label}</span>
+          </button>
+        ))}
+      </nav>
+
+      <button className="create-main" type="button">
+        <Icon name="create" />
+        <span>Create</span>
+      </button>
+
+      <button className="account-chip" type="button">
+        <span className="account-avatar">TP</span>
+        <span>
+          <strong>Terry</strong>
+          <small>Your Playground</small>
+        </span>
+      </button>
+    </aside>
+  );
+}
+
+function CreateTray() {
+  const actions = [
+    ["Text", "text"],
+    ["Photo", "photo"],
+    ["Quote", "quote"],
+    ["Link", "link"],
+    ["Audio", "audio"],
+    ["Video", "video"],
+  ] as const;
+
+  return (
+    <section className="create-tray" aria-label="Create">
+      {actions.map(([label, icon]) => (
+        <button type="button" key={label}>
+          <span>
+            <Icon name={icon} />
+          </span>
+          <small>{label}</small>
+        </button>
+      ))}
+    </section>
+  );
+}
+
+function PostCard({ post }: { post: Post }) {
   const [pushed, setPushed] = useState(false);
   const [animating, setAnimating] = useState(false);
 
-  const push = () => {
-    setPushed((value) => !value);
+  const handlePush = () => {
+    setPushed((current) => !current);
     setAnimating(false);
 
     requestAnimationFrame(() => {
       setAnimating(true);
-      window.setTimeout(() => setAnimating(false), 650);
+      window.setTimeout(() => setAnimating(false), 620);
     });
   };
 
   return (
-    <article
-      className={`canvas-card canvas-card--${post.type} ${
-        animating ? "canvas-card--pushing" : ""
-      }`}
-      style={{
-        left: post.x,
-        top: post.y,
-        width: post.width,
-        height: post.height,
-        transform: `rotate(${post.rotation}deg)`,
-      }}
-    >
-      <header className="card-header">
-        <button className="creator" type="button">
+    <article className={`post-card ${animating ? "post-card--pushing" : ""}`}>
+      {post.pushedBy && (
+        <div className="pushed-context">
+          <Icon name="push" />
+          <span>{post.pushedBy} gave this a Push</span>
+        </div>
+      )}
+
+      <header className="post-header">
+        <button className="post-creator" type="button">
           <span className="creator-avatar">
             {post.creator
               .split(" ")
@@ -233,7 +281,7 @@ function ContentCard({ post }: { post: CanvasPost }) {
               .join("")}
           </span>
 
-          <span className="creator-copy">
+          <span>
             <strong>{post.creator}</strong>
             <small>
               {post.handle} · {post.medium}
@@ -241,121 +289,102 @@ function ContentCard({ post }: { post: CanvasPost }) {
           </span>
         </button>
 
-        <button className="follow" type="button">
-          Follow
-        </button>
+        <div className="post-header-actions">
+          <button className="follow-button" type="button">
+            Follow
+          </button>
+
+          <button className="more-button" type="button" aria-label="More options">
+            <Icon name="more" />
+          </button>
+        </div>
       </header>
 
-      {post.type === "image" && (
-        <button className="image-surface" type="button">
-          <img src={post.image} alt="" draggable={false} />
-          <span className="image-shade" />
-        </button>
-      )}
+      <button className="post-media" type="button">
+        <img src={post.image} alt="" draggable={false} />
+        <span className="media-glaze" />
+      </button>
 
-      {post.type === "quote" && (
-        <button className="quote-surface" type="button">
-          <blockquote>{post.quote}</blockquote>
-          <span>— {post.creator}</span>
-        </button>
-      )}
+      <div className="post-copy">
+        <span>{post.medium}</span>
+        <h2>{post.title}</h2>
+        <p>{post.caption}</p>
+      </div>
 
-      {post.type === "audio" && (
-        <div className="audio-surface">
-          <img src={post.image} alt="" draggable={false} />
-
-          <div className="audio-overlay">
-            <button className="play-button" type="button">
-              <Icon name="play" />
-            </button>
-
-            <div>
-              <span>Now playing</span>
-              <strong>{post.song}</strong>
-              <small>{post.artist}</small>
-            </div>
-
-            <div className="equalizer" aria-hidden="true">
-              <i />
-              <i />
-              <i />
-              <i />
-              <i />
-            </div>
-          </div>
-        </div>
-      )}
-
-      <footer className="card-footer">
-        <div>
-          <span className="post-medium">{post.medium}</span>
-          <h2>{post.title}</h2>
-        </div>
-
+      <footer className="post-footer">
         <button
-          className={`push ${pushed ? "push--active" : ""}`}
+          className={`push-button ${pushed ? "push-button--active" : ""}`}
           type="button"
-          aria-label={pushed ? "Remove Push" : "Give this work a Push"}
+          onClick={handlePush}
           aria-pressed={pushed}
-          onClick={push}
         >
           <Icon name="push" />
           <span>{pushed ? "Pushed" : "Push"}</span>
+        </button>
+
+        <button className="enter-button" type="button">
+          Enter Playground
         </button>
       </footer>
     </article>
   );
 }
 
-function Dock() {
-  const [active, setActive] = useState("Slide");
-
-  const items = [
-    ["Slide", "slide"],
-    ["Search", "search"],
-    ["Create", "create"],
-    ["Messages", "message"],
-    ["You", "you"],
-  ] as const;
+function DiscoveryRail() {
+  const suggestions = [
+    ["Nia Vale", "Writing and visual essays"],
+    ["Iris Bloom", "Music and digital art"],
+    ["Noah Saint", "Architecture and film"],
+  ];
 
   return (
-    <nav className="dock" aria-label="Primary navigation">
-      {items.map(([label, icon]) => (
-        <button
-          key={label}
-          type="button"
-          className={`${active === label ? "dock-item--active" : ""} ${
-            label === "Create" ? "dock-item--create" : ""
-          }`}
-          onClick={() => setActive(label)}
-        >
-          <span>
-            <Icon name={icon} />
-          </span>
-          <small>{label}</small>
-        </button>
-      ))}
-    </nav>
+    <aside className="discovery-rail">
+      <label className="search-field">
+        <Icon name="search" />
+        <input type="search" placeholder="Search Playground" />
+      </label>
+
+      <section className="rail-panel">
+        <div className="rail-heading">
+          <span>Playgrounds to enter</span>
+          <button type="button">Explore</button>
+        </div>
+
+        <div className="suggestions">
+          {suggestions.map(([name, description]) => (
+            <button className="suggestion" type="button" key={name}>
+              <span className="suggestion-avatar">
+                {name
+                  .split(" ")
+                  .map((part) => part[0])
+                  .join("")}
+              </span>
+
+              <span>
+                <strong>{name}</strong>
+                <small>{description}</small>
+              </span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="rail-statement">
+        <BrandMark />
+        <p>Creativity moves through people, not numbers.</p>
+      </section>
+    </aside>
   );
 }
 
 function App() {
   const [launchVisible, setLaunchVisible] = useState(true);
   const [launchLeaving, setLaunchLeaving] = useState(false);
-  const [position, setPosition] = useState({ x: -40, y: -35 });
-  const [scale, setScale] = useState(0.82);
-  const [dragging, setDragging] = useState(false);
-
-  const dragRef = useRef({
-    pointerX: 0,
-    pointerY: 0,
-    originX: 0,
-    originY: 0,
-  });
+  const [feed, setFeed] = useState<"Slide" | "Following">("Slide");
 
   useEffect(() => {
-    const leavingTimer = window.setTimeout(() => setLaunchLeaving(true), 650);
-    const removeTimer = window.setTimeout(() => setLaunchVisible(false), 1050);
+    const leavingTimer = window.setTimeout(() => setLaunchLeaving(true), 620);
+    const removeTimer = window.setTimeout(() => setLaunchVisible(false), 1020);
 
     return () => {
       window.clearTimeout(leavingTimer);
@@ -363,134 +392,49 @@ function App() {
     };
   }, []);
 
-  const startDrag = (event: PointerEvent<HTMLDivElement>) => {
-    if ((event.target as HTMLElement).closest("button")) {
-      return;
-    }
-
-    setDragging(true);
-    dragRef.current = {
-      pointerX: event.clientX,
-      pointerY: event.clientY,
-      originX: position.x,
-      originY: position.y,
-    };
-
-    event.currentTarget.setPointerCapture(event.pointerId);
-  };
-
-  const drag = (event: PointerEvent<HTMLDivElement>) => {
-    if (!dragging) {
-      return;
-    }
-
-    setPosition({
-      x: dragRef.current.originX + event.clientX - dragRef.current.pointerX,
-      y: dragRef.current.originY + event.clientY - dragRef.current.pointerY,
-    });
-  };
-
-  const stopDrag = () => {
-    setDragging(false);
-  };
-
-  const zoom = (event: WheelEvent<HTMLDivElement>) => {
-    event.preventDefault();
-
-    const nextScale = Math.min(
-      1.35,
-      Math.max(0.48, scale - event.deltaY * 0.0008),
-    );
-
-    setScale(nextScale);
-  };
-
-  const resetCanvas = () => {
-    setPosition({ x: -40, y: -35 });
-    setScale(0.82);
-  };
-
   return (
     <>
       {launchVisible && <LaunchScreen leaving={launchLeaving} />}
 
-      <main className="app">
-        <header className="topbar">
-          <button className="brand" type="button">
-            <LogoMark />
-            <span>playground</span>
-          </button>
+      <main className="app-shell">
+        <Sidebar />
 
-          <div className="view-switcher">
-            <button className="view-switcher--active" type="button">
-              Canvas
-            </button>
-            <button type="button">Story</button>
+        <section className="main-column">
+          <header className="feed-header">
+            <div className="feed-tabs">
+              <button
+                type="button"
+                className={feed === "Slide" ? "feed-tab--active" : ""}
+                onClick={() => setFeed("Slide")}
+              >
+                Slide
+              </button>
+
+              <button
+                type="button"
+                className={feed === "Following" ? "feed-tab--active" : ""}
+                onClick={() => setFeed("Following")}
+              >
+                Following
+              </button>
+            </div>
+          </header>
+
+          <CreateTray />
+
+          <section className="feed">
+            {posts.map((post) => (
+              <PostCard post={post} key={post.id} />
+            ))}
+          </section>
+
+          <div className="feed-end">
+            <BrandMark />
+            <span>Keep creating. The right people will feel it.</span>
           </div>
-
-          <button className="profile-button" type="button">
-            TP
-          </button>
-        </header>
-
-        <section className="canvas-label">
-          <span>Your creative current</span>
-          <h1>Slide</h1>
-          <p>Drag to move. Scroll to zoom. Enter anything that pulls you closer.</p>
         </section>
 
-        <div
-          className={`viewport ${dragging ? "viewport--dragging" : ""}`}
-          onPointerDown={startDrag}
-          onPointerMove={drag}
-          onPointerUp={stopDrag}
-          onPointerCancel={stopDrag}
-          onWheel={zoom}
-        >
-          <div className="grid-plane" />
-
-          <div
-            className="world"
-            style={{
-              transform: `translate3d(${position.x}px, ${position.y}px, 0) scale(${scale})`,
-            }}
-          >
-            {posts.map((post) => (
-              <ContentCard key={post.id} post={post} />
-            ))}
-          </div>
-        </div>
-
-        <aside className="canvas-controls">
-          <button
-            type="button"
-            onClick={() => setScale((value) => Math.max(0.48, value - 0.1))}
-            aria-label="Zoom out"
-          >
-            <Icon name="minus" />
-          </button>
-
-          <span>{Math.round(scale * 100)}%</span>
-
-          <button
-            type="button"
-            onClick={() => setScale((value) => Math.min(1.35, value + 0.1))}
-            aria-label="Zoom in"
-          >
-            <Icon name="plus" />
-          </button>
-
-          <button type="button" onClick={resetCanvas} aria-label="Reset canvas">
-            <Icon name="reset" />
-          </button>
-        </aside>
-
-        <div className="canvas-hint">
-          <span />
-          <p>Creativity moves through people, not numbers.</p>
-        </div>
-
-        <Dock />
+        <DiscoveryRail />
       </main>
     </>
   );
