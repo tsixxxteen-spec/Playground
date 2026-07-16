@@ -3173,3 +3173,413 @@ body.viewer-open {
     right: calc(50% - 54px) !important;
   }
 }
+
+/* =========================================================
+   CREATE COMPOSER
+   ========================================================= */
+
+body.composer-open {
+  overflow: hidden !important;
+}
+
+.create-composer {
+  position: fixed;
+  z-index: 12000;
+  inset: 0;
+
+  display: grid;
+  place-items: center;
+
+  padding: 26px;
+
+  background: rgba(4, 4, 5, 0.94);
+  backdrop-filter: blur(28px) saturate(0.75);
+
+  animation: composer-background-in 240ms ease-out;
+}
+
+.composer-panel {
+  display: flex;
+  width: min(1120px, calc(100vw - 52px));
+  max-height: calc(100vh - 52px);
+  flex-direction: column;
+
+  overflow: hidden;
+
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 26px;
+
+  background: rgba(18, 18, 20, 0.97);
+  color: #f4f3ef;
+
+  box-shadow:
+    0 32px 100px rgba(0, 0, 0, 0.5);
+
+  animation: composer-panel-in 460ms
+    cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.composer-header {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  padding: 24px 26px 18px;
+}
+
+.composer-header span {
+  color: rgba(255, 255, 255, 0.46);
+  font-family: "Courier New", monospace;
+  font-size: 7px;
+  letter-spacing: 0.16em;
+}
+
+.composer-header h2 {
+  margin: 5px 0 0;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(32px, 4vw, 58px);
+  font-weight: 500;
+  letter-spacing: -0.06em;
+  line-height: 0.92;
+}
+
+.composer-close {
+  position: relative;
+
+  width: 38px;
+  height: 38px;
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+}
+
+.composer-close i {
+  position: absolute;
+  top: 18px;
+  left: 11px;
+
+  display: block;
+  width: 15px;
+  height: 1px;
+
+  background: currentColor;
+}
+
+.composer-close i:first-child {
+  transform: rotate(45deg);
+}
+
+.composer-close i:last-child {
+  transform: rotate(-45deg);
+}
+
+.composer-body {
+  display: grid;
+  min-height: 0;
+  flex: 1 1 auto;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+  gap: 22px;
+
+  padding: 0 26px 24px;
+  overflow: auto;
+}
+
+.composer-dropzone {
+  position: relative;
+
+  display: grid;
+  min-height: 500px;
+  place-items: center;
+
+  overflow: hidden;
+
+  border: 1px dashed rgba(255, 255, 255, 0.22);
+  border-radius: 18px;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 0.055),
+      rgba(255, 255, 255, 0.018)
+    );
+
+  color: inherit;
+  cursor: pointer;
+
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.composer-dropzone:hover,
+.composer-dropzone--dragging {
+  border-color: rgba(255, 242, 0, 0.68);
+  background: rgba(255, 242, 0, 0.035);
+}
+
+.composer-dropzone--dragging {
+  transform: scale(0.992);
+}
+
+.composer-dropzone--filled {
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 0.1);
+  background: #09090a;
+}
+
+.composer-dropzone img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 68vh;
+
+  object-fit: contain;
+  image-rendering: auto;
+}
+
+.composer-empty {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.composer-empty strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 21px;
+  font-weight: 500;
+  letter-spacing: -0.035em;
+}
+
+.composer-empty span {
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 10px;
+}
+
+.composer-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.composer-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+
+  padding: 8px 2px;
+}
+
+.composer-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.composer-field > span,
+.composer-weight legend {
+  margin-bottom: 9px;
+
+  color: rgba(255, 255, 255, 0.48);
+  font-family: "Courier New", monospace;
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.composer-field textarea {
+  width: 100%;
+  min-height: 150px;
+  resize: vertical;
+
+  padding: 15px 0;
+
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0;
+
+  outline: none;
+  background: transparent;
+  color: #fff;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.composer-field textarea::placeholder {
+  color: rgba(255, 255, 255, 0.28);
+}
+
+.composer-field small {
+  align-self: flex-end;
+  margin-top: 7px;
+
+  color: rgba(255, 255, 255, 0.32);
+  font-family: "Courier New", monospace;
+  font-size: 7px;
+}
+
+.composer-weight {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.composer-weight > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.composer-weight button {
+  height: 32px;
+  padding: 0 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+
+  cursor: pointer;
+  font-size: 8px;
+
+  transition:
+    border-color 180ms ease,
+    color 180ms ease,
+    background 180ms ease;
+}
+
+.composer-weight button:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #fff;
+}
+
+.composer-weight button.active {
+  border-color: #fff200;
+  background: rgba(255, 242, 0, 0.1);
+  color: #fff200;
+}
+
+.composer-footer {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 17px 26px 20px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.composer-footer > span {
+  color: rgba(255, 255, 255, 0.38);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 11px;
+}
+
+.composer-publish {
+  min-width: 120px;
+  height: 39px;
+
+  border-radius: 999px;
+
+  background: #fff200;
+  color: #11110f;
+
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 750;
+
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.composer-publish:hover {
+  box-shadow:
+    0 0 28px rgba(255, 242, 0, 0.2);
+  transform: translateY(-1px);
+}
+
+.composer-publish:active {
+  transform: scale(0.98);
+}
+
+@keyframes composer-background-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes composer-panel-in {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(18px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 760px) {
+  .create-composer {
+    width: 100vw;
+    min-width: 0;
+    padding: 0;
+  }
+
+  .composer-panel {
+    width: 100vw;
+    height: 100vh;
+    max-height: none;
+
+    border: 0;
+    border-radius: 0;
+  }
+
+  .composer-body {
+    display: flex;
+    flex-direction: column;
+
+    padding: 0 16px 20px;
+  }
+
+  .composer-dropzone {
+    min-height: 46vh;
+  }
+
+  .composer-dropzone img {
+    max-height: 54vh;
+  }
+
+  .composer-footer {
+    align-items: stretch;
+    flex-direction: column;
+
+    padding: 14px 16px 18px;
+  }
+
+  .composer-publish {
+    width: 100%;
+  }
+}

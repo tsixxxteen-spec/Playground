@@ -701,12 +701,207 @@ function ImmersiveViewer({
   );
 }
 
+
+function CreateComposer({
+  onClose,
+  onPublish,
+}: {
+  onClose: () => void;
+  onPublish: (post: Post) => void;
+}) {
+  const [image, setImage] = useState<string | null>(null);
+  const [caption, setCaption] = useState("");
+  const [weight, setWeight] = useState<Weight>("wide");
+  const [dragging, setDragging] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    document.body.classList.add("composer-open");
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.classList.remove("composer-open");
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [onClose]);
+
+  const loadFile = (file?: File) => {
+    if (!file || !file.type.startsWith("image/")) {
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setImage(reader.result);
+      }
+    };
+
+    reader.readAsDataURL(file);
+  };
+
+  const publish = () => {
+    if (!image) {
+      fileInputRef.current?.click();
+      return;
+    }
+
+    onPublish({
+      id: Date.now(),
+      image,
+      username: "@terry",
+      caption: caption.trim() || "Untitled.",
+      weight,
+      position: "center",
+    });
+  };
+
+  return (
+    <div
+      className="create-composer"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Create a post"
+      onClick={onClose}
+    >
+      <section
+        className="composer-panel"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <header className="composer-header">
+          <div>
+            <span>NEW WORK</span>
+            <h2>Create</h2>
+          </div>
+
+          <button
+            className="composer-close"
+            type="button"
+            onClick={onClose}
+            aria-label="Close Create"
+          >
+            <i />
+            <i />
+          </button>
+        </header>
+
+        <div className="composer-body">
+          <button
+            className={`composer-dropzone ${
+              image ? "composer-dropzone--filled" : ""
+            } ${
+              dragging ? "composer-dropzone--dragging" : ""
+            }`}
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            onDragEnter={(event) => {
+              event.preventDefault();
+              setDragging(true);
+            }}
+            onDragOver={(event) => {
+              event.preventDefault();
+              setDragging(true);
+            }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={(event) => {
+              event.preventDefault();
+              setDragging(false);
+              loadFile(event.dataTransfer.files[0]);
+            }}
+          >
+            {image ? (
+              <img src={image} alt="New post preview" />
+            ) : (
+              <div className="composer-empty">
+                <strong>Drop an image here</strong>
+                <span>or click to choose one</span>
+              </div>
+            )}
+          </button>
+
+          <input
+            ref={fileInputRef}
+            className="composer-file-input"
+            type="file"
+            accept="image/*"
+            onChange={(event) => loadFile(event.target.files?.[0])}
+          />
+
+          <div className="composer-fields">
+            <label className="composer-field">
+              <span>Caption</span>
+
+              <textarea
+                value={caption}
+                maxLength={280}
+                placeholder="Give the work a thought, title, or feeling."
+                onChange={(event) => setCaption(event.target.value)}
+              />
+
+              <small>{caption.length}/280</small>
+            </label>
+
+            <fieldset className="composer-weight">
+              <legend>Placement</legend>
+
+              <div>
+                {(
+                  [
+                    ["standard", "Small"],
+                    ["wide", "Wide"],
+                    ["tall", "Tall"],
+                    ["hero", "Feature"],
+                    ["panorama", "Panorama"],
+                  ] as [Weight, string][]
+                ).map(([value, label]) => (
+                  <button
+                    className={weight === value ? "active" : ""}
+                    type="button"
+                    key={value}
+                    onClick={() => setWeight(value)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+          </div>
+        </div>
+
+        <footer className="composer-footer">
+          <span>
+            Your Playground remains yours. Pushes never appear here.
+          </span>
+
+          <button
+            className="composer-publish"
+            type="button"
+            onClick={publish}
+          >
+            {image ? "Publish" : "Choose image"}
+          </button>
+        </footer>
+      </section>
+    </div>
+  );
+}
+
 function Navigation({
   open,
   onClose,
+  onCreate,
 }: {
   open: boolean;
   onClose: () => void;
+  onCreate: () => void;
 }) {
   return (
     <>
@@ -732,7 +927,14 @@ function Navigation({
           <button type="button">Settings</button>
         </nav>
 
-        <button className="create-action" type="button">
+        <button
+          className="create-action"
+          type="button"
+          onClick={() => {
+            onClose();
+            onCreate();
+          }}
+        >
           Create
         </button>
 
@@ -750,6 +952,8 @@ function Navigation({
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [composerOpen, setComposerOpen] = useState(false);
+  const [feedPosts, setFeedPosts] = useState<Post[]>(posts);
   const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
   const [pushedPostIds, setPushedPostIds] = useState<number[]>(() => {
     try {
@@ -814,24 +1018,35 @@ function App() {
   const showPreviousPost = () => {
     setSelectedPostIndex((current) => {
       if (current === null) return null;
-      return current === 0 ? posts.length - 1 : current - 1;
+      return current === 0 ? feedPosts.length - 1 : current - 1;
     });
   };
 
   const showNextPost = () => {
     setSelectedPostIndex((current) => {
       if (current === null) return null;
-      return current === posts.length - 1 ? 0 : current + 1;
+      return current === feedPosts.length - 1 ? 0 : current + 1;
     });
   };
 
   return (
     <main className="app">
+      {composerOpen && (
+        <CreateComposer
+          onClose={() => setComposerOpen(false)}
+          onPublish={(newPost) => {
+            setFeedPosts((current) => [newPost, ...current]);
+            setComposerOpen(false);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+        />
+      )}
+
       {selectedPostIndex !== null && (
         <ImmersiveViewer
-          post={posts[selectedPostIndex]}
-          pushed={pushedPostIds.includes(posts[selectedPostIndex].id)}
-          onPush={() => togglePush(posts[selectedPostIndex].id)}
+          post={feedPosts[selectedPostIndex]}
+          pushed={pushedPostIds.includes(feedPosts[selectedPostIndex].id)}
+          onPush={() => togglePush(feedPosts[selectedPostIndex].id)}
           onClose={closeViewer}
           onPrevious={showPreviousPost}
           onNext={showNextPost}
@@ -913,10 +1128,14 @@ function App() {
         </div>
       </header>
 
-      <Navigation open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <Navigation
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        onCreate={() => setComposerOpen(true)}
+      />
 
       <section className="weighted-wall" aria-label="Slide">
-        {posts.map((post, index) => (
+        {feedPosts.map((post, index) => (
           <PostTile
             post={post}
             key={post.id}
