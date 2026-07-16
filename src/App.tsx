@@ -563,12 +563,78 @@ function PostTile({
   const desktopOpenTimer = useRef<number | null>(null);
   const touchOpenTimer = useRef<number | null>(null);
   const lastTouchTime = useRef(0);
+  const tileRef = useRef<HTMLElement | null>(null);
+
+  const mediaAspectRatio =
+    post.aspectRatio && Number.isFinite(post.aspectRatio)
+      ? post.aspectRatio
+      : null;
+
+  /*
+    Uploaded visual media chooses its own collage footprint.
+
+    Landscape work receives more horizontal room.
+    Portrait work receives enough width to remain expressive.
+    Extremely tall work may become a narrow editorial accent.
+  */
+  const adaptiveColumnSpan = mediaAspectRatio
+    ? mediaAspectRatio >= 2.15
+      ? 3
+      : mediaAspectRatio >= 1.05
+        ? 2
+        : mediaAspectRatio >= 0.62
+          ? 2
+          : 1
+    : null;
+
+  const [adaptiveRowSpan, setAdaptiveRowSpan] =
+    useState<number | null>(null);
+
+  useEffect(() => {
+    if (!mediaAspectRatio || !tileRef.current) {
+      setAdaptiveRowSpan(null);
+      return;
+    }
+
+    const tile = tileRef.current;
+
+    const updateTileHeight = () => {
+      const width = tile.getBoundingClientRect().width;
+
+      if (width <= 0) return;
+
+      /*
+        The collage grid uses 8px row units.
+        The tile height is calculated from the media's real ratio.
+      */
+      const naturalHeight = width / mediaAspectRatio;
+      const rowSpan = Math.max(
+        8,
+        Math.ceil(naturalHeight / 8),
+      );
+
+      setAdaptiveRowSpan(rowSpan);
+    };
+
+    updateTileHeight();
+
+    const observer = new ResizeObserver(updateTileHeight);
+    observer.observe(tile);
+
+    return () => observer.disconnect();
+  }, [mediaAspectRatio, adaptiveColumnSpan]);
 
   const style = {
     "--image-position": post.position ?? "center",
-    "--media-aspect": post.aspectRatio
-      ? String(post.aspectRatio)
+    "--media-aspect": mediaAspectRatio
+      ? String(mediaAspectRatio)
       : "auto",
+    "--tile-columns": adaptiveColumnSpan
+      ? String(adaptiveColumnSpan)
+      : undefined,
+    "--tile-rows": adaptiveRowSpan
+      ? String(adaptiveRowSpan)
+      : undefined,
   } as CSSProperties;
 
   const clearDesktopTimer = () => {
@@ -697,6 +763,7 @@ function PostTile({
 
   return (
     <article
+      ref={tileRef}
       className={`post-tile post-tile--${post.weight} ${
         post.aspectRatio ? "post-tile--native-media" : ""
       } ${
@@ -1056,6 +1123,48 @@ function CreateComposer({
     setCompanionType(null);
   };
 
+  const handleDroppedFiles = (files: File[]) => {
+    if (files.length === 0) return;
+
+    const audioFile = files.find(
+      (file) => classifyFile(file) === "audio",
+    );
+
+    const visualFile = files.find((file) => {
+      const type = classifyFile(file);
+      return type === "image" || type === "video";
+    });
+
+    /*
+      Dropping audio and a visual together creates an audio post
+      with that photo/video as its companion.
+    */
+    if (audioFile) {
+      loadPrimaryFile(audioFile);
+
+      if (visualFile) {
+        loadCompanionFile(visualFile);
+      }
+
+      return;
+    }
+
+    /*
+      When an audio post already exists, another dropped visual
+      becomes its companion rather than replacing the audio.
+    */
+    if (
+      mediaType === "audio" &&
+      primaryFile &&
+      visualFile
+    ) {
+      loadCompanionFile(visualFile);
+      return;
+    }
+
+    loadPrimaryFile(files[0]);
+  };
+
   const publish = () => {
     if (!primaryFile || !primaryUrl || !mediaType) {
       primaryInputRef.current?.click();
@@ -1168,11 +1277,51 @@ function CreateComposer({
 
   return (
     <div
-      className="create-composer"
+      className={`create-composer ${
+        dragging ? "create-composer--dragging" : ""
+      }`}
       role="dialog"
       aria-modal="true"
       aria-label="Create a post"
       onClick={onClose}
+      onDragEnterCapture={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        dragDepthRef.current += 1;
+        setDragging(true);
+      }}
+      onDragOverCapture={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        event.dataTransfer.dropEffect = "copy";
+        setDragging(true);
+      }}
+      onDragLeaveCapture={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        dragDepthRef.current = Math.max(
+          0,
+          dragDepthRef.current - 1,
+        );
+
+        if (dragDepthRef.current === 0) {
+          setDragging(false);
+        }
+      }}
+      onDropCapture={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        dragDepthRef.current = 0;
+        setDragging(false);
+
+        handleDroppedFiles(
+          Array.from(event.dataTransfer.files),
+        );
+      }}
     >
       <section
         className={`composer-panel composer-panel--multimedia ${

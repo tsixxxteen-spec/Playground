@@ -5112,3 +5112,169 @@ body.composer-open {
     max-height: calc(100vh - 130px) !important;
   }
 }
+
+
+/* =========================================================
+   ADAPTIVE HOME GALLERY — VERIFIED FINAL OVERRIDES
+   ========================================================= */
+
+/*
+  Home is an adaptive museum/gallery collage.
+  Slide will remain a separate reel-style experience.
+*/
+
+.weighted-wall {
+  display: grid !important;
+  grid-auto-flow: dense !important;
+  grid-auto-rows: 8px !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  gap: 0 !important;
+  align-items: start !important;
+}
+
+/*
+  Uploaded visual media overrides the old preset weight dimensions.
+  Its real aspect ratio determines its grid height.
+*/
+.post-tile--native-media {
+  grid-column: span var(--tile-columns, 2) !important;
+  grid-row: span var(--tile-rows, 24) !important;
+
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+
+  overflow: hidden !important;
+  background: #080809 !important;
+}
+
+/*
+  Because the tile itself now matches the upload's aspect ratio,
+  cover no longer distorts or meaningfully crops the media.
+*/
+.post-tile--native-media > .feed-media {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.post-tile--native-media > .feed-media > img,
+.post-tile--native-media > .feed-media > video {
+  display: block !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  object-fit: cover !important;
+  object-position: center !important;
+
+  background: #080809 !important;
+  transform: scale(1.001) !important;
+}
+
+.post-tile--native-media:hover > .feed-media > img,
+.post-tile--native-media:hover > .feed-media > video {
+  filter: brightness(0.72) !important;
+  transform: scale(1.018) !important;
+}
+
+/*
+  Audio posts continue using a designed weighted tile because
+  the audio file itself has no visual dimensions.
+*/
+.post-tile--native-media:has(.feed-media--audio) {
+  grid-column: span 2 !important;
+  grid-row: span 40 !important;
+}
+
+/* =========================================================
+   RELIABLE FULL-WINDOW DRAG AND DROP
+   ========================================================= */
+
+.create-composer {
+  position: fixed !important;
+}
+
+.create-composer::after {
+  position: fixed;
+  z-index: 13000;
+  inset: 18px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px dashed rgba(255, 242, 0, 0.88);
+  border-radius: 24px;
+
+  background: rgba(5, 5, 6, 0.88);
+  color: #fff200;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(26px, 4vw, 58px);
+  letter-spacing: -0.055em;
+
+  content: "Drop into Playground";
+
+  visibility: hidden;
+  opacity: 0;
+  transform: scale(0.985);
+
+  pointer-events: none;
+  backdrop-filter: blur(26px);
+
+  transition:
+    visibility 150ms ease,
+    opacity 150ms ease,
+    transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.create-composer--dragging::after {
+  visibility: visible;
+  opacity: 1;
+  transform: scale(1);
+}
+
+/*
+  The inner dropzone remains clickable, but the root composer
+  now owns drag events so nested controls cannot block dropping.
+*/
+.composer-dropzone {
+  position: relative !important;
+}
+
+.composer-dropzone--filled > img,
+.composer-dropzone--filled > video {
+  display: block !important;
+
+  width: auto !important;
+  height: auto !important;
+
+  max-width: 100% !important;
+  max-height: 65vh !important;
+
+  margin: auto !important;
+
+  object-fit: contain !important;
+  object-position: center !important;
+
+  background: #080809 !important;
+}
+
+@media (max-width: 1100px) {
+  .weighted-wall {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 760px) {
+  /*
+    Preserve the desktop gallery composition on mobile.
+    The canvas remains broad and horizontally explorable.
+  */
+  .weighted-wall {
+    min-width: 1120px !important;
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    grid-auto-rows: 8px !important;
+  }
+}
