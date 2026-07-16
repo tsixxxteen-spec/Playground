@@ -4266,3 +4266,668 @@ body.composer-open {
     min-height: 0;
   }
 }
+
+/* =========================================================
+   PLAYGROUND MULTIMEDIA FOUNDATION
+   ========================================================= */
+
+.feed-media {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #09090a;
+}
+
+.feed-media > img,
+.feed-media > video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--image-position, center);
+}
+
+.feed-media-badge {
+  position: absolute;
+  z-index: 3;
+  top: 10px;
+  right: 10px;
+
+  padding: 5px 7px;
+
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 999px;
+
+  background: rgba(5, 5, 6, 0.34);
+  color: rgba(255, 255, 255  color: rgba(255, 255, 255  color: rgba(255, 255, 255  color: rgba(255, 255, 255  color: rgba(255, 255, 255  color: rgba(255, 255, 255  color: rgba(255, 255, 255  color: rgba(255, 255, 255  color: rgba(255, 255, 255  color: rgba(255, 255, 255  color: rgba(255, 255, 255  color: rgba(255, 255, 255  color: rgba(255 "";
+  pointer-events: none;
+}
+
+.audio-default-art {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+
+  background:
+    radial-gradient(
+      circle at 38% 32%,
+      rgba(255, 242, 0, 0.18),
+      transparent 32%
+    ),
+    linear-gradient(145deg, #282313, #080808 65%);
+}
+
+.audio-default-art span {
+  color: #fff200;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(44px, 8vw, 130px);
+  letter-spacing: -0.09em;
+  text-shadow: 0 0 40px rgba(255, 242, 0, 0.25);
+}
+
+.audio-feed-treatment {
+  position: absolute;
+  z-index: 2;
+  right: 16px;
+  bottom: 17px;
+  left: 16px;
+
+  display: flex;
+  align-items: flex-end;
+  gap: 15px;
+
+  color: #fff;
+}
+
+.audio-feed-treatment > div:last-child {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.audio-feed-treatment span {
+  color: rgba(255, 255, 255, 0.56);
+  font-family: "Courier New", monospace;
+  font-size: 6px;
+  letter-spacing: 0.14em;
+}
+
+.audio-feed-treatment strong {
+  overflow: hidden;
+  margin-top: 4px;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(14px, 1.5vw, 24px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.audio-feed-treatment small {
+  margin-top: 2px;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 8px;
+}
+
+.audio-wave {
+  display: flex;
+  width: 88px;
+  height: 34px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 2px;
+}
+
+.audio-wave i {
+  width: 2px;
+  height: var(--wave-height);
+  border-radius: 999px;
+  background: #fff200;
+  opacity: 0.76;
+}
+
+/* Viewer video */
+.viewer-frame .viewer-primary-video {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: calc(100vw - 152px);
+  max-height: calc(100vh - 88px);
+
+  background: #000;
+  object-fit: contain;
+}
+
+/* Viewer audio */
+.viewer-audio {
+  display: flex;
+  width: min(980px, calc(100vw - 152px));
+  max-height: calc(100vh - 88px);
+  flex-direction: column;
+
+  overflow: hidden;
+
+  background: #0a0a0b;
+}
+
+.viewer-audio-visual {
+  position: relative;
+  min-height: min(68vh, 680px);
+  overflow: hidden;
+}
+
+.viewer-audio-visual > img,
+.viewer-audio-visual > video,
+.viewer-audio-visual > .audio-default-art {
+  display: block;
+  width: 100%;
+  height: min(68vh, 680px);
+  object-fit: cover;
+}
+
+.viewer-audio-visual::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.86),
+      transparent 70%
+    );
+  content: "";
+}
+
+.viewer-audio-copy {
+  position: absolute;
+  z-index: 2;
+  right: 24px;
+  bottom: 24px;
+  left: 24px;
+
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+}
+
+.viewer-audio-copy > span {
+  color: #fff200;
+  font-family: "Courier New", monospace;
+  font-size: 7px;
+  letter-spacing: 0.16em;
+}
+
+.viewer-audio-copy strong {
+  margin-top: 7px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(28px, 5vw, 70px);
+  font-weight: 500;
+  letter-spacing: -0.06em;
+}
+
+.viewer-audio-copy small {
+  margin-top: 5px;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 12px;
+}
+
+.viewer-audio > audio {
+  width: calc(100% - 32px);
+  margin: 16px;
+}
+
+/* =========================================================
+   MULTIMEDIA CREATE COMPOSER
+   ========================================================= */
+
+body.composer-open {
+  overflow: hidden !important;
+}
+
+.create-composer {
+  position: fixed;
+  z-index: 12000;
+  inset: 0;
+
+  display: grid;
+  place-items: center;
+  padding: 26px;
+
+  background: rgba(4, 4, 5, 0.95);
+  backdrop-filter: blur(28px) saturate(0.75);
+}
+
+.composer-panel--multimedia {
+  display: flex;
+  width: min(1160px, calc(100vw - 52px));
+  max-height: calc(100vh - 52px);
+  flex-direction: column;
+
+  overflow: hidden;
+
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 26px;
+
+  background: rgba(18, 18, 20, 0.98);
+  color: #f4f3ef;
+}
+
+.composer-header {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 24px 26px 18px;
+}
+
+.composer-header > div > span {
+  color: rgba(255, 255, 255, 0.46);
+  font-family: "Courier New", monospace;
+  font-size: 7px;
+  letter-spacing: 0.16em;
+}
+
+.composer-header h2 {
+  margin: 5px 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(32px, 4vw, 58px);
+  font-weight: 500;
+  letter-spacing: -0.06em;
+  line-height: 0.92;
+}
+
+.composer-close {
+  position: relative;
+  width: 38px;
+  height: 38px;
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  cursor: pointer;
+}
+
+.composer-close i {
+  position: absolute;
+  top: 18px;
+  left: 11px;
+
+  width: 15px;
+  height: 1px;
+  background: currentColor;
+}
+
+.composer-close i:first-child {
+  transform: rotate(45deg);
+}
+
+.composer-close i:last-child {
+  transform: rotate(-45deg);
+}
+
+.composer-body {
+  display: grid;
+  min-height: 0;
+  flex: 1;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+  gap: 22px;
+
+  padding: 0 26px 24px;
+  overflow: auto;
+}
+
+.composer-media-column {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.composer-dropzone {
+  display: grid;
+  min-height: 480px;
+  place-items: center;
+
+  overflow: hidden;
+
+  border: 1px dashed rgba(255, 255, 255, 0.22);
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.025);
+  color: inherit;
+  cursor: pointer;
+}
+
+.composer-dropzone--dragging {
+  border-color: #fff200;
+  background: rgba(255, 242, 0, 0.035);
+}
+
+.composer-dropzone--filled {
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 0.1);
+  background: #09090a;
+}
+
+.composer-dropzone > img,
+.composer-dropzone > video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 65vh;
+  object-fit: contain;
+}
+
+.composer-empty {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.composer-empty strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 21px;
+  font-weight: 500;
+}
+
+.composer-empty span {
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 10px;
+}
+
+.composer-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.composer-audio-preview {
+  display: flex;
+  width: min(440px, 86%);
+  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.composer-audio-orb {
+  display: grid;
+  width: 170px;
+  height: 170px;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle at 35% 30%,
+      rgba(255, 242, 0, 0.48),
+      rgba(255, 242, 0, 0.04) 43%,
+      rgba(0, 0, 0, 0.9)
+    );
+
+  box-shadow:
+    0 0 65px rgba(255, 242, 0, 0.08);
+}
+
+.composer-audio-orb span {
+  color: #fff200;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 48px;
+  letter-spacing: -0.08em;
+}
+
+.composer-audio-preview > strong {
+  margin-top: 10px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+}
+
+.composer-audio-preview > span {
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 10px;
+}
+
+.composer-audio-preview audio {
+  width: 100%;
+  margin-top: 14px;
+}
+
+.companion-uploader {
+  display: grid;
+  gap: 12px;
+
+  padding: 15px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.companion-uploader > div:first-child > span {
+  color: #fff200;
+  font-family: "Courier New", monospace;
+  font-size: 7px;
+  letter-spacing: 0.14em;
+}
+
+.companion-uploader p {
+  margin: 5px 0 0;
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 9px;
+}
+
+.companion-uploader > button {
+  width: fit-content;
+  height: 31px;
+  padding: 0 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  font-size: 8px;
+}
+
+.companion-preview {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.companion-preview > img,
+.companion-preview > video {
+  display: block;
+  width: 100%;
+  max-height: 230px;
+  object-fit: cover;
+}
+
+.companion-preview > button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+
+  height: 26px;
+  padding: 0 9px;
+
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.68);
+  color: #fff;
+  cursor: pointer;
+  font-size: 7px;
+}
+
+.composer-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 8px 2px;
+}
+
+.composer-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.composer-field > span,
+.composer-weight legend {
+  margin-bottom: 9px;
+  color: rgba(255, 255, 255, 0.48);
+  font-family: "Courier New", monospace;
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.composer-field input,
+.composer-field textarea {
+  width: 100%;
+  padding: 13px 0;
+
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0;
+
+  outline: none;
+  background: transparent;
+  color: #fff;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 19px;
+}
+
+.composer-field textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.composer-field small {
+  align-self: flex-end;
+  margin-top: 7px;
+  color: rgba(255, 255, 255, 0.32);
+  font-size: 7px;
+}
+
+.composer-weight {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.composer-weight > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.composer-weight button {
+  height: 32px;
+  padding: 0 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  font-size: 8px;
+}
+
+.composer-weight button.active {
+  border-color: #fff200;
+  background: rgba(255, 242, 0, 0.1);
+  color: #fff200;
+}
+
+.composer-footer {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 17px 26px 20px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.composer-footer > span {
+  color: rgba(255, 255, 255, 0.38);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 11px;
+}
+
+.composer-publish {
+  min-width: 120px;
+  height: 39px;
+
+  border-radius: 999px;
+
+  background: #fff200;
+  color: #11110f;
+
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+@media (max-width: 760px) {
+  .create-composer {
+    width: 100vw;
+    min-width: 0;
+    padding: 0;
+  }
+
+  .composer-panel--multimedia {
+    width: 100vw;
+    height: 100vh;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .composer-body {
+    display: flex;
+    flex-direction: column;
+    padding: 0 16px 20px;
+  }
+
+  .composer-dropzone {
+    min-height: 43vh;
+  }
+
+  .composer-footer {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 14px 16px 18px;
+  }
+
+  .composer-publish {
+    width: 100%;
+  }
+
+  .viewer-frame .viewer-primary-video,
+  .viewer-audio {
+    max-width: calc(100vw - 24px);
+    max-height: calc(100vh - 130px);
+  }
+
+  .viewer-audio-visual,
+  .viewer-audio-visual > img,
+  .viewer-audio-visual > video,
+  .viewer-audio-visual > .audio-default-art {
+    height: 58vh;
+    min-height: 0;
+  }
+}
