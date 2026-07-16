@@ -493,3 +493,1333 @@ button:focus-visible,
     transition-duration: 1ms !important;
   }
 }
+
+
+@media (prefers-reduced-motion: reduce) {
+  .startup-title,
+  .startup-title::before,
+  .startup-title span {
+    animation-duration: 1ms !important;
+  }
+}
+
+
+
+
+/* =========================================================
+   PLAYGROUND PARTICLE FUSION INTRO — 2.9 SECONDS
+   ========================================================= */
+
+.startup-title {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+  animation: startup-container 4400ms linear forwards;
+}
+
+.startup-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(0, 0, 0, 0.08) 0%,
+      rgba(0, 0, 0, 0.28) 56%,
+      rgba(0, 0, 0, 0.48) 100%
+    );
+  backdrop-filter: brightness(0.67) saturate(0.88);
+  animation: startup-vignette 4400ms ease-in-out forwards;
+}
+
+.startup-word,
+.startup-monogram {
+  position: absolute;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  color: #fff200;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+  font-size: clamp(52px, 8.2vw, 142px);
+  font-weight: 600;
+  line-height: 0.86;
+  white-space: nowrap;
+  text-shadow:
+    0 0 10px rgba(255, 242, 0, 0.72),
+    0 0 28px rgba(255, 214, 0, 0.42),
+    0 0 76px rgba(255, 190, 0, 0.24);
+}
+
+.startup-word {
+  letter-spacing: -0.075em;
+  animation: word-arrival 4400ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.startup-letter {
+  display: inline-block;
+  transform-origin: center;
+  will-change: opacity, filter, transform;
+}
+
+.startup-letter--fade {
+  animation:
+    letter-dissolve 4400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.startup-letter--1 { --letter-x: 28px;  --letter-y: -22px; --letter-rotate: -5deg; }
+.startup-letter--2 { --letter-x: 43px;  --letter-y: -42px; --letter-rotate: 7deg; }
+.startup-letter--3 { --letter-x: 56px;  --letter-y: -27px; --letter-rotate: -8deg; }
+.startup-letter--4 { --letter-x: 72px;  --letter-y: -50px; --letter-rotate: 10deg; }
+.startup-letter--5 { --letter-x: 88px;  --letter-y: -31px; --letter-rotate: -12deg; }
+.startup-letter--6 { --letter-x: 106px; --letter-y: -62px; --letter-rotate: 13deg; }
+.startup-letter--7 { --letter-x: 124px; --letter-y: -38px; --letter-rotate: -9deg; }
+.startup-letter--8 { --letter-x: 145px; --letter-y: -70px; --letter-rotate: 15deg; }
+
+.startup-letter--p {
+  animation:
+    preserve-p 4400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.startup-letter--g {
+  animation:
+    preserve-g 4400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.startup-letter--dot {
+  animation:
+    preserve-dot 4400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.particle-field {
+  position: absolute;
+  width: min(76vw, 980px);
+  height: 260px;
+  transform: translateY(-2px);
+  pointer-events: none;
+}
+
+.particle-field i {
+  position: absolute;
+  top: 50%;
+  left: 56%;
+  width: var(--particle-size);
+  height: var(--particle-size);
+  border-radius: 50%;
+  background: #fff200;
+  box-shadow:
+    0 0 5px rgba(255, 242, 0, 0.95),
+    0 0 13px rgba(255, 190, 0, 0.66);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0);
+  animation:
+    golden-particle 1650ms cubic-bezier(0.14, 0.73, 0.23, 1) calc(1900ms + var(--particle-delay)) forwards;
+}
+
+.startup-monogram {
+  gap: 0;
+  letter-spacing: -0.085em;
+  opacity: 0;
+  filter: blur(18px);
+  transform: scale(0.78);
+  animation:
+    monogram-fusion 4400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.startup-monogram span {
+  display: inline-block;
+}
+
+
+
+
+
+
+
+
+
+
+
+@keyframes golden-particle {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+  }
+
+  12% {
+    opacity: 0.96;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  48% {
+    opacity: 0.82;
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translate(
+        calc(
+          -50% +
+          cos(var(--particle-angle)) * var(--particle-distance)
+        ),
+        calc(
+          -50% +
+          sin(var(--particle-angle)) * var(--particle-distance) +
+          var(--particle-lift)
+        )
+      )
+      scale(0.15);
+  }
+}
+
+
+
+
+
+
+
+@media (prefers-reduced-motion: reduce) {
+  .startup-title,
+  .startup-vignette,
+  .startup-word,
+  .startup-monogram,
+  .startup-letter,
+  .particle-field i {
+    animation-duration: 1ms !important;
+  }
+}
+
+
+@keyframes word-arrival {
+  0% {
+    opacity: 0;
+    filter: blur(20px);
+    transform: translateY(10px) scale(0.92);
+  }
+
+  8% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+  }
+
+  /* Playground. stays intact until 1.9 seconds */
+  43.2% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+  }
+
+  57% {
+    opacity: 0.72;
+  }
+
+  70%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes letter-dissolve {
+  0%,
+  43.2% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate(0, 0) rotate(0) scale(1);
+  }
+
+  49% {
+    opacity: 0.92;
+    filter: blur(2px);
+  }
+
+  58% {
+    opacity: 0.52;
+    filter: blur(8px);
+    transform:
+      translate(
+        calc(var(--letter-x) * 0.38),
+        calc(var(--letter-y) * 0.38)
+      )
+      rotate(calc(var(--letter-rotate) * 0.45))
+      scale(1.05);
+  }
+
+  68% {
+    opacity: 0.1;
+    filter: blur(21px);
+    transform:
+      translate(
+        calc(var(--letter-x) * 0.82),
+        calc(var(--letter-y) * 0.82)
+      )
+      rotate(calc(var(--letter-rotate) * 0.84))
+      scale(1.16);
+  }
+
+  76%,
+  100% {
+    opacity: 0;
+    filter: blur(36px);
+    transform:
+      translate(var(--letter-x), var(--letter-y))
+      rotate(var(--letter-rotate))
+      scale(1.28);
+  }
+}
+
+@keyframes preserve-p {
+  0%,
+  43.2% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0) scale(1);
+  }
+
+  54% {
+    opacity: 1;
+    transform: translateX(34px) scale(1.02);
+  }
+
+  64% {
+    opacity: 0.88;
+    filter: blur(3px);
+    transform: translateX(76px) scale(1.06);
+  }
+
+  72%,
+  100% {
+    opacity: 0;
+    filter: blur(15px);
+    transform: translateX(96px) scale(1.12);
+  }
+}
+
+@keyframes preserve-g {
+  0%,
+  43.2% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0) scale(1);
+  }
+
+  54% {
+    opacity: 1;
+    transform: translateX(-40px) scale(1.03);
+  }
+
+  64% {
+    opacity: 0.88;
+    filter: blur(3px);
+    transform: translateX(-88px) scale(1.08);
+  }
+
+  72%,
+  100% {
+    opacity: 0;
+    filter: blur(15px);
+    transform: translateX(-108px) scale(1.14);
+  }
+}
+
+@keyframes preserve-dot {
+  0%,
+  43.2% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0) scale(1);
+  }
+
+  56% {
+    opacity: 1;
+    transform: translateX(-76px) scale(1.08);
+  }
+
+  66% {
+    opacity: 0.84;
+    filter: blur(3px);
+    transform: translateX(-124px) scale(1.14);
+  }
+
+  73%,
+  100% {
+    opacity: 0;
+    filter: blur(13px);
+    transform: translateX(-142px) scale(1.22);
+  }
+}
+
+@keyframes monogram-fusion {
+  0%,
+  43.2% {
+    opacity: 0;
+    filter: blur(22px);
+    transform: scale(0.72);
+  }
+
+  48% {
+    opacity: 0.18;
+    filter: blur(14px);
+    transform: scale(0.84);
+  }
+
+  55% {
+    opacity: 0.72;
+    filter: blur(5px);
+    transform: scale(0.96);
+  }
+
+  61% {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+    text-shadow:
+      0 0 18px rgba(255, 242, 0, 0.9),
+      0 0 60px rgba(255, 190, 0, 0.52);
+  }
+
+  /* PG. receives the longer hold */
+  92% {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1.015);
+  }
+
+  100% {
+    opacity: 0;
+    filter: blur(12px);
+    transform: translateY(-5px) scale(1.07);
+  }
+}
+
+@keyframes startup-vignette {
+  0% {
+    opacity: 0;
+  }
+
+  7% {
+    opacity: 1;
+  }
+
+  94% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes startup-container {
+  0%,
+  99% {
+    visibility: visible;
+  }
+
+  100% {
+    visibility: hidden;
+  }
+}
+
+
+/* =========================================================
+   PLAYGROUND INTRO — 3.6 SECOND PG. DOCK TRANSITION
+   ========================================================= */
+
+/*
+  Timing:
+  0.0–0.3s  Playground. appears
+  0.3–1.4s  Playground. holds
+  1.4–2.4s  Middle letters evaporate
+  2.4–3.2s  PG. forms
+  3.2–3.6s  PG. docks into the interface
+*/
+
+.startup-title {
+  animation: startup-container-final 3600ms linear forwards !important;
+}
+
+.startup-vignette {
+  animation: startup-vignette-final 3600ms ease forwards !important;
+}
+
+.startup-word {
+  animation: word-arrival-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.startup-letter--fade {
+  animation: letter-dissolve-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.startup-letter--p {
+  animation: preserve-p-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.startup-letter--g {
+  animation: preserve-g-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.startup-letter--dot {
+  animation: preserve-dot-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.startup-monogram {
+  animation: monogram-dock-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+/* Particles begin during the evaporation phase. */
+.particle-field i {
+  animation:
+    golden-particle 1050ms
+    cubic-bezier(0.14, 0.73, 0.23, 1)
+    calc(1450ms + var(--particle-delay))
+    forwards !important;
+}
+
+/* Move the persistent interface brand beside the menu button. */
+.utility-bar {
+  grid-template-columns: auto auto 1fr !important;
+  column-gap: 10px;
+}
+
+.utility-brand {
+  justify-self: start !important;
+  opacity: 0;
+  transform: translateX(-5px) scale(0.92);
+  animation: utility-brand-arrival 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.utility-actions {
+  justify-self: end;
+}
+
+/* The menu remains on the far left. */
+.menu-button {
+  grid-column: 1;
+}
+
+.utility-brand {
+  grid-column: 2;
+}
+
+.utility-actions {
+  grid-column: 3;
+}
+
+@keyframes word-arrival-final {
+  0% {
+    opacity: 0;
+    filter: blur(18px);
+    transform: translateY(10px) scale(0.92);
+  }
+
+  8.3% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+  }
+
+  /* Hold Playground. until roughly 1.4 seconds. */
+  38.9% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+  }
+
+  58% {
+    opacity: 0.5;
+  }
+
+  69%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes letter-dissolve-final {
+  0%,
+  38.9% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+
+  47% {
+    opacity: 0.9;
+    filter: blur(2px);
+  }
+
+  57% {
+    opacity: 0.52;
+    filter: blur(8px);
+    transform:
+      translate(
+        calc(var(--letter-x) * 0.38),
+        calc(var(--letter-y) * 0.38)
+      )
+      rotate(calc(var(--letter-rotate) * 0.45))
+      scale(1.05);
+  }
+
+  67% {
+    opacity: 0.11;
+    filter: blur(21px);
+    transform:
+      translate(
+        calc(var(--letter-x) * 0.82),
+        calc(var(--letter-y) * 0.82)
+      )
+      rotate(calc(var(--letter-rotate) * 0.84))
+      scale(1.16);
+  }
+
+  72%,
+  100% {
+    opacity: 0;
+    filter: blur(36px);
+    transform:
+      translate(var(--letter-x), var(--letter-y))
+      rotate(var(--letter-rotate))
+      scale(1.28);
+  }
+}
+
+@keyframes preserve-p-final {
+  0%,
+  39% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0) scale(1);
+  }
+
+  52% {
+    opacity: 1;
+    transform: translateX(36px) scale(1.02);
+  }
+
+  63% {
+    opacity: 0.75;
+    filter: blur(4px);
+    transform: translateX(84px) scale(1.07);
+  }
+
+  70%,
+  100% {
+    opacity: 0;
+    filter: blur(15px);
+    transform: translateX(104px) scale(1.12);
+  }
+}
+
+@keyframes preserve-g-final {
+  0%,
+  39% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0) scale(1);
+  }
+
+  52% {
+    opacity: 1;
+    transform: translateX(-42px) scale(1.03);
+  }
+
+  63% {
+    opacity: 0.75;
+    filter: blur(4px);
+    transform: translateX(-92px) scale(1.08);
+  }
+
+  70%,
+  100% {
+    opacity: 0;
+    filter: blur(15px);
+    transform: translateX(-112px) scale(1.14);
+  }
+}
+
+@keyframes preserve-dot-final {
+  0%,
+  41% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0) scale(1);
+  }
+
+  54% {
+    opacity: 1;
+    transform: translateX(-80px) scale(1.08);
+  }
+
+  65% {
+    opacity: 0.7;
+    filter: blur(4px);
+    transform: translateX(-128px) scale(1.15);
+  }
+
+  71%,
+  100% {
+    opacity: 0;
+    filter: blur(14px);
+    transform: translateX(-146px) scale(1.22);
+  }
+}
+
+@keyframes monogram-dock-final {
+  0%,
+  61% {
+    opacity: 0;
+    filter: blur(20px);
+    transform: translate(0, 0) scale(0.74);
+  }
+
+  /* PG. begins forming around 2.4 seconds. */
+  67% {
+    opacity: 0.25;
+    filter: blur(12px);
+    transform: translate(0, 0) scale(0.86);
+  }
+
+  76% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate(0, 0) scale(1);
+    text-shadow:
+      0 0 18px rgba(255, 242, 0, 0.9),
+      0 0 62px rgba(255, 190, 0, 0.55);
+  }
+
+  88.8% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate(0, 0) scale(1.02);
+  }
+
+  /* PG. flies into the upper-left interface position. */
+  100% {
+    opacity: 0;
+    filter: blur(0);
+    transform:
+      translate(
+        calc(-50vw + 94px),
+        calc(-50vh + 29px)
+      )
+      scale(0.18);
+    text-shadow:
+      0 0 6px rgba(255, 242, 0, 0.28);
+  }
+}
+
+@keyframes utility-brand-arrival {
+  0%,
+  91% {
+    opacity: 0;
+    transform: translateX(-5px) scale(0.92);
+  }
+
+  96% {
+    opacity: 0.35;
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes startup-vignette-final {
+  0% {
+    opacity: 0;
+  }
+
+  8% {
+    opacity: 1;
+  }
+
+  88% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes startup-container-final {
+  0%,
+  99.8% {
+    visibility: visible;
+  }
+
+  100% {
+    visibility: hidden;
+  }
+}
+
+@media (max-width: 760px) {
+  .utility-bar {
+    grid-template-columns: auto auto 1fr !important;
+  }
+
+  @keyframes monogram-dock-final {
+    0%,
+    61% {
+      opacity: 0;
+      filter: blur(20px);
+      transform: translate(0, 0) scale(0.74);
+    }
+
+    67% {
+      opacity: 0.25;
+      filter: blur(12px);
+      transform: translate(0, 0) scale(0.86);
+    }
+
+    76% {
+      opacity: 1;
+      filter: blur(0);
+      transform: translate(0, 0) scale(1);
+    }
+
+    88.8% {
+      opacity: 1;
+      filter: blur(0);
+      transform: translate(0, 0) scale(1.02);
+    }
+
+    100% {
+      opacity: 0;
+      filter: blur(0);
+      transform:
+        translate(
+          calc(-50vw + 94px),
+          calc(-50vh + 29px)
+        )
+        scale(0.18);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .startup-title,
+  .startup-vignette,
+  .startup-word,
+  .startup-monogram,
+  .startup-letter,
+  .particle-field i,
+  .utility-brand {
+    animation-duration: 1ms !important;
+  }
+}
+
+
+/* =========================================================
+   PLAYGROUND INTRO — 3.6 SECOND PG. DOCK TRANSITION
+   ========================================================= */
+
+/*
+  Timing:
+  0.0–0.3s  Playground. appears
+  0.3–1.4s  Playground. holds
+  1.4–2.4s  Middle letters evaporate
+  2.4–3.2s  PG. forms
+  3.2–3.6s  PG. docks into the interface
+*/
+
+.startup-title {
+  animation: startup-container-final 3600ms linear forwards !important;
+}
+
+.startup-vignette {
+  animation: startup-vignette-final 3600ms ease forwards !important;
+}
+
+.startup-word {
+  animation: word-arrival-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.startup-letter--fade {
+  animation: letter-dissolve-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.startup-letter--p {
+  animation: preserve-p-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.startup-letter--g {
+  animation: preserve-g-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.startup-letter--dot {
+  animation: preserve-dot-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.startup-monogram {
+  animation: monogram-dock-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+/* Particles begin during the evaporation phase. */
+.particle-field i {
+  animation:
+    golden-particle 1050ms
+    cubic-bezier(0.14, 0.73, 0.23, 1)
+    calc(1450ms + var(--particle-delay))
+    forwards !important;
+}
+
+/* Move the persistent interface brand beside the menu button. */
+.utility-bar {
+  grid-template-columns: auto auto 1fr !important;
+  column-gap: 10px;
+}
+
+.utility-brand {
+  justify-self: start !important;
+  opacity: 0;
+  transform: translateX(-5px) scale(0.92);
+  animation: utility-brand-arrival 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.utility-actions {
+  justify-self: end;
+}
+
+/* The menu remains on the far left. */
+.menu-button {
+  grid-column: 1;
+}
+
+.utility-brand {
+  grid-column: 2;
+}
+
+.utility-actions {
+  grid-column: 3;
+}
+
+@keyframes word-arrival-final {
+  0% {
+    opacity: 0;
+    filter: blur(18px);
+    transform: translateY(10px) scale(0.92);
+  }
+
+  8.3% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+  }
+
+  /* Hold Playground. until roughly 1.4 seconds. */
+  38.9% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+  }
+
+  58% {
+    opacity: 0.5;
+  }
+
+  69%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes letter-dissolve-final {
+  0%,
+  38.9% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+
+  47% {
+    opacity: 0.9;
+    filter: blur(2px);
+  }
+
+  57% {
+    opacity: 0.52;
+    filter: blur(8px);
+    transform:
+      translate(
+        calc(var(--letter-x) * 0.38),
+        calc(var(--letter-y) * 0.38)
+      )
+      rotate(calc(var(--letter-rotate) * 0.45))
+      scale(1.05);
+  }
+
+  67% {
+    opacity: 0.11;
+    filter: blur(21px);
+    transform:
+      translate(
+        calc(var(--letter-x) * 0.82),
+        calc(var(--letter-y) * 0.82)
+      )
+      rotate(calc(var(--letter-rotate) * 0.84))
+      scale(1.16);
+  }
+
+  72%,
+  100% {
+    opacity: 0;
+    filter: blur(36px);
+    transform:
+      translate(var(--letter-x), var(--letter-y))
+      rotate(var(--letter-rotate))
+      scale(1.28);
+  }
+}
+
+@keyframes preserve-p-final {
+  0%,
+  39% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0) scale(1);
+  }
+
+  52% {
+    opacity: 1;
+    transform: translateX(36px) scale(1.02);
+  }
+
+  63% {
+    opacity: 0.75;
+    filter: blur(4px);
+    transform: translateX(84px) scale(1.07);
+  }
+
+  70%,
+  100% {
+    opacity: 0;
+    filter: blur(15px);
+    transform: translateX(104px) scale(1.12);
+  }
+}
+
+@keyframes preserve-g-final {
+  0%,
+  39% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0) scale(1);
+  }
+
+  52% {
+    opacity: 1;
+    transform: translateX(-42px) scale(1.03);
+  }
+
+  63% {
+    opacity: 0.75;
+    filter: blur(4px);
+    transform: translateX(-92px) scale(1.08);
+  }
+
+  70%,
+  100% {
+    opacity: 0;
+    filter: blur(15px);
+    transform: translateX(-112px) scale(1.14);
+  }
+}
+
+@keyframes preserve-dot-final {
+  0%,
+  41% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0) scale(1);
+  }
+
+  54% {
+    opacity: 1;
+    transform: translateX(-80px) scale(1.08);
+  }
+
+  65% {
+    opacity: 0.7;
+    filter: blur(4px);
+    transform: translateX(-128px) scale(1.15);
+  }
+
+  71%,
+  100% {
+    opacity: 0;
+    filter: blur(14px);
+    transform: translateX(-146px) scale(1.22);
+  }
+}
+
+@keyframes monogram-dock-final {
+  0%,
+  61% {
+    opacity: 0;
+    filter: blur(20px);
+    transform: translate(0, 0) scale(0.74);
+  }
+
+  /* PG. begins forming around 2.4 seconds. */
+  67% {
+    opacity: 0.25;
+    filter: blur(12px);
+    transform: translate(0, 0) scale(0.86);
+  }
+
+  76% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate(0, 0) scale(1);
+    text-shadow:
+      0 0 18px rgba(255, 242, 0, 0.9),
+      0 0 62px rgba(255, 190, 0, 0.55);
+  }
+
+  88.8% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate(0, 0) scale(1.02);
+  }
+
+  /* PG. flies into the upper-left interface position. */
+  100% {
+    opacity: 0;
+    filter: blur(0);
+    transform:
+      translate(
+        calc(-50vw + 94px),
+        calc(-50vh + 29px)
+      )
+      scale(0.18);
+    text-shadow:
+      0 0 6px rgba(255, 242, 0, 0.28);
+  }
+}
+
+@keyframes utility-brand-arrival {
+  0%,
+  91% {
+    opacity: 0;
+    transform: translateX(-5px) scale(0.92);
+  }
+
+  96% {
+    opacity: 0.35;
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes startup-vignette-final {
+  0% {
+    opacity: 0;
+  }
+
+  8% {
+    opacity: 1;
+  }
+
+  88% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes startup-container-final {
+  0%,
+  99.8% {
+    visibility: visible;
+  }
+
+  100% {
+    visibility: hidden;
+  }
+}
+
+@media (max-width: 760px) {
+  .utility-bar {
+    grid-template-columns: auto auto 1fr !important;
+  }
+
+  @keyframes monogram-dock-final {
+    0%,
+    61% {
+      opacity: 0;
+      filter: blur(20px);
+      transform: translate(0, 0) scale(0.74);
+    }
+
+    67% {
+      opacity: 0.25;
+      filter: blur(12px);
+      transform: translate(0, 0) scale(0.86);
+    }
+
+    76% {
+      opacity: 1;
+      filter: blur(0);
+      transform: translate(0, 0) scale(1);
+    }
+
+    88.8% {
+      opacity: 1;
+      filter: blur(0);
+      transform: translate(0, 0) scale(1.02);
+    }
+
+    100% {
+      opacity: 0;
+      filter: blur(0);
+      transform:
+        translate(
+          calc(-50vw + 94px),
+          calc(-50vh + 29px)
+        )
+        scale(0.18);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .startup-title,
+  .startup-vignette,
+  .startup-word,
+  .startup-monogram,
+  .startup-letter,
+  .particle-field i,
+  .utility-brand {
+    animation-duration: 1ms !important;
+  }
+}
+
+
+/* =========================================================
+   CENTERED PG. ENDING — REMOVE CORNER DOCK
+   ========================================================= */
+
+/* Return the utility bar to its original centered structure. */
+.utility-bar {
+  grid-template-columns: 1fr auto 1fr !important;
+  column-gap: 0 !important;
+}
+
+.menu-button {
+  grid-column: auto !important;
+}
+
+.utility-brand {
+  grid-column: auto !important;
+  justify-self: center !important;
+  opacity: 0;
+  transform: scale(0.96);
+  animation: utility-brand-after-intro 3600ms ease forwards !important;
+}
+
+.utility-actions {
+  grid-column: auto !important;
+  justify-self: end !important;
+}
+
+/* PG. stays centered, holds briefly, then evaporates in place. */
+.startup-monogram {
+  animation: monogram-centered-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+@keyframes monogram-centered-final {
+  0%,
+  61% {
+    opacity: 0;
+    filter: blur(20px);
+    transform: scale(0.74);
+  }
+
+  67% {
+    opacity: 0.24;
+    filter: blur(12px);
+    transform: scale(0.86);
+  }
+
+  76% {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+    text-shadow:
+      0 0 18px rgba(255, 242, 0, 0.9),
+      0 0 62px rgba(255, 190, 0, 0.55);
+  }
+
+  /* Hold PG. centered. */
+  91% {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1.02);
+  }
+
+  /* Evaporate without moving toward the corner. */
+  100% {
+    opacity: 0;
+    filter: blur(18px);
+    letter-spacing: 0.02em;
+    transform: translateY(-10px) scale(1.12);
+    text-shadow:
+      0 0 90px rgba(255, 242, 0, 0);
+  }
+}
+
+/* Reveal the regular centered utility brand once the intro is ending. */
+@keyframes utility-brand-after-intro {
+  0%,
+  94% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 760px) {
+  .utility-bar {
+    grid-template-columns: 1fr auto 1fr !important;
+  }
+
+  .utility-brand {
+    justify-self: center !important;
+  }
+}

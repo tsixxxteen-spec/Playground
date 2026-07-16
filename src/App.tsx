@@ -400,6 +400,7 @@ function Navigation({
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [startupVisible, setStartupVisible] = useState(true);
   const [theme, setTheme] = useState<Theme>(() => {
     const stored = window.localStorage.getItem("playground-theme");
 
@@ -409,6 +410,14 @@ function App() {
 
     return "system";
   });
+
+  useEffect(() => {
+    const startupTimer = window.setTimeout(() => {
+      setStartupVisible(false);
+    }, 3600);
+
+    return () => window.clearTimeout(startupTimer);
+  }, []);
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-color-scheme: dark)");
@@ -427,6 +436,57 @@ function App() {
 
   return (
     <main className="app">
+      {startupVisible && (
+        <div className="startup-title" aria-hidden="true">
+          <div className="startup-vignette" />
+
+          <div className="startup-word" aria-hidden="true">
+            <span className="startup-letter startup-letter--p">P</span>
+            <span className="startup-letter startup-letter--fade startup-letter--1">l</span>
+            <span className="startup-letter startup-letter--fade startup-letter--2">a</span>
+            <span className="startup-letter startup-letter--fade startup-letter--3">y</span>
+            <span className="startup-letter startup-letter--g">g</span>
+            <span className="startup-letter startup-letter--fade startup-letter--4">r</span>
+            <span className="startup-letter startup-letter--fade startup-letter--5">o</span>
+            <span className="startup-letter startup-letter--fade startup-letter--6">u</span>
+            <span className="startup-letter startup-letter--fade startup-letter--7">n</span>
+            <span className="startup-letter startup-letter--fade startup-letter--8">d</span>
+            <span className="startup-letter startup-letter--dot">.</span>
+          </div>
+
+          <div className="particle-field" aria-hidden="true">
+            {Array.from({ length: 72 }, (_, index) => {
+              const angle = (index * 137.5) % 360;
+              const distance = 45 + ((index * 29) % 170);
+              const lift = -26 - ((index * 17) % 145);
+              const size = 2 + (index % 5);
+              const delay = (index % 16) * 18;
+
+              return (
+                <i
+                  key={index}
+                  style={
+                    {
+                      "--particle-angle": `${angle}deg`,
+                      "--particle-distance": `${distance}px`,
+                      "--particle-lift": `${lift}px`,
+                      "--particle-size": `${size}px`,
+                      "--particle-delay": `${delay}ms`,
+                    } as React.CSSProperties
+                  }
+                />
+              );
+            })}
+          </div>
+
+          <div className="startup-monogram" aria-hidden="true">
+            <span>P</span>
+            <span>G</span>
+            <span>.</span>
+          </div>
+        </div>
+      )}
+
       <header className="utility-bar">
         <button
           className="menu-button"
