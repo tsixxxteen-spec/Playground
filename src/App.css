@@ -4931,3 +4931,61 @@ body.composer-open {
     min-height: 0;
   }
 }
+
+/* =========================================================
+   VERIFIED MULTIMEDIA DOM REPAIR
+   ========================================================= */
+
+.post-tile > .feed-media {
+  position: absolute !important;
+  z-index: 1 !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.post-tile > .feed-media > img,
+.post-tile > .feed-media > video,
+.post-tile > .feed-media > .audio-default-art {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+.post-tile:hover > .feed-media > img,
+.post-tile:hover > .feed-media > video {
+  filter: brightness(0.72);
+  transform: scale(1.025);
+}
+
+.viewer-frame > .viewer-primary-video {
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: calc(100vw - 152px) !important;
+  max-height: calc(100vh - 88px) !important;
+  object-fit: contain !important;
+  background: #000 !important;
+}
+
+.viewer-frame > .viewer-audio {
+  width: min(980px, calc(100vw - 152px)) !important;
+  max-height: calc(100vh - 88px) !important;
+}
+
+.composer-dropzone {
+  cursor: pointer;
+}
+
+.composer-dropzone video,
+.composer-dropzone audio {
+  pointer-events: auto;
+}
+
+@media (max-width: 760px) {
+  .viewer-frame > .viewer-primary-video,
+  .viewer-frame > .viewer-audio {
+    max-width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 130px) !important;
+  }
+}

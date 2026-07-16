@@ -4,9 +4,29 @@ import "./App.css";
 type Theme = "light" | "dark" | "system";
 type Weight = "standard" | "wide" | "tall" | "hero" | "panorama";
 
+type MediaType = "image" | "video" | "audio";
+type CompanionType = "image" | "video";
+
 type Post = {
   id: number;
-  image: string;
+
+  /*
+    Existing demo posts use `image`.
+    Newly uploaded posts use `mediaType` and `mediaSrc`.
+  */
+  image?: string;
+  mediaType?: MediaType;
+  mediaSrc?: string;
+
+  /*
+    Audio posts can optionally include artwork or a looping video.
+  */
+  companionType?: CompanionType;
+  companionSrc?: string;
+
+  title?: string;
+  artist?: string;
+
   username: string;
   caption: string;
   pushedBy?: string;
@@ -324,6 +344,203 @@ function ThemeControl({
   );
 }
 
+
+function getPostMediaType(post: Post): MediaType {
+  return post.mediaType ?? "image";
+}
+
+function getPostMediaSource(post: Post): string {
+  return post.mediaSrc ?? post.image ?? "";
+}
+
+function FeedMedia({ post }: { post: Post }) {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const companionVideoRef = useRef<HTMLVideoElement | null>(null);
+
+  const mediaType = getPostMediaType(post);
+  const source = getPostMediaSource(post);
+
+  const playMutedVideo = (
+    ref: React.RefObject<HTMLVideoElement | null>,
+  ) => {
+    const video = ref.current;
+
+    if (!video) return;
+
+    video.muted = true;
+    void video.play().catch(() => {
+      /* The platform may block autoplay. */
+    });
+  };
+
+  const stopVideo = (
+    ref: React.RefObject<HTMLVideoElement | null>,
+  ) => {
+    const video = ref.current;
+
+    if (!video) return;
+
+    video.pause();
+    video.currentTime = 0;
+  };
+
+  if (mediaType === "video") {
+    return (
+      <div
+        className="feed-media feed-media--video"
+        onMouseEnter={() => playMutedVideo(videoRef)}
+        onMouseLeave={() => stopVideo(videoRef)}
+      >
+        <video
+          ref={videoRef}
+          src={source}
+          muted
+          loop
+          playsInline
+          preload="metadata"
+        />
+
+        <span className="feed-media-badge">VIDEO</span>
+      </div>
+    );
+  }
+
+  if (mediaType === "audio") {
+    return (
+      <div className="feed-media feed-media--audio">
+        {post.companionType === "video" && post.companionSrc ? (
+          <video
+            ref={companionVideoRef}
+            src={post.companionSrc}
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            onMouseEnter={() =>
+              playMutedVideo(companionVideoRef)
+            }
+            onMouseLeave={() =>
+              stopVideo(companionVideoRef)
+            }
+          />
+        ) : post.companionSrc ? (
+          <img
+            src={post.companionSrc}
+            alt=""
+            draggable={false}
+            decoding="async"
+          />
+        ) : (
+          <div className="audio-default-art">
+            <span>PG.</span>
+          </div>
+        )}
+
+        <div className="audio-feed-treatment">
+          <div className="audio-wave" aria-hidden="true">
+            {Array.from({ length: 24 }, (_, index) => (
+              <i
+                key={index}
+                style={
+                  {
+                    "--wave-height": `${22 + ((index * 17) % 58)}%`,
+                  } as CSSProperties
+                }
+              />
+            ))}
+          </div>
+
+          <div>
+            <span>NOW PLAYING</span>
+            <strong>{post.title || "Untitled audio"}</strong>
+            <small>{post.artist || post.username}</small>
+          </div>
+        </div>
+
+        <span className="feed-media-badge">AUDIO</span>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={source}
+      alt=""
+      draggable={false}
+      decoding="async"
+    />
+  );
+}
+
+function ViewerMedia({ post }: { post: Post }) {
+  const mediaType = getPostMediaType(post);
+  const source = getPostMediaSource(post);
+
+  if (mediaType === "video") {
+    return (
+      <video
+        className="viewer-primary-video"
+        src={source}
+        controls
+        playsInline
+        preload="auto"
+      />
+    );
+  }
+
+  if (mediaType === "audio") {
+    return (
+      <div className="viewer-audio">
+        <div className="viewer-audio-visual">
+          {post.companionType === "video" && post.companionSrc ? (
+            <video
+              src={post.companionSrc}
+              muted
+              loop
+              autoPlay
+              playsInline
+              preload="metadata"
+            />
+          ) : post.companionSrc ? (
+            <img
+              src={post.companionSrc}
+              alt=""
+              draggable={false}
+            />
+          ) : (
+            <div className="audio-default-art audio-default-art--viewer">
+              <span>PG.</span>
+            </div>
+          )}
+
+          <div className="viewer-audio-copy">
+            <span>AUDIO</span>
+            <strong>{post.title || "Untitled audio"}</strong>
+            <small>{post.artist || post.username}</small>
+          </div>
+        </div>
+
+        <audio
+          src={source}
+          controls
+          preload="auto"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={source}
+      alt=""
+      draggable={false}
+      decoding="sync"
+      loading="eager"
+      style={{ objectPosition: post.position ?? "center" }}
+    />
+  );
+}
+
 function PostTile({
   post,
   pushed,
@@ -485,12 +702,7 @@ function PostTile({
       onPointerUp={handleTouch}
       onKeyDown={handleKeyDown}
     >
-      <img
-        src={post.image}
-        alt=""
-        draggable={false}
-        decoding="async"
-      />
+      <FeedMedia post={post} />
 
       <div className="post-reveal">
         <div className="post-reveal-copy">
@@ -649,14 +861,7 @@ function ImmersiveViewer({
         className="viewer-frame"
         onClick={(event) => event.stopPropagation()}
       >
-        <img
-          src={post.image}
-          alt=""
-          draggable={false}
-          decoding="sync"
-          loading="eager"
-          style={{ objectPosition: post.position ?? "center" }}
-        />
+        <ViewerMedia post={post} />
 
         <figcaption className="viewer-caption">
           <div className="viewer-caption-copy">
@@ -709,18 +914,27 @@ function CreateComposer({
   onClose: () => void;
   onPublish: (post: Post) => void;
 }) {
-  const [image, setImage] = useState<string | null>(null);
+  const [primaryFile, setPrimaryFile] = useState<File | null>(null);
+  const [primaryUrl, setPrimaryUrl] = useState<string | null>(null);
+  const [mediaType, setMediaType] = useState<MediaType | null>(null);
+
+  const [companionFile, setCompanionFile] = useState<File | null>(null);
+  const [companionUrl, setCompanionUrl] = useState<string | null>(null);
+  const [companionType, setCompanionType] =
+    useState<CompanionType | null>(null);
+
   const [caption, setCaption] = useState("");
+  const [title, setTitle] = useState("");
+  const [artist, setArtist] = useState("");
   const [weight, setWeight] = useState<Weight>("wide");
   const [dragging, setDragging] = useState(false);
 
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const primaryInputRef = useRef<HTMLInputElement | null>(null);
+  const companionInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-      }
+      if (event.key === "Escape") onClose();
     };
 
     document.body.classList.add("composer-open");
@@ -732,36 +946,190 @@ function CreateComposer({
     };
   }, [onClose]);
 
-  const loadFile = (file?: File) => {
-    if (!file || !file.type.startsWith("image/")) {
+  const classifyFile = (file: File): MediaType | null => {
+    if (file.type.startsWith("image/")) return "image";
+    if (file.type.startsWith("video/")) return "video";
+    if (file.type.startsWith("audio/")) return "audio";
+
+    const extension = file.name.split(".").pop()?.toLowerCase();
+
+    if (
+      extension &&
+      ["jpg", "jpeg", "png", "webp", "avif", "gif"].includes(extension)
+    ) {
+      return "image";
+    }
+
+    if (
+      extension &&
+      ["mp4", "mov", "webm", "m4v"].includes(extension)
+    ) {
+      return "video";
+    }
+
+    if (
+      extension &&
+      ["mp3", "wav", "m4a", "aac", "ogg", "flac"].includes(extension)
+    ) {
+      return "audio";
+    }
+
+    return null;
+  };
+
+  const loadPrimaryFile = (file?: File) => {
+    if (!file) return;
+
+    const nextType = classifyFile(file);
+
+    if (!nextType) {
+      window.alert("Please choose an image, video, or audio file.");
       return;
     }
 
-    const reader = new FileReader();
+    if (primaryUrl) {
+      URL.revokeObjectURL(primaryUrl);
+    }
 
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        setImage(reader.result);
+    const nextUrl = URL.createObjectURL(file);
+
+    setPrimaryFile(file);
+    setPrimaryUrl(nextUrl);
+    setMediaType(nextType);
+
+    if (nextType === "audio" && !title) {
+      setTitle(file.name.replace(/\.[^.]+$/, ""));
+    }
+
+    if (nextType !== "audio") {
+      if (companionUrl) {
+        URL.revokeObjectURL(companionUrl);
       }
-    };
 
-    reader.readAsDataURL(file);
+      setCompanionFile(null);
+      setCompanionUrl(null);
+      setCompanionType(null);
+    }
+  };
+
+  const loadCompanionFile = (file?: File) => {
+    if (!file) return;
+
+    const nextType = classifyFile(file);
+
+    if (nextType !== "image" && nextType !== "video") {
+      window.alert("An audio companion must be an image or video.");
+      return;
+    }
+
+    if (companionUrl) {
+      URL.revokeObjectURL(companionUrl);
+    }
+
+    setCompanionFile(file);
+    setCompanionUrl(URL.createObjectURL(file));
+    setCompanionType(nextType);
+  };
+
+  const removeCompanion = () => {
+    if (companionUrl) {
+      URL.revokeObjectURL(companionUrl);
+    }
+
+    setCompanionFile(null);
+    setCompanionUrl(null);
+    setCompanionType(null);
   };
 
   const publish = () => {
-    if (!image) {
-      fileInputRef.current?.click();
+    if (!primaryFile || !primaryUrl || !mediaType) {
+      primaryInputRef.current?.click();
       return;
     }
 
     onPublish({
       id: Date.now(),
-      image,
+      mediaType,
+      mediaSrc: primaryUrl,
+
+      companionType:
+        mediaType === "audio" && companionFile
+          ? companionType ?? undefined
+          : undefined,
+
+      companionSrc:
+        mediaType === "audio" && companionFile
+          ? companionUrl ?? undefined
+          : undefined,
+
+      title:
+        mediaType === "audio"
+          ? title.trim() || "Untitled audio"
+          : undefined,
+
+      artist:
+        mediaType === "audio"
+          ? artist.trim() || "@terry"
+          : undefined,
+
       username: "@terry",
       caption: caption.trim() || "Untitled.",
       weight,
       position: "center",
     });
+  };
+
+  const renderPreview = () => {
+    if (!primaryUrl || !mediaType) {
+      return (
+        <div className="composer-empty">
+          <strong>Drop your work here</strong>
+          <span>Image, video, or audio</span>
+        </div>
+      );
+    }
+
+    if (mediaType === "video") {
+      return (
+        <video
+          src={primaryUrl}
+          controls
+          muted
+          playsInline
+          preload="metadata"
+          onClick={(event) => event.stopPropagation()}
+        />
+      );
+    }
+
+    if (mediaType === "audio") {
+      return (
+        <div
+          className="composer-audio-preview"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <div className="composer-audio-orb">
+            <span>PG.</span>
+          </div>
+
+          <strong>{title || primaryFile?.name}</strong>
+          <span>{artist || "Add an artist name"}</span>
+
+          <audio
+            src={primaryUrl}
+            controls
+            preload="metadata"
+          />
+        </div>
+      );
+    }
+
+    return (
+      <img
+        src={primaryUrl}
+        alt="New post preview"
+      />
+    );
   };
 
   return (
@@ -773,7 +1141,7 @@ function CreateComposer({
       onClick={onClose}
     >
       <section
-        className="composer-panel"
+        className="composer-panel composer-panel--multimedia"
         onClick={(event) => event.stopPropagation()}
       >
         <header className="composer-header">
@@ -794,48 +1162,130 @@ function CreateComposer({
         </header>
 
         <div className="composer-body">
-          <button
-            className={`composer-dropzone ${
-              image ? "composer-dropzone--filled" : ""
-            } ${
-              dragging ? "composer-dropzone--dragging" : ""
-            }`}
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            onDragEnter={(event) => {
-              event.preventDefault();
-              setDragging(true);
-            }}
-            onDragOver={(event) => {
-              event.preventDefault();
-              setDragging(true);
-            }}
-            onDragLeave={() => setDragging(false)}
-            onDrop={(event) => {
-              event.preventDefault();
-              setDragging(false);
-              loadFile(event.dataTransfer.files[0]);
-            }}
-          >
-            {image ? (
-              <img src={image} alt="New post preview" />
-            ) : (
-              <div className="composer-empty">
-                <strong>Drop an image here</strong>
-                <span>or click to choose one</span>
+          <div className="composer-media-column">
+            <div
+              className={`composer-dropzone ${
+                primaryUrl ? "composer-dropzone--filled" : ""
+              } ${
+                dragging ? "composer-dropzone--dragging" : ""
+              }`}
+              role="button"
+              tabIndex={0}
+              onClick={() => primaryInputRef.current?.click()}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  primaryInputRef.current?.click();
+                }
+              }}
+              onDragEnter={(event) => {
+                event.preventDefault();
+                setDragging(true);
+              }}
+              onDragOver={(event) => {
+                event.preventDefault();
+                setDragging(true);
+              }}
+              onDragLeave={() => setDragging(false)}
+              onDrop={(event) => {
+                event.preventDefault();
+                setDragging(false);
+                loadPrimaryFile(event.dataTransfer.files[0]);
+              }}
+            >
+              {renderPreview()}
+            </div>
+
+            <input
+              ref={primaryInputRef}
+              className="composer-file-input"
+              type="file"
+              accept="image/*,video/*,audio/*,.mov,.m4v,.m4a,.flac"
+              onChange={(event) =>
+                loadPrimaryFile(event.target.files?.[0])
+              }
+            />
+
+            {mediaType === "audio" && (
+              <div className="companion-uploader">
+                <div>
+                  <span>VISUAL COMPANION</span>
+                  <p>
+                    Add optional artwork or a looping video to accompany
+                    the audio.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => companionInputRef.current?.click()}
+                >
+                  {companionUrl ? "Replace visual" : "Add image or video"}
+                </button>
+
+                {companionUrl && (
+                  <div className="companion-preview">
+                    {companionType === "video" ? (
+                      <video
+                        src={companionUrl}
+                        muted
+                        loop
+                        autoPlay
+                        playsInline
+                      />
+                    ) : (
+                      <img src={companionUrl} alt="" />
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={removeCompanion}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                )}
+
+                <input
+                  ref={companionInputRef}
+                  className="composer-file-input"
+                  type="file"
+                  accept="image/*,video/*,.mov,.m4v"
+                  onChange={(event) =>
+                    loadCompanionFile(event.target.files?.[0])
+                  }
+                />
               </div>
             )}
-          </button>
-
-          <input
-            ref={fileInputRef}
-            className="composer-file-input"
-            type="file"
-            accept="image/*"
-            onChange={(event) => loadFile(event.target.files?.[0])}
-          />
+          </div>
 
           <div className="composer-fields">
+            {mediaType === "audio" && (
+              <>
+                <label className="composer-field">
+                  <span>Title</span>
+
+                  <input
+                    value={title}
+                    maxLength={100}
+                    placeholder="Track title"
+                    onChange={(event) => setTitle(event.target.value)}
+                  />
+                </label>
+
+                <label className="composer-field">
+                  <span>Artist</span>
+
+                  <input
+                    value={artist}
+                    maxLength={100}
+                    placeholder="Artist name"
+                    onChange={(event) => setArtist(event.target.value)}
+                  />
+                </label>
+              </>
+            )}
+
             <label className="composer-field">
               <span>Caption</span>
 
@@ -878,7 +1328,7 @@ function CreateComposer({
 
         <footer className="composer-footer">
           <span>
-            Your Playground remains yours. Pushes never appear here.
+            Photos, motion, and sound all belong in Playground.
           </span>
 
           <button
@@ -886,7 +1336,7 @@ function CreateComposer({
             type="button"
             onClick={publish}
           >
-            {image ? "Publish" : "Choose image"}
+            {primaryUrl ? "Publish" : "Choose media"}
           </button>
         </footer>
       </section>
