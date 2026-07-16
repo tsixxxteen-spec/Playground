@@ -1,0 +1,55 @@
+html {
+  min-width: 320px;
+  min-height: 100%;
+  background: #070809;
+  color-scheme: dark;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Display",
+    "SF Pro Text",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+  background: #070809;
+}
+
+body,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: rgba(185, 215, 255, 0.25);
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: #070809;
+}
+
+::-webkit-scrollbar-thumb {
+  border: 3px solid #070809;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+#root {
+  min-height: 100vh;
+}
