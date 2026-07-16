@@ -541,6 +541,9 @@ function ImmersiveViewer({
   onPrevious: () => void;
   onNext: () => void;
 }) {
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
@@ -557,15 +560,57 @@ function ImmersiveViewer({
     };
   }, [onClose, onPrevious, onNext]);
 
-  return (
-    <div className="immersive-viewer" role="dialog" aria-modal="true">
-      <button
-        className="viewer-backdrop"
-        type="button"
-        aria-label="Close post"
-        onClick={onClose}
-      />
+  const handleBackdropClick = (
+    event: React.MouseEvent<HTMLDivElement>,
+  ) => {
+    if (event.target === event.currentTarget) {
+      onClose();
+    }
+  };
 
+  const handleTouchStart = (
+    event: React.TouchEvent<HTMLDivElement>,
+  ) => {
+    const touch = event.touches[0];
+
+    touchStartX.current = touch.clientX;
+    touchStartY.current = touch.clientY;
+  };
+
+  const handleTouchEnd = (
+    event: React.TouchEvent<HTMLDivElement>,
+  ) => {
+    if (
+      touchStartX.current === null ||
+      touchStartY.current === null
+    ) {
+      return;
+    }
+
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - touchStartX.current;
+    const deltaY = touch.clientY - touchStartY.current;
+
+    touchStartX.current = null;
+    touchStartY.current = null;
+
+    const isHorizontal = Math.abs(deltaX) > Math.abs(deltaY);
+    const isRightSwipe = deltaX > 90;
+
+    if (isHorizontal && isRightSwipe) {
+      onClose();
+    }
+  };
+
+  return (
+    <div
+      className="immersive-viewer"
+      role="dialog"
+      aria-modal="true"
+      onClick={handleBackdropClick}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       <button
         className="viewer-close"
         type="button"
@@ -585,7 +630,10 @@ function ImmersiveViewer({
         ←
       </button>
 
-      <figure className="viewer-stage">
+      <figure
+        className="viewer-stage"
+        onClick={(event) => event.stopPropagation()}
+      >
         <img
           src={post.image}
           alt=""
