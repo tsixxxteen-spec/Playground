@@ -2928,3 +2928,27 @@ body.viewer-open {
 .viewer-push {
   cursor: pointer;
 }
+
+/* =========================================================
+   VIEWER DISMISS INTERACTIONS
+   ========================================================= */
+
+.immersive-viewer {
+  cursor: zoom-out;
+  touch-action: pan-y;
+}
+
+.viewer-stage,
+.viewer-stage * {
+  cursor: default;
+}
+
+.viewer-stage {
+  pointer-events: auto;
+}
+
+.viewer-close,
+.viewer-arrow,
+.viewer-push {
+  cursor: pointer;
+}
