@@ -32,6 +32,12 @@ type Post = {
   pushedBy?: string;
   weight: Weight;
   position?: string;
+
+  /*
+    Width divided by height. Used to preserve the original
+    photo or video proportions without cropping.
+  */
+  aspectRatio?: number;
 };
 
 const posts: Post[] = [
@@ -560,6 +566,9 @@ function PostTile({
 
   const style = {
     "--image-position": post.position ?? "center",
+    "--media-aspect": post.aspectRatio
+      ? String(post.aspectRatio)
+      : "auto",
   } as CSSProperties;
 
   const clearDesktopTimer = () => {
@@ -689,6 +698,8 @@ function PostTile({
   return (
     <article
       className={`post-tile post-tile--${post.weight} ${
+        post.aspectRatio ? "post-tile--native-media" : ""
+      } ${
         pushed ? "post-tile--pushed" : ""
       } ${
         pushAnimating ? "post-tile--push-animating" : ""
@@ -928,7 +939,10 @@ function CreateComposer({
   const [artist, setArtist] = useState("");
   const [weight, setWeight] = useState<Weight>("wide");
   const [dragging, setDragging] = useState(false);
+  const [mediaAspectRatio, setMediaAspectRatio] =
+    useState<number | null>(null);
 
+  const dragDepthRef = useRef(0);
   const primaryInputRef = useRef<HTMLInputElement | null>(null);
   const companionInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -996,6 +1010,7 @@ function CreateComposer({
     setPrimaryFile(file);
     setPrimaryUrl(nextUrl);
     setMediaType(nextType);
+    setMediaAspectRatio(null);
 
     if (nextType === "audio" && !title) {
       setTitle(file.name.replace(/\.[^.]+$/, ""));
@@ -1076,6 +1091,7 @@ function CreateComposer({
       caption: caption.trim() || "Untitled.",
       weight,
       position: "center",
+      aspectRatio: mediaAspectRatio ?? undefined,
     });
   };
 
@@ -1097,6 +1113,15 @@ function CreateComposer({
           muted
           playsInline
           preload="metadata"
+          onLoadedMetadata={(event) => {
+            const video = event.currentTarget;
+
+            if (video.videoWidth > 0 && video.videoHeight > 0) {
+              setMediaAspectRatio(
+                video.videoWidth / video.videoHeight,
+              );
+            }
+          }}
           onClick={(event) => event.stopPropagation()}
         />
       );
@@ -1128,6 +1153,15 @@ function CreateComposer({
       <img
         src={primaryUrl}
         alt="New post preview"
+        onLoad={(event) => {
+          const image = event.currentTarget;
+
+          if (image.naturalWidth > 0 && image.naturalHeight > 0) {
+            setMediaAspectRatio(
+              image.naturalWidth / image.naturalHeight,
+            );
+          }
+        }}
       />
     );
   };
@@ -1141,8 +1175,93 @@ function CreateComposer({
       onClick={onClose}
     >
       <section
-        className="composer-panel composer-panel--multimedia"
+        className={`composer-panel composer-panel--multimedia ${
+          dragging ? "composer-panel--dragging" : ""
+        }`}
         onClick={(event) => event.stopPropagation()}
+        onDragEnter={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          dragDepthRef.current += 1;
+          setDragging(true);
+        }}
+        onDragOver={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          if (event.dataTransfer) {
+            event.dataTransfer.dropEffect = "copy";
+          }
+
+          setDragging(true);
+        }}
+        onDragLeave={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          dragDepthRef.current = Math.max(
+            0,
+            dragDepthRef.current - 1,
+          );
+
+          if (dragDepthRef.current === 0) {
+            setDragging(false);
+          }
+        }}
+        onDrop={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          dragDepthRef.current = 0;
+          setDragging(false);
+
+          const files = Array.from(event.dataTransfer.files);
+
+          if (files.length === 0) return;
+
+          /*
+            When the primary file is audio and a second image/video
+            is dropped, treat that second file as its companion.
+          */
+          if (
+            mediaType === "audio" &&
+            primaryFile &&
+            files.length === 1
+          ) {
+            const droppedType = classifyFile(files[0]);
+
+            if (
+              droppedType === "image" ||
+              droppedType === "video"
+            ) {
+              loadCompanionFile(files[0]);
+              return;
+            }
+          }
+
+          loadPrimaryFile(files[0]);
+
+          /*
+            Audio plus an image/video may be dropped together.
+          */
+          if (files.length > 1) {
+            const primaryType = classifyFile(files[0]);
+
+            if (primaryType === "audio") {
+              const visual = files
+                .slice(1)
+                .find((file) => {
+                  const type = classifyFile(file);
+                  return type === "image" || type === "video";
+                });
+
+              if (visual) {
+                loadCompanionFile(visual);
+              }
+            }
+          }
+        }}
       >
         <header className="composer-header">
           <div>

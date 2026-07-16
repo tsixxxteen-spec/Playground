@@ -4989,3 +4989,126 @@ body.composer-open {
     max-height: calc(100vh - 130px) !important;
   }
 }
+
+/* =========================================================
+   FULL COMPOSER DRAG AND DROP
+   ========================================================= */
+
+.composer-panel--multimedia {
+  position: relative;
+}
+
+.composer-panel--multimedia::after {
+  position: absolute;
+  z-index: 100;
+  inset: 12px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px dashed rgba(255, 242, 0, 0.78);
+  border-radius: 19px;
+
+  background: rgba(7, 7, 8, 0.82);
+  color: #fff200;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(22px, 3vw, 42px);
+  letter-spacing: -0.045em;
+
+  content: "Drop into Playground";
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.985);
+
+  pointer-events: none;
+  backdrop-filter: blur(20px);
+
+  transition:
+    opacity 160ms ease,
+    visibility 160ms ease,
+    transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.composer-panel--dragging::after {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+}
+
+.composer-dropzone--dragging {
+  border-color: #fff200 !important;
+}
+
+/* =========================================================
+   PRESERVE ORIGINAL PHOTO AND VIDEO PROPORTIONS
+   ========================================================= */
+
+/*
+  Newly uploaded media is fitted without stretching or cropping.
+  The weighted tile remains part of the collage, while the actual
+  media keeps its original width-to-height relationship.
+*/
+
+.post-tile--native-media {
+  background: #050506 !important;
+}
+
+.post-tile--native-media > img,
+.post-tile--native-media > .feed-media > img,
+.post-tile--native-media > .feed-media > video {
+  width: 100% !important;
+  height: 100% !important;
+
+  object-fit: contain !important;
+  object-position: center !important;
+
+  background: #050506 !important;
+
+  transform: none !important;
+  filter: none;
+}
+
+/* Hover may darken the work but must not crop or enlarge it. */
+.post-tile--native-media:hover > img,
+.post-tile--native-media:hover > .feed-media > img,
+.post-tile--native-media:hover > .feed-media > video {
+  object-fit: contain !important;
+  transform: none !important;
+  filter: brightness(0.72) !important;
+}
+
+/* Composer preview also preserves original proportions. */
+.composer-dropzone--filled > img,
+.composer-dropzone--filled > video {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: 65vh !important;
+
+  object-fit: contain !important;
+  background: #050506;
+}
+
+/* Immersive media never stretches or crops. */
+.viewer-frame > img,
+.viewer-frame > .viewer-primary-video {
+  width: auto !important;
+  height: auto !important;
+
+  max-width: calc(100vw - 152px) !important;
+  max-height: calc(100vh - 88px) !important;
+
+  object-fit: contain !important;
+  object-position: center !important;
+
+  image-rendering: auto !important;
+}
+
+@media (max-width: 760px) {
+  .viewer-frame > img,
+  .viewer-frame > .viewer-primary-video {
+    max-width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 130px) !important;
+  }
+}
