@@ -1,4 +1,4 @@
-import { CSSProperties, useEffect, useState } from "react";
+import { CSSProperties, useEffect, useState, useRef } from "react";
 import "./App.css";
 
 type Theme = "light" | "dark" | "system";
@@ -326,41 +326,205 @@ function ThemeControl({
 
 function PostTile({
   post,
+  pushed,
+  onPush,
   onOpen,
 }: {
   post: Post;
+  pushed: boolean;
+  onPush: () => void;
   onOpen: () => void;
 }) {
+  const [pushAnimating, setPushAnimating] = useState(false);
+
+  const desktopOpenTimer = useRef<number | null>(null);
+  const touchOpenTimer = useRef<number | null>(null);
+  const lastTouchTime = useRef(0);
+
   const style = {
     "--image-position": post.position ?? "center",
   } as CSSProperties;
 
+  const clearDesktopTimer = () => {
+    if (desktopOpenTimer.current !== null) {
+      window.clearTimeout(desktopOpenTimer.current);
+      desktopOpenTimer.current = null;
+    }
+  };
+
+  const clearTouchTimer = () => {
+    if (touchOpenTimer.current !== null) {
+      window.clearTimeout(touchOpenTimer.current);
+      touchOpenTimer.current = null;
+    }
+  };
+
+  const performPush = () => {
+    clearDesktopTimer();
+    clearTouchTimer();
+
+    setPushAnimating(false);
+
+    requestAnimationFrame(() => {
+      setPushAnimating(true);
+
+      window.setTimeout(() => {
+        setPushAnimating(false);
+      }, 520);
+    });
+
+    onPush();
+  };
+
+  const handleDesktopClick = (
+    event: React.MouseEvent<HTMLElement>,
+  ) => {
+    if ((event.target as HTMLElement).closest(".tile-push")) {
+      return;
+    }
+
+    if (window.matchMedia("(pointer: coarse)").matches) {
+      return;
+    }
+
+    clearDesktopTimer();
+
+    /*
+      A short delay gives the browser time to determine whether
+      this is a single click or the first half of a double-click.
+    */
+    desktopOpenTimer.current = window.setTimeout(() => {
+      onOpen();
+      desktopOpenTimer.current = null;
+    }, 300);
+  };
+
+  const handleDesktopDoubleClick = (
+    event: React.MouseEvent<HTMLElement>,
+  ) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    clearDesktopTimer();
+    performPush();
+  };
+
+  const handleTouch = (
+    event: React.PointerEvent<HTMLElement>,
+  ) => {
+    if (event.pointerType !== "touch") {
+      return;
+    }
+
+    if ((event.target as HTMLElement).closest(".tile-push")) {
+      return;
+    }
+
+    const now = window.performance.now();
+    const elapsed = now - lastTouchTime.current;
+
+    /*
+      A second tap within 360ms cancels the pending viewer open
+      and performs Push instead.
+    */
+    if (lastTouchTime.current > 0 && elapsed <= 360) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      lastTouchTime.current = 0;
+      clearTouchTimer();
+      performPush();
+      return;
+    }
+
+    lastTouchTime.current = now;
+    clearTouchTimer();
+
+    touchOpenTimer.current = window.setTimeout(() => {
+      onOpen();
+      touchOpenTimer.current = null;
+      lastTouchTime.current = 0;
+    }, 380);
+  };
+
+  const handlePushButton = (
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    event.preventDefault();
+    event.stopPropagation();
+    performPush();
+  };
+
+  const handleKeyDown = (
+    event: React.KeyboardEvent<HTMLElement>,
+  ) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      onOpen();
+    }
+
+    if (event.key === " ") {
+      event.preventDefault();
+      performPush();
+    }
+  };
+
   return (
     <article
-      className={`post-tile post-tile--${post.weight}`}
+      className={`post-tile post-tile--${post.weight} ${
+        pushed ? "post-tile--pushed" : ""
+      } ${
+        pushAnimating ? "post-tile--push-animating" : ""
+      }`}
       style={style}
       tabIndex={0}
       role="button"
-      aria-label={`Open post by ${post.username}`}
-      onClick={onOpen}
-      onKeyDown={(event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          onOpen();
-        }
-      }}
+      aria-label={`${post.username}. Double-click or double-tap to Push.`}
+      onClick={handleDesktopClick}
+      onDoubleClick={handleDesktopDoubleClick}
+      onPointerUp={handleTouch}
+      onKeyDown={handleKeyDown}
     >
-      <img src={post.image} alt="" draggable={false} />
+      <img
+        src={post.image}
+        alt=""
+        draggable={false}
+        decoding="async"
+      />
 
       <div className="post-reveal">
-        <strong>{post.username}</strong>
-        <p>{post.caption}</p>
-        {post.pushedBy && <span>Pushed by {post.pushedBy}</span>}
+        <div className="post-reveal-copy">
+          <strong>{post.username}</strong>
+          <p>{post.caption}</p>
+
+          {post.pushedBy && (
+            <span>Pushed by {post.pushedBy}</span>
+          )}
+        </div>
       </div>
+
+      <button
+        className={`tile-push ${
+          pushed ? "tile-push--active" : ""
+        }`}
+        type="button"
+        aria-label={pushed ? "Remove Push" : "Push this post"}
+        aria-pressed={pushed}
+        onClick={handlePushButton}
+        onDoubleClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+        }}
+        onPointerUp={(event) => {
+          event.stopPropagation();
+        }}
+      >
+        <span aria-hidden="true">↗</span>
+        <span>{pushed ? "Pushed" : "Push"}</span>
+      </button>
     </article>
   );
 }
-
 
 function ImmersiveViewer({
   post,
@@ -426,6 +590,8 @@ function ImmersiveViewer({
           src={post.image}
           alt=""
           draggable={false}
+          decoding="sync"
+          loading="eager"
           style={{ objectPosition: post.position ?? "center" }}
         />
 
@@ -634,7 +800,7 @@ function App() {
                       "--particle-lift": `${lift}px`,
                       "--particle-size": `${size}px`,
                       "--particle-delay": `${delay}ms`,
-                    } as React.CSSProperties
+                    } as CSSProperties
                   }
                 />
               );
@@ -680,6 +846,8 @@ function App() {
           <PostTile
             post={post}
             key={post.id}
+            pushed={pushedPostIds.includes(post.id)}
+            onPush={() => togglePush(post.id)}
             onOpen={() => setSelectedPostIndex(index)}
           />
         ))}
