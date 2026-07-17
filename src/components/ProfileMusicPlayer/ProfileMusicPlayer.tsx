@@ -1,23 +1,22 @@
 import {
-  ChangeEvent,
   useEffect,
   useRef,
   useState,
 } from "react";
+import type { ChangeEvent } from "react";
 
 import "./ProfileMusicPlayer.css";
 
 export type ProfileTrack = {
-  id: string;
   title: string;
-  artist: string;
+  artist?: string;
   audioSrc: string;
-  artworkSrc?: string;
 };
 
 type ProfileMusicPlayerProps = {
-  tracks: ProfileTrack[];
-  username: string;
+  track: ProfileTrack | null;
+  visible?: boolean;
+  defaultExpanded?: boolean;
 };
 
 function formatTime(seconds: number): string {
@@ -34,22 +33,21 @@ function formatTime(seconds: number): string {
 }
 
 export default function ProfileMusicPlayer({
-  tracks,
-  username,
+  track,
+  visible = true,
+  defaultExpanded = false,
 }: ProfileMusicPlayerProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const [trackIndex, setTrackIndex] = useState(0);
+  const [expanded, setExpanded] = useState(defaultExpanded);
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
-  const activeTrack = tracks[trackIndex];
-
   useEffect(() => {
     const audio = audioRef.current;
 
-    if (!audio || !activeTrack) {
+    if (!audio) {
       return;
     }
 
@@ -59,7 +57,22 @@ export default function ProfileMusicPlayer({
     setPlaying(false);
     setCurrentTime(0);
     setDuration(0);
-  }, [activeTrack]);
+  }, [track?.audioSrc]);
+
+  useEffect(() => {
+    if (visible) {
+      return;
+    }
+
+    const audio = audioRef.current;
+
+    if (audio) {
+      audio.pause();
+    }
+
+    setPlaying(false);
+    setExpanded(false);
+  }, [visible]);
 
   useEffect(() => {
     return () => {
@@ -67,13 +80,8 @@ export default function ProfileMusicPlayer({
     };
   }, []);
 
-  if (!activeTrack) {
-    return (
-      <section className="profile-music profile-music--empty">
-        <span>MUSIC</span>
-        <p>{username} has not added music yet.</p>
-      </section>
-    );
+  if (!visible || !track) {
+    return null;
   }
 
   const togglePlayback = async () => {
@@ -87,7 +95,8 @@ export default function ProfileMusicPlayer({
       try {
         await audio.play();
       } catch (error) {
-        console.error("Music playback failed:", error);
+        console.error("Profile music playback failed:", error);
+        setPlaying(false);
       }
 
       return;
@@ -96,24 +105,8 @@ export default function ProfileMusicPlayer({
     audio.pause();
   };
 
-  const changeTrack = (direction: -1 | 1) => {
-    if (tracks.length <= 1) {
-      return;
-    }
-
-    setTrackIndex((current) => {
-      const next = current + direction;
-
-      if (next < 0) {
-        return tracks.length - 1;
-      }
-
-      if (next >= tracks.length) {
-        return 0;
-      }
-
-      return next;
-    });
+  const toggleExpanded = () => {
+    setExpanded((current) => !current);
   };
 
   const seek = (event: ChangeEvent<HTMLInputElement>) => {
@@ -129,95 +122,98 @@ export default function ProfileMusicPlayer({
   };
 
   return (
-    <section
-      className="profile-music"
-      aria-label={`${username} music player`}
+    <div
+      className={`profile-bio-music ${
+        expanded
+          ? "profile-bio-music--expanded"
+          : "profile-bio-music--collapsed"
+      }`}
     >
-      <div className="profile-music__artwork">
-        {activeTrack.artworkSrc ? (
-          <img
-            src={activeTrack.artworkSrc}
-            alt=""
-            draggable={false}
-          />
-        ) : (
-          <div className="profile-music__fallback">
-            PG.
-          </div>
-        )}
-
+      <div className="profile-bio-music__topline">
         <button
-          className="profile-music__play"
+          className="profile-bio-music__identity"
           type="button"
-          onClick={togglePlayback}
-          aria-label={playing ? "Pause track" : "Play track"}
+          onClick={toggleExpanded}
+          aria-expanded={expanded}
+          aria-label={
+            expanded
+              ? `Collapse ${track.title} player`
+              : `Expand ${track.title} player`
+          }
         >
-          <span aria-hidden="true">
-            {playing ? "Ⅱ" : "▶"}
+          <span
+            className="profile-bio-music__note"
+            aria-hidden="true"
+          >
+            ♫
+          </span>
+
+          <span className="profile-bio-music__title">
+            {track.title}
           </span>
         </button>
+
+        {expanded && (
+          <div className="profile-bio-music__actions">
+            <span className="profile-bio-music__duration">
+              {formatTime(duration)}
+            </span>
+
+            <button
+              className="profile-bio-music__collapse"
+              type="button"
+              onClick={toggleExpanded}
+              aria-label="Collapse music player"
+            >
+              −
+            </button>
+          </div>
+        )}
       </div>
 
-      <div className="profile-music__body">
-        <header className="profile-music__header">
-          <div>
-            <span>PROFILE MUSIC</span>
-            <strong>{activeTrack.title}</strong>
-            <small>{activeTrack.artist}</small>
-          </div>
-
-          <span className="profile-music__count">
-            {trackIndex + 1}/{tracks.length}
-          </span>
-        </header>
-
-        <div className="profile-music__timeline">
-          <span>{formatTime(currentTime)}</span>
-
-          <input
-            type="range"
-            min="0"
-            max={duration || 0}
-            step="0.01"
-            value={Math.min(currentTime, duration || 0)}
-            onChange={seek}
-            aria-label="Track position"
-          />
-
-          <span>{formatTime(duration)}</span>
-        </div>
-
-        <div className="profile-music__controls">
+      <div
+        className="profile-bio-music__expanded-content"
+        aria-hidden={!expanded}
+      >
+        <div className="profile-bio-music__playback">
           <button
-            type="button"
-            onClick={() => changeTrack(-1)}
-            disabled={tracks.length <= 1}
-            aria-label="Previous track"
-          >
-            ←
-          </button>
-
-          <button
+            className="profile-bio-music__play"
             type="button"
             onClick={togglePlayback}
+            aria-label={playing ? "Pause song" : "Play song"}
           >
-            {playing ? "Pause" : "Play"}
+            <span aria-hidden="true">
+              {playing ? "Ⅱ" : "▶"}
+            </span>
           </button>
 
-          <button
-            type="button"
-            onClick={() => changeTrack(1)}
-            disabled={tracks.length <= 1}
-            aria-label="Next track"
-          >
-            →
-          </button>
+          <div className="profile-bio-music__timeline">
+            <input
+              type="range"
+              min="0"
+              max={duration || 0}
+              step="0.01"
+              value={Math.min(currentTime, duration || 0)}
+              onChange={seek}
+              aria-label="Song position"
+            />
+
+            <div className="profile-bio-music__times">
+              <span>{formatTime(currentTime)}</span>
+
+              {track.artist && (
+                <span>{track.artist}</span>
+              )}
+
+              <span>{formatTime(duration)}</span>
+            </div>
+          </div>
         </div>
       </div>
 
       <audio
         ref={audioRef}
-        src={activeTrack.audioSrc}
+        src={track.audioSrc}
         preload="metadata"
         onLoadedMetadata={(event) => {
           const nextDuration = event.currentTarget.duration;
@@ -240,17 +236,16 @@ export default function ProfileMusicPlayer({
         onTimeUpdate={(event) => {
           setCurrentTime(event.currentTarget.currentTime);
         }}
-        onPlay={() => setPlaying(true)}
+        onPlay={() => {
+          setPlaying(true);
+          setExpanded(true);
+        }}
         onPause={() => setPlaying(false)}
         onEnded={() => {
-          if (tracks.length > 1) {
-            changeTrack(1);
-          } else {
-            setPlaying(false);
-            setCurrentTime(0);
-          }
+          setPlaying(false);
+          setCurrentTime(0);
         }}
       />
-    </section>
+    </div>
   );
 }
