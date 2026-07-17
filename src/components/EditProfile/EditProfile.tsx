@@ -8,6 +8,14 @@ import type {
   FormEvent,
 } from "react";
 
+import AvatarStudio, {
+  DEFAULT_AVATAR_TRANSFORM,
+  getAvatarImageStyle,
+} from "../AvatarStudio";
+import type {
+  AvatarTransform,
+} from "../AvatarStudio";
+
 import "./EditProfile.css";
 
 export type EditableProfile = {
@@ -15,6 +23,7 @@ export type EditableProfile = {
   username: string;
   bio: string;
   avatarSrc?: string;
+  avatarTransform: AvatarTransform;
   musicTitle: string;
   musicArtist?: string;
   musicSrc?: string;
@@ -110,6 +119,22 @@ export default function EditProfile({
   const [avatarSrc, setAvatarSrc] =
     useState(profile.avatarSrc);
 
+  const [
+    avatarTransform,
+    setAvatarTransform,
+  ] = useState<AvatarTransform>(
+    profile.avatarTransform ??
+      DEFAULT_AVATAR_TRANSFORM,
+  );
+
+  const [
+    pendingAvatarSrc,
+    setPendingAvatarSrc,
+  ] = useState<string | null>(null);
+
+  const [avatarStudioOpen, setAvatarStudioOpen] =
+    useState(false);
+
   const [musicTitle, setMusicTitle] =
     useState(profile.musicTitle);
 
@@ -197,7 +222,8 @@ export default function EditProfile({
 
     temporaryAvatarUrlRef.current = nextUrl;
 
-    setAvatarSrc(nextUrl);
+    setPendingAvatarSrc(nextUrl);
+    setAvatarStudioOpen(true);
     setError("");
   };
 
@@ -294,6 +320,7 @@ export default function EditProfile({
       username: nextUsername,
       bio: bio.trim(),
       avatarSrc,
+      avatarTransform,
       musicTitle: musicTitle.trim(),
       musicArtist:
         musicArtist.trim() || nextDisplayName,
@@ -352,6 +379,9 @@ export default function EditProfile({
                   src={avatarSrc}
                   alt=""
                   draggable={false}
+                  style={getAvatarImageStyle(
+                    avatarTransform,
+                  )}
                 />
               ) : (
                 <span aria-hidden="true">
@@ -368,14 +398,30 @@ export default function EditProfile({
                 format.
               </p>
 
-              <button
-                type="button"
-                onClick={() =>
-                  avatarInputRef.current?.click()
-                }
-              >
-                Change photo
-              </button>
+              <div className="edit-profile__avatar-buttons">
+                <button
+                  type="button"
+                  onClick={() =>
+                    avatarInputRef.current?.click()
+                  }
+                >
+                  Change photo
+                </button>
+
+                {avatarSrc && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPendingAvatarSrc(
+                        avatarSrc,
+                      );
+                      setAvatarStudioOpen(true);
+                    }}
+                  >
+                    Adjust position
+                  </button>
+                )}
+              </div>
 
               <input
                 ref={avatarInputRef}
@@ -591,6 +637,51 @@ export default function EditProfile({
           </button>
         </footer>
       </form>
+
+      {avatarStudioOpen &&
+        pendingAvatarSrc && (
+          <AvatarStudio
+            imageSrc={pendingAvatarSrc}
+            initialTransform={
+              pendingAvatarSrc === avatarSrc
+                ? avatarTransform
+                : DEFAULT_AVATAR_TRANSFORM
+            }
+            onCancel={() => {
+              if (
+                pendingAvatarSrc !==
+                  avatarSrc &&
+                pendingAvatarSrc.startsWith(
+                  "blob:",
+                )
+              ) {
+                URL.revokeObjectURL(
+                  pendingAvatarSrc,
+                );
+              }
+
+              setPendingAvatarSrc(null);
+              setAvatarStudioOpen(false);
+
+              if (avatarInputRef.current) {
+                avatarInputRef.current.value =
+                  "";
+              }
+            }}
+            onSave={(
+              nextTransform: AvatarTransform,
+            ) => {
+              setAvatarSrc(
+                pendingAvatarSrc,
+              );
+              setAvatarTransform(
+                nextTransform,
+              );
+              setPendingAvatarSrc(null);
+              setAvatarStudioOpen(false);
+            }}
+          />
+        )}
     </div>
   );
 }

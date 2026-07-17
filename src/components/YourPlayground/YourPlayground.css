@@ -279,3 +279,12 @@
 .your-playground__edit:active {
   transform: scale(0.96);
 }
+
+.your-playground__avatar {
+  overflow: hidden;
+}
+
+.your-playground__avatar img {
+  transform-origin: center;
+  will-change: transform, filter;
+}

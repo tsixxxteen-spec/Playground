@@ -12,6 +12,15 @@ import ProfileMusicPlayer from "../ProfileMusicPlayer";
 import type { ProfileTrack } from "../ProfileMusicPlayer";
 
 import {
+  DEFAULT_AVATAR_TRANSFORM,
+  getAvatarImageStyle,
+  normalizeAvatarTransform,
+} from "../AvatarStudio";
+import type {
+  AvatarTransform,
+} from "../AvatarStudio";
+
+import {
   blobFromSource,
   deleteProfileMedia,
   readProfileMedia,
@@ -44,6 +53,7 @@ type StoredProfile = {
   username: string;
   bio: string;
   avatarSrc?: string | null;
+  avatarTransform?: AvatarTransform;
   musicTitle: string;
   musicArtist?: string;
   musicSrc?: string | null;
@@ -132,6 +142,16 @@ function readStoredProfile(
             : undefined
           : fallback.avatarSrc,
 
+      avatarTransform:
+        normalizeAvatarTransform(
+          parsed.avatarTransform &&
+          typeof parsed.avatarTransform ===
+            "object"
+            ? parsed.avatarTransform
+            : fallback.avatarTransform ??
+              DEFAULT_AVATAR_TRANSFORM,
+        ),
+
       musicTitle:
         typeof parsed.musicTitle === "string"
           ? parsed.musicTitle
@@ -179,6 +199,10 @@ function persistProfile(
       ? profile.avatarSrc
       : null,
 
+    avatarTransform:
+      profile.avatarTransform ??
+      DEFAULT_AVATAR_TRANSFORM,
+
     musicTitle: profile.musicTitle,
     musicArtist: profile.musicArtist,
 
@@ -223,6 +247,8 @@ export default function YourPlayground({
         username,
         bio,
         avatarSrc,
+        avatarTransform:
+          DEFAULT_AVATAR_TRANSFORM,
 
         musicTitle:
           musicTrack?.title ?? "FREE",
@@ -405,6 +431,10 @@ export default function YourPlayground({
                   src={profile.avatarSrc}
                   alt={`${profile.displayName} profile`}
                   draggable={false}
+                  style={getAvatarImageStyle(
+                    profile.avatarTransform ??
+                      DEFAULT_AVATAR_TRANSFORM,
+                  )}
                 />
               ) : (
                 <span aria-hidden="true">
