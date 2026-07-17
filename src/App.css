@@ -5668,3 +5668,304 @@ body.composer-open {
   width:auto !important;
   margin:0 !important;
 }
+
+/* =========================================================
+   ISOLATED PLAYGROUND AUDIO VIEWER
+   This block uses unique pg-audio-* classes so old viewer
+   experiments cannot hide or reposition the controls.
+   ========================================================= */
+
+.viewer-frame:has(.pg-audio-viewer) {
+  display: flex !important;
+  width: min(920px, calc(100vw - 156px)) !important;
+  max-width: min(920px, calc(100vw - 156px)) !important;
+  max-height: calc(100vh - 70px) !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  background: #080809 !important;
+}
+
+.pg-audio-viewer {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  background: #080809 !important;
+}
+
+.pg-audio-viewer__canvas {
+  position: relative !important;
+  width: 100% !important;
+  height: min(68vh, 650px) !important;
+  min-height: 380px !important;
+  overflow: hidden !important;
+  background: #080809 !important;
+}
+
+.pg-audio-viewer__visual,
+.pg-audio-viewer__fallback {
+  position: absolute !important;
+  z-index: 1 !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  background: #080809 !important;
+}
+
+.pg-audio-viewer__fallback {
+  display: grid !important;
+  place-items: center !important;
+  color: #fff200 !important;
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-size: clamp(52px, 10vw, 130px) !important;
+}
+
+.pg-audio-viewer__shade {
+  position: absolute !important;
+  z-index: 2 !important;
+  inset: 0 !important;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.03),
+      rgba(0, 0, 0, 0.08) 48%,
+      rgba(0, 0, 0, 0.74) 100%
+    ) !important;
+  pointer-events: none !important;
+}
+
+.pg-audio-viewer__track {
+  position: absolute !important;
+  z-index: 4 !important;
+  right: 24px !important;
+  bottom: 22px !important;
+  left: 24px !important;
+  display: flex !important;
+  min-width: 0 !important;
+  flex-direction: column !important;
+  color: #fff !important;
+  pointer-events: none !important;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.92) !important;
+}
+
+.pg-audio-viewer__track > span {
+  color: #fff200 !important;
+  font-family: "Courier New", monospace !important;
+  font-size: 7px !important;
+  letter-spacing: 0.18em !important;
+}
+
+.pg-audio-viewer__track > strong {
+  display: block !important;
+  max-width: 100% !important;
+  margin-top: 8px !important;
+  overflow: hidden !important;
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-size: clamp(28px, 4.2vw, 58px) !important;
+  font-weight: 500 !important;
+  line-height: 0.98 !important;
+  letter-spacing: -0.055em !important;
+  text-overflow: ellipsis !important;
+}
+
+.pg-audio-viewer__track > small {
+  margin-top: 8px !important;
+  color: rgba(255, 255, 255, 0.72) !important;
+  font-size: 11px !important;
+}
+
+.pg-audio-player {
+  position: absolute !important;
+  z-index: 20 !important;
+  display: grid !important;
+  grid-template-columns: 46px 34px minmax(80px, 1fr) 34px !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: min(500px, calc(100% - 56px)) !important;
+  min-height: 64px !important;
+  padding: 9px 14px !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  border-radius: 20px !important;
+  background: rgba(7, 7, 9, 0.7) !important;
+  color: #fff !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.38) !important;
+  backdrop-filter: blur(24px) saturate(135%) !important;
+  pointer-events: auto !important;
+}
+
+/* Image artwork: centered player */
+.pg-audio-viewer--image .pg-audio-player {
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+/* Video visual: compact lower strip */
+.pg-audio-viewer--video .pg-audio-player {
+  right: 18px !important;
+  bottom: 18px !important;
+  left: 18px !important;
+  width: auto !important;
+  min-height: 48px !important;
+  padding: 6px 10px !important;
+  border-radius: 14px !important;
+  transform: none !important;
+}
+
+.pg-audio-viewer--video .pg-audio-viewer__track {
+  bottom: 82px !important;
+}
+
+.pg-audio-player__button {
+  display: grid !important;
+  width: 46px !important;
+  height: 46px !important;
+  min-width: 46px !important;
+  padding: 0 !important;
+  place-items: center !important;
+  border: 1px solid rgba(255, 242, 0, 0.82) !important;
+  border-radius: 50% !important;
+  background: #fff200 !important;
+  color: #11110f !important;
+  cursor: pointer !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+.pg-audio-player__button > span {
+  display: block !important;
+  font-size: 17px !important;
+  line-height: 1 !important;
+  transform: translateX(1px) !important;
+}
+
+.pg-audio-player__button:hover {
+  transform: scale(1.05) !important;
+}
+
+.pg-audio-player__button:active {
+  transform: scale(0.94) !important;
+}
+
+.pg-audio-player__time {
+  display: block !important;
+  color: rgba(255, 255, 255, 0.74) !important;
+  font-family: "Courier New", monospace !important;
+  font-size: 8px !important;
+  text-align: center !important;
+}
+
+.pg-audio-player__timeline {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 18px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  accent-color: #fff200 !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+.pg-audio-player__engine {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Keep post metadata below the audio canvas. */
+.viewer-frame:has(.pg-audio-viewer) > .viewer-caption {
+  position: relative !important;
+  z-index: 30 !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  display: flex !important;
+  width: 100% !important;
+  min-height: 68px !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+  padding: 11px 15px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.09) !important;
+  background: #0b0b0d !important;
+  pointer-events: auto !important;
+}
+
+.viewer-frame:has(.pg-audio-viewer) .viewer-caption-copy {
+  min-width: 0 !important;
+  max-width: calc(100% - 112px) !important;
+}
+
+.viewer-frame:has(.pg-audio-viewer) .viewer-caption-copy strong,
+.viewer-frame:has(.pg-audio-viewer) .viewer-caption-copy p,
+.viewer-frame:has(.pg-audio-viewer) .viewer-caption-copy span {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.viewer-frame:has(.pg-audio-viewer) .viewer-push {
+  position: static !important;
+  min-width: 92px !important;
+  height: 34px !important;
+  flex: 0 0 auto !important;
+}
+
+@media (max-width: 760px) {
+  .viewer-frame:has(.pg-audio-viewer) {
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 112px) !important;
+  }
+
+  .pg-audio-viewer__canvas {
+    height: 57vh !important;
+    min-height: 300px !important;
+  }
+
+  .pg-audio-player {
+    grid-template-columns: 42px 31px minmax(60px, 1fr) 31px !important;
+    gap: 7px !important;
+    width: calc(100% - 28px) !important;
+    min-height: 56px !important;
+    padding: 7px 9px !important;
+    border-radius: 16px !important;
+  }
+
+  .pg-audio-player__button {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+  }
+
+  .pg-audio-viewer--video .pg-audio-player {
+    right: 10px !important;
+    bottom: 10px !important;
+    left: 10px !important;
+    width: auto !important;
+  }
+
+  .pg-audio-viewer--video .pg-audio-viewer__track {
+    bottom: 70px !important;
+  }
+
+  .pg-audio-viewer__track {
+    right: 15px !important;
+    bottom: 15px !important;
+    left: 15px !important;
+  }
+
+  .pg-audio-viewer__track > strong {
+    font-size: clamp(23px, 8vw, 42px) !important;
+  }
+}

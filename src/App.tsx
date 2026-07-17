@@ -478,6 +478,196 @@ function FeedMedia({ post }: { post: Post }) {
   );
 }
 
+function formatAudioTime(seconds: number): string {
+  if (!Number.isFinite(seconds) || seconds < 0) {
+    return "0:00";
+  }
+
+  const minutes = Math.floor(seconds / 60);
+  const remaining = Math.floor(seconds % 60);
+
+  return `${minutes}:${remaining.toString().padStart(2, "0")}`;
+}
+
+function AudioViewerMedia({ post }: { post: Post }) {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const [playing, setPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  const source = getPostMediaSource(post);
+
+  const hasVideoVisual =
+    post.companionType === "video" &&
+    Boolean(post.companionSrc);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+
+    if (!audio) return;
+
+    const updateTime = () => {
+      setCurrentTime(audio.currentTime);
+    };
+
+    const updateDuration = () => {
+      setDuration(
+        Number.isFinite(audio.duration)
+          ? audio.duration
+          : 0,
+      );
+    };
+
+    const handlePlay = () => setPlaying(true);
+    const handlePause = () => setPlaying(false);
+
+    const handleEnded = () => {
+      setPlaying(false);
+      setCurrentTime(0);
+    };
+
+    audio.addEventListener("timeupdate", updateTime);
+    audio.addEventListener("loadedmetadata", updateDuration);
+    audio.addEventListener("durationchange", updateDuration);
+    audio.addEventListener("play", handlePlay);
+    audio.addEventListener("pause", handlePause);
+    audio.addEventListener("ended", handleEnded);
+
+    return () => {
+      audio.pause();
+
+      audio.removeEventListener("timeupdate", updateTime);
+      audio.removeEventListener("loadedmetadata", updateDuration);
+      audio.removeEventListener("durationchange", updateDuration);
+      audio.removeEventListener("play", handlePlay);
+      audio.removeEventListener("pause", handlePause);
+      audio.removeEventListener("ended", handleEnded);
+    };
+  }, [source]);
+
+  const togglePlayback = async () => {
+    const audio = audioRef.current;
+
+    if (!audio) return;
+
+    if (audio.paused) {
+      try {
+        await audio.play();
+      } catch (error) {
+        console.error("Audio playback failed:", error);
+      }
+    } else {
+      audio.pause();
+    }
+  };
+
+  const seek = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const audio = audioRef.current;
+    const nextTime = Number(event.target.value);
+
+    if (!audio || !Number.isFinite(nextTime)) {
+      return;
+    }
+
+    audio.currentTime = nextTime;
+    setCurrentTime(nextTime);
+  };
+
+  return (
+    <div
+      className={`pg-audio-viewer ${
+        hasVideoVisual
+          ? "pg-audio-viewer--video"
+          : "pg-audio-viewer--image"
+      }`}
+    >
+      <div className="pg-audio-viewer__canvas">
+        {hasVideoVisual ? (
+          <video
+            className="pg-audio-viewer__visual"
+            src={post.companionSrc}
+            muted
+            loop
+            autoPlay
+            playsInline
+            preload="metadata"
+          />
+        ) : post.companionSrc ? (
+          <img
+            className="pg-audio-viewer__visual"
+            src={post.companionSrc}
+            alt=""
+            draggable={false}
+          />
+        ) : (
+          <div className="pg-audio-viewer__fallback">
+            PG.
+          </div>
+        )}
+
+        <div className="pg-audio-viewer__shade" />
+
+        <div className="pg-audio-viewer__track">
+          <span>AUDIO</span>
+
+          <strong>
+            {post.title || "Untitled audio"}
+          </strong>
+
+          <small>
+            {post.artist || post.username}
+          </small>
+        </div>
+
+        <div
+          className="pg-audio-player"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <button
+            className="pg-audio-player__button"
+            type="button"
+            onClick={togglePlayback}
+            aria-label={playing ? "Pause audio" : "Play audio"}
+          >
+            <span aria-hidden="true">
+              {playing ? "Ⅱ" : "▶"}
+            </span>
+          </button>
+
+          <span className="pg-audio-player__time">
+            {formatAudioTime(currentTime)}
+          </span>
+
+          <input
+            className="pg-audio-player__timeline"
+            type="range"
+            min="0"
+            max={duration || 0}
+            step="0.01"
+            value={Math.min(currentTime, duration || 0)}
+            onChange={seek}
+            aria-label="Audio playback position"
+          />
+
+          <span className="pg-audio-player__time">
+            {formatAudioTime(duration)}
+          </span>
+        </div>
+
+        <audio
+          ref={audioRef}
+          className="pg-audio-player__engine"
+          src={source}
+          preload="metadata"
+        />
+      </div>
+    </div>
+  );
+}
+
 function ViewerMedia({ post }: { post: Post }) {
   const mediaType = getPostMediaType(post);
   const source = getPostMediaSource(post);
@@ -495,66 +685,7 @@ function ViewerMedia({ post }: { post: Post }) {
   }
 
   if (mediaType === "audio") {
-    const hasVideoVisual =
-      post.companionType === "video" &&
-      Boolean(post.companionSrc);
-
-    return (
-      <div
-        className={`viewer-audio viewer-audio--overlay ${
-          hasVideoVisual
-            ? "viewer-audio--video-visual"
-            : "viewer-audio--image-visual"
-        }`}
-      >
-        <div className="viewer-audio-visual">
-          {hasVideoVisual ? (
-            <video
-              className="viewer-audio-companion"
-              src={post.companionSrc}
-              muted
-              loop
-              autoPlay
-              playsInline
-              preload="metadata"
-            />
-          ) : post.companionSrc ? (
-            <img
-              className="viewer-audio-companion"
-              src={post.companionSrc}
-              alt=""
-              draggable={false}
-            />
-          ) : (
-            <div className="audio-default-art audio-default-art--viewer">
-              <span>PG.</span>
-            </div>
-          )}
-
-          <div className="viewer-audio-scrim" />
-
-          <div className="viewer-audio-copy">
-            <span>AUDIO</span>
-
-            <strong>
-              {post.title || "Untitled audio"}
-            </strong>
-
-            <small>
-              {post.artist || post.username}
-            </small>
-          </div>
-
-          <div className="viewer-audio-player-shell">
-            <audio
-              src={source}
-              controls
-              preload="auto"
-            />
-          </div>
-        </div>
-      </div>
-    );
+    return <AudioViewerMedia post={post} />;
   }
 
   return (
