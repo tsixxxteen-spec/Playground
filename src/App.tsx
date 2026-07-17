@@ -495,11 +495,22 @@ function ViewerMedia({ post }: { post: Post }) {
   }
 
   if (mediaType === "audio") {
+    const hasVideoVisual =
+      post.companionType === "video" &&
+      Boolean(post.companionSrc);
+
     return (
-      <div className="viewer-audio">
+      <div
+        className={`viewer-audio viewer-audio--overlay ${
+          hasVideoVisual
+            ? "viewer-audio--video-visual"
+            : "viewer-audio--image-visual"
+        }`}
+      >
         <div className="viewer-audio-visual">
-          {post.companionType === "video" && post.companionSrc ? (
+          {hasVideoVisual ? (
             <video
+              className="viewer-audio-companion"
               src={post.companionSrc}
               muted
               loop
@@ -509,6 +520,7 @@ function ViewerMedia({ post }: { post: Post }) {
             />
           ) : post.companionSrc ? (
             <img
+              className="viewer-audio-companion"
               src={post.companionSrc}
               alt=""
               draggable={false}
@@ -519,18 +531,28 @@ function ViewerMedia({ post }: { post: Post }) {
             </div>
           )}
 
+          <div className="viewer-audio-scrim" />
+
           <div className="viewer-audio-copy">
             <span>AUDIO</span>
-            <strong>{post.title || "Untitled audio"}</strong>
-            <small>{post.artist || post.username}</small>
+
+            <strong>
+              {post.title || "Untitled audio"}
+            </strong>
+
+            <small>
+              {post.artist || post.username}
+            </small>
+          </div>
+
+          <div className="viewer-audio-player-shell">
+            <audio
+              src={source}
+              controls
+              preload="auto"
+            />
           </div>
         </div>
-
-        <audio
-          src={source}
-          controls
-          preload="auto"
-        />
       </div>
     );
   }
@@ -542,7 +564,9 @@ function ViewerMedia({ post }: { post: Post }) {
       draggable={false}
       decoding="sync"
       loading="eager"
-      style={{ objectPosition: post.position ?? "center" }}
+      style={{
+        objectPosition: post.position ?? "center",
+      }}
     />
   );
 }
