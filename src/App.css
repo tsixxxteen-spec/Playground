@@ -5450,3 +5450,175 @@ body.composer-open {
     margin: 10px !important;
   }
 }
+
+/* =========================================================
+   AUDIO VIEWER LAYOUT REPAIR
+   Keeps playback, caption and Push controls separated.
+   ========================================================= */
+
+/* Audio viewer becomes a structured card rather than overlapping layers. */
+.viewer-frame:has(.viewer-audio) {
+  display: block !important;
+  width: min(920px, calc(100vw - 152px)) !important;
+  height: auto !important;
+  max-height: calc(100vh - 88px) !important;
+  overflow: hidden !important;
+  background: #080809 !important;
+}
+
+/* The audio component fills the frame cleanly. */
+.viewer-frame:has(.viewer-audio) .viewer-audio {
+  display: flex !important;
+  width: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  background: #080809 !important;
+}
+
+/* Reserve enough room beneath the artwork for metadata and playback. */
+.viewer-frame:has(.viewer-audio) .viewer-audio-visual {
+  position: relative !important;
+  width: 100% !important;
+  height: min(64vh, 620px) !important;
+  min-height: 360px !important;
+  flex: 0 1 auto !important;
+}
+
+/* Preserve the uploaded visual companion without distortion. */
+.viewer-frame:has(.viewer-audio) .viewer-audio-visual > img,
+.viewer-frame:has(.viewer-audio) .viewer-audio-visual > video,
+.viewer-frame:has(.viewer-audio) .viewer-audio-visual > .audio-default-art {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  background: #080809 !important;
+}
+
+/* Keep the track title safely above the lower controls. */
+.viewer-frame:has(.viewer-audio) .viewer-audio-copy {
+  right: 22px !important;
+  bottom: 26px !important;
+  left: 22px !important;
+  padding-right: 150px !important;
+}
+
+/* Native audio playback receives its own dock. */
+.viewer-frame:has(.viewer-audio) .viewer-audio > audio {
+  position: relative !important;
+  z-index: 5 !important;
+
+  display: block !important;
+  width: calc(100% - 28px) !important;
+  height: 54px !important;
+
+  margin: 14px !important;
+
+  border-radius: 12px !important;
+  background: #111113 !important;
+
+  flex: 0 0 auto !important;
+}
+
+/*
+  The normal viewer caption becomes a separate metadata strip
+  above the playback dock instead of covering it.
+*/
+.viewer-frame:has(.viewer-audio) > .viewer-caption {
+  position: relative !important;
+  z-index: 6 !important;
+
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+
+  display: flex !important;
+  width: 100% !important;
+  min-height: 68px !important;
+
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 20px !important;
+
+  padding: 12px 16px !important;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+
+  background: #0b0b0d !important;
+  pointer-events: auto !important;
+}
+
+/* Prevent long captions from pushing into the Push button. */
+.viewer-frame:has(.viewer-audio) .viewer-caption-copy {
+  min-width: 0 !important;
+  max-width: calc(100% - 112px) !important;
+}
+
+.viewer-frame:has(.viewer-audio) .viewer-caption-copy strong,
+.viewer-frame:has(.viewer-audio) .viewer-caption-copy p,
+.viewer-frame:has(.viewer-audio) .viewer-caption-copy span {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.viewer-frame:has(.viewer-audio) .viewer-caption-copy p {
+  margin-top: 4px !important;
+}
+
+/* Push stays isolated from the playback timeline. */
+.viewer-frame:has(.viewer-audio) .viewer-push {
+  position: relative !important;
+  right: auto !important;
+  bottom: auto !important;
+
+  min-width: 92px !important;
+  height: 34px !important;
+
+  flex: 0 0 auto !important;
+  pointer-events: auto !important;
+}
+
+/* Mobile audio viewer */
+@media (max-width: 760px) {
+  .viewer-frame:has(.viewer-audio) {
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 110px) !important;
+  }
+
+  .viewer-frame:has(.viewer-audio) .viewer-audio-visual {
+    height: 52vh !important;
+    min-height: 280px !important;
+  }
+
+  .viewer-frame:has(.viewer-audio) .viewer-audio-copy {
+    right: 16px !important;
+    bottom: 18px !important;
+    left: 16px !important;
+    padding-right: 0 !important;
+  }
+
+  .viewer-frame:has(.viewer-audio) > .viewer-caption {
+    align-items: stretch !important;
+    flex-direction: row !important;
+    padding: 10px 12px !important;
+  }
+
+  .viewer-frame:has(.viewer-audio) .viewer-caption-copy {
+    max-width: calc(100% - 96px) !important;
+  }
+
+  .viewer-frame:has(.viewer-audio) .viewer-push {
+    min-width: 82px !important;
+  }
+
+  .viewer-frame:has(.viewer-audio) .viewer-audio > audio {
+    width: calc(100% - 20px) !important;
+    margin: 10px !important;
+  }
+}
