@@ -11,6 +11,13 @@ import type { EditableProfile } from "../EditProfile";
 import ProfileMusicPlayer from "../ProfileMusicPlayer";
 import type { ProfileTrack } from "../ProfileMusicPlayer";
 
+import {
+  blobFromSource,
+  deleteProfileMedia,
+  readProfileMedia,
+  saveProfileMedia,
+} from "../../lib/profileMediaStore";
+
 import "./YourPlayground.css";
 
 type YourPlaygroundProps = {
@@ -36,10 +43,10 @@ type StoredProfile = {
   displayName: string;
   username: string;
   bio: string;
-  avatarSrc?: string;
+  avatarSrc?: string | null;
   musicTitle: string;
   musicArtist?: string;
-  musicSrc?: string;
+  musicSrc?: string | null;
   showMusicPlayer: boolean;
 };
 
@@ -116,8 +123,13 @@ function readStoredProfile(
           : fallback.bio,
 
       avatarSrc:
-        typeof parsed.avatarSrc === "string"
-          ? parsed.avatarSrc
+        Object.prototype.hasOwnProperty.call(
+          parsed,
+          "avatarSrc",
+        )
+          ? typeof parsed.avatarSrc === "string"
+            ? parsed.avatarSrc
+            : undefined
           : fallback.avatarSrc,
 
       musicTitle:
@@ -131,8 +143,13 @@ function readStoredProfile(
           : fallback.musicArtist,
 
       musicSrc:
-        typeof parsed.musicSrc === "string"
-          ? parsed.musicSrc
+        Object.prototype.hasOwnProperty.call(
+          parsed,
+          "musicSrc",
+        )
+          ? typeof parsed.musicSrc === "string"
+            ? parsed.musicSrc
+            : undefined
           : fallback.musicSrc,
 
       showMusicPlayer:
@@ -160,14 +177,14 @@ function persistProfile(
 
     avatarSrc: canPersistSource(profile.avatarSrc)
       ? profile.avatarSrc
-      : undefined,
+      : null,
 
     musicTitle: profile.musicTitle,
     musicArtist: profile.musicArtist,
 
     musicSrc: canPersistSource(profile.musicSrc)
       ? profile.musicSrc
-      : undefined,
+      : null,
 
     showMusicPlayer:
       Boolean(profile.musicSrc) &&
@@ -239,23 +256,74 @@ export default function YourPlayground({
     useState(false);
 
   useEffect(() => {
-    if (!editorOpen) {
-      return;
-    }
+    let active = true;
+    let avatarObjectUrl: string | null = null;
+    let musicObjectUrl: string | null = null;
 
-    const currentProfile = profile;
+    const restoreMedia = async () => {
+      try {
+        const [avatarBlob, musicBlob] =
+          await Promise.all([
+            readProfileMedia("profile-avatar"),
+            readProfileMedia("profile-music"),
+          ]);
 
-    return () => {
-      if (
-        currentProfile.avatarSrc?.startsWith(
-          "blob:",
-        )
-      ) {
-        // The active preview remains valid for this
-        // session. Permanent file storage comes later.
+        if (!active) {
+          return;
+        }
+
+        if (avatarBlob) {
+          avatarObjectUrl =
+            URL.createObjectURL(avatarBlob);
+        }
+
+        if (musicBlob) {
+          musicObjectUrl =
+            URL.createObjectURL(musicBlob);
+        }
+
+        if (
+          avatarObjectUrl ||
+          musicObjectUrl
+        ) {
+          setProfile((currentProfile) => ({
+            ...currentProfile,
+
+            avatarSrc:
+              avatarObjectUrl ??
+              currentProfile.avatarSrc,
+
+            musicSrc:
+              musicObjectUrl ??
+              currentProfile.musicSrc,
+          }));
+        }
+      } catch (error) {
+        console.error(
+          "Could not restore profile media:",
+          error,
+        );
       }
     };
-  }, [editorOpen, profile]);
+
+    void restoreMedia();
+
+    return () => {
+      active = false;
+
+      if (avatarObjectUrl) {
+        URL.revokeObjectURL(
+          avatarObjectUrl,
+        );
+      }
+
+      if (musicObjectUrl) {
+        URL.revokeObjectURL(
+          musicObjectUrl,
+        );
+      }
+    };
+  }, []);
 
   const profileTrack =
     profile.musicSrc && profile.musicTitle
@@ -268,9 +336,56 @@ export default function YourPlayground({
         }
       : null;
 
-  const saveProfile = (
+  const saveProfile = async (
     nextProfile: EditableProfile,
   ) => {
+    try {
+      if (
+        nextProfile.avatarSrc?.startsWith(
+          "blob:",
+        )
+      ) {
+        const avatarBlob =
+          await blobFromSource(
+            nextProfile.avatarSrc,
+          );
+
+        await saveProfileMedia(
+          "profile-avatar",
+          avatarBlob,
+        );
+      } else if (!nextProfile.avatarSrc) {
+        await deleteProfileMedia(
+          "profile-avatar",
+        );
+      }
+
+      if (
+        nextProfile.musicSrc?.startsWith(
+          "blob:",
+        )
+      ) {
+        const musicBlob =
+          await blobFromSource(
+            nextProfile.musicSrc,
+          );
+
+        await saveProfileMedia(
+          "profile-music",
+          musicBlob,
+        );
+      } else if (!nextProfile.musicSrc) {
+        await deleteProfileMedia(
+          "profile-music",
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Could not permanently save profile media:",
+        error,
+      );
+    }
+
     setProfile(nextProfile);
     persistProfile(nextProfile);
     setEditorOpen(false);
