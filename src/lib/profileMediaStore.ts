@@ -4,7 +4,8 @@ const STORE_NAME = "media";
 
 export type ProfileMediaKey =
   | "profile-avatar"
-  | "profile-music";
+  | "profile-music"
+  | `profile-track:${string}`;
 
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {

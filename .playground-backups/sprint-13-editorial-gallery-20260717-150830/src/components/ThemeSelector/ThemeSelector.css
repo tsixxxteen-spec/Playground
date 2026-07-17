@@ -1,0 +1,28 @@
+.theme-selector{display:grid;gap:18px;padding-top:27px;border-top:1px solid rgba(255,255,255,.08)}
+.theme-selector__header{display:flex;align-items:end;justify-content:space-between;gap:20px}
+.theme-selector__header span{font:7px "Courier New",monospace;letter-spacing:.15em;opacity:.48}
+.theme-selector__header h3{margin:5px 0 0;font:11px "Courier New",monospace;letter-spacing:.08em}
+.theme-selector__header p{width:min(100%,330px);margin:0;font-size:9px;line-height:1.5;text-align:right;opacity:.5}
+.theme-selector__filters{display:flex;gap:7px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.theme-selector__filters::-webkit-scrollbar{display:none}
+.theme-selector__filters button{flex:0 0 auto;padding:7px 10px;border:1px solid rgba(255,255,255,.11);border-radius:999px;background:rgba(255,255,255,.035);color:inherit;cursor:pointer;font:7px "Courier New",monospace;letter-spacing:.1em;text-transform:uppercase}
+.theme-selector__filters button[data-active="true"]{border-color:#fff200;background:#fff200;color:#111}
+.theme-selector__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.theme-selector__option{display:grid;gap:9px;min-width:0;padding:9px;border:1px solid rgba(255,255,255,.11);border-radius:14px;background:rgba(255,255,255,.035);color:inherit;cursor:pointer;text-align:left;transition:border-color 160ms ease,background 160ms ease,transform 160ms ease}
+.theme-selector__option:hover{border-color:rgba(255,255,255,.28);transform:translateY(-2px)}
+.theme-selector__option[data-selected="true"]{border-color:#fff200;background:rgba(255,242,0,.075)}
+.theme-selector__preview{position:relative;display:flex;aspect-ratio:1.42;overflow:hidden;flex-direction:column;justify-content:flex-end;padding:12px;border:1px solid;border-radius:8px}
+.theme-selector__preview::after{position:absolute;inset:0;background:linear-gradient(110deg,transparent 52%,currentColor 52% 53%,transparent 53%),linear-gradient(180deg,transparent 62%,currentColor 62% 63%,transparent 63%);content:"";opacity:.12}
+.theme-selector__preview-kicker{position:absolute;z-index:1;top:10px;left:11px;font:6px "Courier New",monospace;letter-spacing:.13em;text-transform:uppercase}
+.theme-selector__preview>strong{position:relative;z-index:1;max-width:82%;font-size:clamp(14px,1.4vw,23px);font-weight:500;line-height:.9;letter-spacing:-.05em}
+.theme-selector__preview>i{position:absolute;z-index:1;top:10px;right:10px;width:9px;height:9px;border-radius:50%}
+.theme-selector__preview>small{position:absolute;z-index:1;right:10px;bottom:10px;display:grid;width:22%;gap:3px}
+.theme-selector__preview>small b{height:2px;background:currentColor;opacity:.45}
+.theme-selector__meta{display:flex;align-items:start;justify-content:space-between;gap:8px}
+.theme-selector__meta>span{display:grid;min-width:0;gap:3px}
+.theme-selector__meta strong{overflow:hidden;font-size:9px;text-overflow:ellipsis;white-space:nowrap}
+.theme-selector__meta small,.theme-selector__meta em{font:6px "Courier New",monospace;letter-spacing:.08em;text-transform:uppercase;opacity:.48}
+.theme-selector__meta em{color:#fff200;font-style:normal;opacity:1}
+@media(max-width:760px){.theme-selector__grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.theme-selector__header{align-items:start;flex-direction:column;gap:7px}.theme-selector__header p{text-align:left}}
+@media(max-width:420px){.theme-selector__grid{grid-template-columns:1fr}}

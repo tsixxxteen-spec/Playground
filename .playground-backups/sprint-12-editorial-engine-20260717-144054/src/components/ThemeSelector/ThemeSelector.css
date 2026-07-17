@@ -1,0 +1,115 @@
+.theme-selector {
+  display: grid;
+  gap: 18px;
+  padding-top: 27px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+.theme-selector__header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+}
+.theme-selector__header span {
+  font: 7px "Courier New", monospace;
+  letter-spacing: .15em;
+  opacity: .48;
+}
+.theme-selector__header h3 {
+  margin: 5px 0 0;
+  font: 11px "Courier New", monospace;
+  letter-spacing: .08em;
+}
+.theme-selector__header p {
+  width: min(100%, 310px);
+  margin: 0;
+  font-size: 9px;
+  line-height: 1.5;
+  text-align: right;
+  opacity: .5;
+}
+.theme-selector__grid {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 12px;
+}
+.theme-selector__option {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid rgba(255,255,255,.11);
+  border-radius: 14px;
+  background: rgba(255,255,255,.035);
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+.theme-selector__option[data-selected="true"] {
+  border-color: #fff200;
+  background: rgba(255,242,0,.075);
+}
+.theme-selector__swatch {
+  position: relative;
+  display: block;
+  aspect-ratio: 1.55;
+  overflow: hidden;
+  border: 1px solid;
+  border-radius: 8px;
+}
+.theme-selector__swatch > i {
+  position: absolute;
+  top: 15%;
+  left: 10%;
+  width: 18%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+.theme-selector__swatch > b {
+  position: absolute;
+  top: 19%;
+  right: 10%;
+  width: 52%;
+  height: 4px;
+  background: currentColor;
+  box-shadow: 0 8px 0 color-mix(in srgb,currentColor 45%,transparent);
+}
+.theme-selector__swatch > em {
+  position: absolute;
+  top: 49%;
+  right: 10%;
+  left: 10%;
+  height: 10%;
+  border-radius: 99px;
+}
+.theme-selector__swatch small {
+  position: absolute;
+  right: 10%;
+  bottom: 11%;
+  left: 10%;
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 4px;
+}
+.theme-selector__swatch u {
+  height: 17px;
+  background: currentColor;
+  opacity: .2;
+}
+.theme-selector__option strong {
+  overflow: hidden;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width:620px) {
+  .theme-selector__header {
+    align-items: start;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .theme-selector__header p { text-align:left; }
+  .theme-selector__grid {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+  }
+}

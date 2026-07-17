@@ -1,0 +1,16 @@
+{
+  "files": [
+    {
+      "file": "src/profile-experiences/ExperienceRenderer.css",
+      "didExist": true
+    },
+    {
+      "file": ".playground/upgrade-state.json",
+      "didExist": true
+    },
+    {
+      "file": "package.json",
+      "didExist": true
+    }
+  ]
+}

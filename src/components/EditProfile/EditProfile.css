@@ -559,3 +559,19 @@ input:disabled + span {
     transition: none;
   }
 }
+
+
+/* Legacy one-song editor is replaced by Profile Soundtrack. */
+.edit-profile__music--legacy { display: none !important; }
+
+/* Unified profile audio mode */
+.edit-profile__audio-mode { display: grid; gap: 14px; }
+.edit-profile__audio-mode-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+.edit-profile__audio-mode-grid label { position: relative; cursor: pointer; }
+.edit-profile__audio-mode-grid input { position: absolute; opacity: 0; pointer-events: none; }
+.edit-profile__audio-mode-grid label > span { display: grid; min-height: 76px; align-content: start; gap: 6px; padding: 13px; border: 1px solid rgba(255,255,255,.1); border-radius: 14px; background: rgba(255,255,255,.025); }
+.edit-profile__audio-mode-grid input:checked + span { border-color: #fff200; background: rgba(255,242,0,.08); }
+.edit-profile__audio-mode-grid input:disabled + span { opacity: .34; cursor: not-allowed; }
+.edit-profile__audio-mode-grid strong { font-size: 10px; }
+.edit-profile__audio-mode-grid small { font-size: 8px; line-height: 1.45; opacity: .5; }
+@media (max-width: 700px) { .edit-profile__audio-mode-grid { grid-template-columns: 1fr; } .edit-profile__audio-mode-grid label > span { min-height: auto; } }

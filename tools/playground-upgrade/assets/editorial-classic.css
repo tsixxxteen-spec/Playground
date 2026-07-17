@@ -1,0 +1,199 @@
+.xp--editorial-classic {
+  min-height: 100vh;
+  padding: 18px clamp(18px, 3vw, 54px) 30px;
+  background: var(--pg-background);
+  color: var(--pg-foreground);
+}
+
+.xp-editorial-classic__masthead {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
+  gap: 24px;
+  padding: 10px 0 16px;
+  border-top: 3px double currentColor;
+  border-bottom: 1px solid currentColor;
+}
+
+.xp-editorial-classic__masthead > div {
+  display: grid;
+  gap: 4px;
+}
+
+.xp-editorial-classic__masthead span,
+.xp-editorial-classic__masthead p,
+.xp-editorial-classic__masthead button,
+.xp-editorial-classic__eyebrow,
+.xp-editorial-classic__music header span,
+.xp-editorial-classic__archive header span {
+  margin: 0;
+  font: 700 8px "Courier New", monospace;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.xp-editorial-classic__masthead strong {
+  font: 600 clamp(18px, 2vw, 28px) Georgia, "Times New Roman", serif;
+}
+
+.xp-editorial-classic__masthead button {
+  justify-self: end;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.xp-editorial-classic__hero {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(380px, 1.1fr);
+  gap: clamp(36px, 6vw, 100px);
+  align-items: end;
+  padding: clamp(52px, 8vw, 118px) 0 78px;
+}
+
+.xp-editorial-classic__copy h1 {
+  margin: 12px 0 26px;
+  font: 500 clamp(70px, 10vw, 158px)/0.82 Georgia, "Times New Roman", serif;
+  letter-spacing: -0.07em;
+}
+
+.xp-editorial-classic__copy > p {
+  max-width: 660px;
+  color: var(--pg-muted);
+  font: clamp(18px, 2vw, 28px)/1.25 Georgia, "Times New Roman", serif;
+}
+
+.xp-editorial-classic__copy > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--pg-border);
+  font: 700 8px "Courier New", monospace;
+  letter-spacing: 0.15em;
+}
+
+.xp-editorial-classic__portrait .xp-avatar {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: 0;
+}
+
+.xp-editorial-classic__portrait small {
+  display: block;
+  margin-top: 8px;
+  font: 8px "Courier New", monospace;
+  letter-spacing: 0.16em;
+}
+
+.xp-editorial-classic__quote {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) minmax(230px, auto);
+  gap: clamp(26px, 5vw, 78px);
+  align-items: start;
+  padding: 46px 0 76px;
+  border-top: 1px solid currentColor;
+  border-bottom: 1px solid var(--pg-border);
+}
+
+.xp-editorial-classic__quote > div {
+  display: grid;
+}
+
+.xp-editorial-classic__quote > div span {
+  font: 8px "Courier New", monospace;
+  letter-spacing: 0.16em;
+}
+
+.xp-editorial-classic__quote > div strong {
+  font: 500 74px/0.82 Georgia, "Times New Roman", serif;
+}
+
+.xp-editorial-classic__quote blockquote {
+  margin: 0;
+  font: italic clamp(32px, 4.5vw, 72px)/1 Georgia, "Times New Roman", serif;
+  letter-spacing: -0.045em;
+}
+
+.xp-editorial-classic__music {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.55fr) minmax(0, 1.45fr);
+  gap: clamp(32px, 6vw, 100px);
+  align-items: center;
+  padding: 70px 0;
+  border-bottom: 1px solid currentColor;
+}
+
+.xp-editorial-classic__music h2,
+.xp-editorial-classic__archive h2 {
+  margin: 8px 0 0;
+  font: 500 clamp(46px, 6vw, 92px)/0.88 Georgia, "Times New Roman", serif;
+  letter-spacing: -0.05em;
+}
+
+.xp-editorial-classic__archive {
+  padding: 72px 0 48px;
+}
+
+.xp-editorial-classic__archive > header {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  align-items: end;
+  gap: 34px;
+  margin-bottom: 44px;
+}
+
+.xp-editorial-classic__footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding-top: 18px;
+  border-top: 3px double currentColor;
+  font: 700 8px "Courier New", monospace;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 900px) {
+  .xp-editorial-classic__hero,
+  .xp-editorial-classic__music {
+    grid-template-columns: 1fr;
+  }
+
+  .xp-editorial-classic__quote {
+    grid-template-columns: 96px minmax(0, 1fr);
+  }
+
+  .xp-editorial-classic__quote .xp-stats {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 680px) {
+  .xp--editorial-classic {
+    padding: 14px;
+  }
+
+  .xp-editorial-classic__masthead {
+    grid-template-columns: 1fr auto;
+  }
+
+  .xp-editorial-classic__masthead > p {
+    display: none;
+  }
+
+  .xp-editorial-classic__hero {
+    padding: 42px 0 58px;
+  }
+
+  .xp-editorial-classic__quote,
+  .xp-editorial-classic__archive > header {
+    grid-template-columns: 1fr;
+  }
+
+  .xp-editorial-classic__footer {
+    flex-direction: column;
+    gap: 6px;
+  }
+}

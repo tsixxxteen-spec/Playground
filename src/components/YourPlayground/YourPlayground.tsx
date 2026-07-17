@@ -1,551 +1,219 @@
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
-
 import EditProfile from "../EditProfile";
 import type { EditableProfile } from "../EditProfile";
-
-import ProfileMusicPlayer from "../ProfileMusicPlayer";
 import type { ProfileTrack } from "../ProfileMusicPlayer";
-
-import {
-  DEFAULT_AVATAR_TRANSFORM,
-  getAvatarImageStyle,
-  normalizeAvatarTransform,
-} from "../AvatarStudio";
-import type {
-  AvatarTransform,
-} from "../AvatarStudio";
-
-import {
-  blobFromSource,
-  deleteProfileMedia,
-  readProfileMedia,
-  saveProfileMedia,
-} from "../../lib/profileMediaStore";
-
+import { DEFAULT_AVATAR_TRANSFORM, normalizeAvatarTransform } from "../AvatarStudio";
+import type { AvatarTransform } from "../AvatarStudio";
+import { blobFromSource, deleteProfileMedia, readProfileMedia, saveProfileMedia } from "../../lib/profileMediaStore";
+import { DEFAULT_THEME_ID, getTheme, getThemeStyle } from "../../themes";
+import { EMPTY_PROFILE_SOUNDTRACK, normalizeSoundtrack } from "../../lib/profileSoundtrack";
+import type { ProfileSoundtrack, SoundtrackTrack } from "../../lib/profileSoundtrack";
+import { ExperienceRenderer } from "../../profile-experiences";
 import "./YourPlayground.css";
 
-type YourPlaygroundProps = {
-  displayName: string;
-  username: string;
-  bio: string;
-  avatarSrc?: string;
-
-  postCount: number;
-  followerCount: number;
-  followingCount: number;
-
-  musicTrack: ProfileTrack | null;
-  showMusicPlayer: boolean;
-
-  children?: ReactNode;
+type Props = {
+  displayName: string; username: string; bio: string; avatarSrc?: string;
+  postCount: number; followerCount: number; followingCount: number;
+  musicTrack: ProfileTrack | null; showMusicPlayer: boolean; children?: ReactNode;
 };
 
-const PROFILE_STORAGE_KEY =
-  "playground.profile.settings.v1";
+const PROFILE_STORAGE_KEY = "playground.profile.settings.v2";
 
 type StoredProfile = {
-  displayName: string;
-  username: string;
-  bio: string;
-  avatarSrc?: string | null;
-  avatarTransform?: AvatarTransform;
-  musicTitle: string;
-  musicArtist?: string;
-  musicSrc?: string | null;
-  showMusicPlayer: boolean;
+  displayName: string; username: string; bio: string; avatarSrc?: string | null;
+  avatarTransform?: AvatarTransform; avatarTransforms?: Record<string, AvatarTransform>;
+  soundtrack?: ProfileSoundtrack; showMusicPlayer: boolean; themeId: string;
 };
 
-function formatCount(value: number): string {
-  if (value >= 1_000_000) {
-    return `${(value / 1_000_000)
-      .toFixed(value >= 10_000_000 ? 0 : 1)
-      .replace(".0", "")}M`;
-  }
-
-  if (value >= 1_000) {
-    return `${(value / 1_000)
-      .toFixed(value >= 10_000 ? 0 : 1)
-      .replace(".0", "")}K`;
-  }
-
-  return String(value);
+function canPersistSource(source?: string): boolean {
+  return Boolean(source && !source.startsWith("blob:"));
 }
 
-function getInitials(displayName: string): string {
-  const words = displayName
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean);
-
-  if (words.length === 0) {
-    return "PG";
-  }
-
-  return words
-    .slice(0, 2)
-    .map((word) => word[0]?.toUpperCase() ?? "")
-    .join("");
+function soundtrackForStorage(soundtrack: ProfileSoundtrack): ProfileSoundtrack {
+  return {
+    ...soundtrack,
+    tracks: soundtrack.tracks.map((track) => ({
+      ...track,
+      source: track.sourceType === "upload" && track.source.startsWith("blob:") ? "" : track.source,
+    })),
+  };
 }
 
-function canPersistSource(
-  source: string | undefined,
-): boolean {
-  if (!source) {
-    return false;
-  }
-
-  return !source.startsWith("blob:");
-}
-
-function readStoredProfile(
-  fallback: EditableProfile,
-): EditableProfile {
+function readStoredProfile(fallback: EditableProfile): EditableProfile {
   try {
-    const raw = window.localStorage.getItem(
-      PROFILE_STORAGE_KEY,
-    );
-
-    if (!raw) {
-      return fallback;
-    }
-
-    const parsed = JSON.parse(raw) as Partial<StoredProfile>;
+    const raw = window.localStorage.getItem(PROFILE_STORAGE_KEY) ?? window.localStorage.getItem("playground.profile.settings.v1");
+    if (!raw) return fallback;
+    const parsed = JSON.parse(raw) as Partial<StoredProfile> & {
+      musicTitle?: string; musicArtist?: string; musicSrc?: string | null;
+    };
+    const migratedSoundtrack = parsed.soundtrack ??
+      (parsed.musicSrc && parsed.musicTitle ? {
+        ...EMPTY_PROFILE_SOUNDTRACK,
+        tracks: [{
+          id: "migrated-profile-track",
+          title: parsed.musicTitle,
+          artist: parsed.musicArtist ?? fallback.displayName,
+          sourceType: "upload" as const,
+          source: parsed.musicSrc,
+        }],
+      } : fallback.soundtrack);
 
     return {
-      displayName:
-        typeof parsed.displayName === "string"
-          ? parsed.displayName
-          : fallback.displayName,
-
-      username:
-        typeof parsed.username === "string"
-          ? parsed.username
-          : fallback.username,
-
-      bio:
-        typeof parsed.bio === "string"
-          ? parsed.bio
-          : fallback.bio,
-
-      avatarSrc:
-        Object.prototype.hasOwnProperty.call(
-          parsed,
-          "avatarSrc",
-        )
-          ? typeof parsed.avatarSrc === "string"
-            ? parsed.avatarSrc
-            : undefined
-          : fallback.avatarSrc,
-
-      avatarTransform:
-        normalizeAvatarTransform(
-          parsed.avatarTransform &&
-          typeof parsed.avatarTransform ===
-            "object"
-            ? parsed.avatarTransform
-            : fallback.avatarTransform ??
-              DEFAULT_AVATAR_TRANSFORM,
-        ),
-
-      musicTitle:
-        typeof parsed.musicTitle === "string"
-          ? parsed.musicTitle
-          : fallback.musicTitle,
-
-      musicArtist:
-        typeof parsed.musicArtist === "string"
-          ? parsed.musicArtist
-          : fallback.musicArtist,
-
-      musicSrc:
-        Object.prototype.hasOwnProperty.call(
-          parsed,
-          "musicSrc",
-        )
-          ? typeof parsed.musicSrc === "string"
-            ? parsed.musicSrc
-            : undefined
-          : fallback.musicSrc,
-
-      showMusicPlayer:
-        typeof parsed.showMusicPlayer === "boolean"
-          ? parsed.showMusicPlayer
-          : fallback.showMusicPlayer,
+      displayName: typeof parsed.displayName === "string" ? parsed.displayName : fallback.displayName,
+      username: typeof parsed.username === "string" ? parsed.username : fallback.username,
+      bio: typeof parsed.bio === "string" ? parsed.bio : fallback.bio,
+      avatarSrc: Object.prototype.hasOwnProperty.call(parsed, "avatarSrc")
+        ? typeof parsed.avatarSrc === "string" ? parsed.avatarSrc : undefined
+        : fallback.avatarSrc,
+      avatarTransform: normalizeAvatarTransform(
+        parsed.avatarTransform && typeof parsed.avatarTransform === "object"
+          ? parsed.avatarTransform
+          : fallback.avatarTransform ?? DEFAULT_AVATAR_TRANSFORM,
+      ),
+      avatarTransforms: parsed.avatarTransforms && typeof parsed.avatarTransforms === "object"
+        ? parsed.avatarTransforms
+        : fallback.avatarTransforms,
+      soundtrack: normalizeSoundtrack(migratedSoundtrack ?? EMPTY_PROFILE_SOUNDTRACK),
+      showMusicPlayer: typeof parsed.showMusicPlayer === "boolean" ? parsed.showMusicPlayer : fallback.showMusicPlayer,
+      themeId: typeof parsed.themeId === "string" ? parsed.themeId : fallback.themeId || DEFAULT_THEME_ID,
     };
   } catch (error) {
-    console.error(
-      "Could not read saved profile settings:",
-      error,
-    );
-
+    console.error("Could not read saved profile settings:", error);
     return fallback;
   }
 }
 
-function persistProfile(
-  profile: EditableProfile,
-): void {
-  const storedProfile: StoredProfile = {
+function persistProfile(profile: EditableProfile): void {
+  const soundtrack = normalizeSoundtrack(profile.soundtrack ?? EMPTY_PROFILE_SOUNDTRACK);
+  const stored: StoredProfile = {
     displayName: profile.displayName,
     username: profile.username,
     bio: profile.bio,
-
-    avatarSrc: canPersistSource(profile.avatarSrc)
-      ? profile.avatarSrc
-      : null,
-
-    avatarTransform:
-      profile.avatarTransform ??
-      DEFAULT_AVATAR_TRANSFORM,
-
-    musicTitle: profile.musicTitle,
-    musicArtist: profile.musicArtist,
-
-    musicSrc: canPersistSource(profile.musicSrc)
-      ? profile.musicSrc
-      : null,
-
-    showMusicPlayer:
-      Boolean(profile.musicSrc) &&
-      profile.showMusicPlayer,
+    avatarSrc: canPersistSource(profile.avatarSrc) ? profile.avatarSrc : null,
+    avatarTransform: profile.avatarTransform ?? DEFAULT_AVATAR_TRANSFORM,
+    avatarTransforms: profile.avatarTransforms,
+    soundtrack: soundtrackForStorage(soundtrack),
+    showMusicPlayer: soundtrack.tracks.length > 0 && profile.showMusicPlayer,
+    themeId: profile.themeId || DEFAULT_THEME_ID,
   };
-
-  try {
-    window.localStorage.setItem(
-      PROFILE_STORAGE_KEY,
-      JSON.stringify(storedProfile),
-    );
-  } catch (error) {
-    console.error(
-      "Could not save profile settings:",
-      error,
-    );
-  }
+  window.localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(stored));
 }
 
-export default function YourPlayground({
-  displayName,
-  username,
-  bio,
-  avatarSrc,
-  postCount,
-  followerCount,
-  followingCount,
-  musicTrack,
-  showMusicPlayer,
-  children,
-}: YourPlaygroundProps) {
-  const fallbackProfile =
-    useMemo<EditableProfile>(
-      () => ({
-        displayName,
-        username,
-        bio,
-        avatarSrc,
-        avatarTransform:
-          DEFAULT_AVATAR_TRANSFORM,
+export default function YourPlayground(props: Props) {
+  const { displayName, username, bio, avatarSrc, postCount, followerCount, followingCount, musicTrack, showMusicPlayer, children } = props;
+  const fallbackProfile = useMemo<EditableProfile>(() => ({
+    displayName, username, bio, avatarSrc,
+    avatarTransform: DEFAULT_AVATAR_TRANSFORM,
+    avatarTransforms: { [DEFAULT_THEME_ID]: DEFAULT_AVATAR_TRANSFORM },
+    soundtrack: musicTrack ? {
+      ...EMPTY_PROFILE_SOUNDTRACK,
+      tracks: [{
+        id: "default-profile-track",
+        title: musicTrack.title,
+        artist: musicTrack.artist ?? displayName,
+        sourceType: "upload",
+        source: musicTrack.audioSrc,
+      }],
+    } : EMPTY_PROFILE_SOUNDTRACK,
+    showMusicPlayer: Boolean(musicTrack) && showMusicPlayer,
+    themeId: DEFAULT_THEME_ID,
+  }), [avatarSrc, bio, displayName, musicTrack, showMusicPlayer, username]);
 
-        musicTitle:
-          musicTrack?.title ?? "FREE",
-
-        musicArtist:
-          musicTrack?.artist ?? displayName,
-
-        musicSrc:
-          musicTrack?.audioSrc,
-
-        showMusicPlayer:
-          Boolean(musicTrack) &&
-          showMusicPlayer,
-      }),
-      [
-        avatarSrc,
-        bio,
-        displayName,
-        musicTrack,
-        showMusicPlayer,
-        username,
-      ],
-    );
-
-  const [profile, setProfile] =
-    useState<EditableProfile>(() =>
-      readStoredProfile(fallbackProfile),
-    );
-
-  const [editorOpen, setEditorOpen] =
-    useState(false);
+  const [profile, setProfile] = useState<EditableProfile>(() => readStoredProfile(fallbackProfile));
+  const [editorOpen, setEditorOpen] = useState(false);
 
   useEffect(() => {
     let active = true;
-    let avatarObjectUrl: string | null = null;
-    let musicObjectUrl: string | null = null;
-
-    const restoreMedia = async () => {
+    const objectUrls: string[] = [];
+    void (async () => {
       try {
-        const [avatarBlob, musicBlob] =
-          await Promise.all([
-            readProfileMedia("profile-avatar"),
-            readProfileMedia("profile-music"),
-          ]);
-
-        if (!active) {
-          return;
-        }
-
+        const avatarBlob = await readProfileMedia("profile-avatar");
+        const currentSoundtrack = normalizeSoundtrack(profile.soundtrack ?? EMPTY_PROFILE_SOUNDTRACK);
+        const restoredTracks = await Promise.all(currentSoundtrack.tracks.map(async (track): Promise<SoundtrackTrack> => {
+          if (track.sourceType !== "upload") return track;
+          const blob = await readProfileMedia(`profile-track:${track.id}`);
+          if (!blob) return track;
+          const objectUrl = URL.createObjectURL(blob);
+          objectUrls.push(objectUrl);
+          return { ...track, source: objectUrl };
+        }));
+        if (!active) return;
+        let restoredAvatar: string | undefined;
         if (avatarBlob) {
-          avatarObjectUrl =
-            URL.createObjectURL(avatarBlob);
+          restoredAvatar = URL.createObjectURL(avatarBlob);
+          objectUrls.push(restoredAvatar);
         }
-
-        if (musicBlob) {
-          musicObjectUrl =
-            URL.createObjectURL(musicBlob);
-        }
-
-        if (
-          avatarObjectUrl ||
-          musicObjectUrl
-        ) {
-          setProfile((currentProfile) => ({
-            ...currentProfile,
-
-            avatarSrc:
-              avatarObjectUrl ??
-              currentProfile.avatarSrc,
-
-            musicSrc:
-              musicObjectUrl ??
-              currentProfile.musicSrc,
-          }));
-        }
+        setProfile((current) => ({
+          ...current,
+          avatarSrc: restoredAvatar ?? current.avatarSrc,
+          soundtrack: { ...currentSoundtrack, tracks: restoredTracks },
+        }));
       } catch (error) {
-        console.error(
-          "Could not restore profile media:",
-          error,
-        );
+        console.error("Could not restore profile media:", error);
       }
-    };
-
-    void restoreMedia();
-
+    })();
     return () => {
       active = false;
-
-      if (avatarObjectUrl) {
-        URL.revokeObjectURL(
-          avatarObjectUrl,
-        );
-      }
-
-      if (musicObjectUrl) {
-        URL.revokeObjectURL(
-          musicObjectUrl,
-        );
-      }
+      objectUrls.forEach((url) => URL.revokeObjectURL(url));
     };
   }, []);
 
-  const profileTrack =
-    profile.musicSrc && profile.musicTitle
-      ? {
-          title: profile.musicTitle,
-          artist:
-            profile.musicArtist ||
-            profile.displayName,
-          audioSrc: profile.musicSrc,
-        }
-      : null;
+  const activeTheme = getTheme(profile.themeId || DEFAULT_THEME_ID);
+  const activeAvatarTransform = normalizeAvatarTransform(
+    profile.avatarTransforms?.[activeTheme.id] ?? profile.avatarTransform ?? DEFAULT_AVATAR_TRANSFORM,
+  );
+  const soundtrack = normalizeSoundtrack(profile.soundtrack ?? EMPTY_PROFILE_SOUNDTRACK);
 
-  const saveProfile = async (
-    nextProfile: EditableProfile,
-  ) => {
+  const saveProfile = async (next: EditableProfile) => {
+    const mergedNext: EditableProfile = {
+      ...next,
+      avatarSrc: next.avatarSrc ?? profile.avatarSrc,
+      avatarTransforms: next.avatarTransforms ?? profile.avatarTransforms,
+      soundtrack: normalizeSoundtrack(next.soundtrack ?? profile.soundtrack),
+    };
     try {
-      if (
-        nextProfile.avatarSrc?.startsWith(
-          "blob:",
-        )
-      ) {
-        const avatarBlob =
-          await blobFromSource(
-            nextProfile.avatarSrc,
-          );
-
-        await saveProfileMedia(
-          "profile-avatar",
-          avatarBlob,
-        );
-      } else if (!nextProfile.avatarSrc) {
-        await deleteProfileMedia(
-          "profile-avatar",
-        );
+      if (mergedNext.avatarSrc?.startsWith("blob:")) {
+        await saveProfileMedia("profile-avatar", await blobFromSource(mergedNext.avatarSrc));
+      } else if (!mergedNext.avatarSrc) {
+        await deleteProfileMedia("profile-avatar");
       }
-
-      if (
-        nextProfile.musicSrc?.startsWith(
-          "blob:",
-        )
-      ) {
-        const musicBlob =
-          await blobFromSource(
-            nextProfile.musicSrc,
-          );
-
-        await saveProfileMedia(
-          "profile-music",
-          musicBlob,
-        );
-      } else if (!nextProfile.musicSrc) {
-        await deleteProfileMedia(
-          "profile-music",
-        );
+      for (const track of mergedNext.soundtrack?.tracks ?? []) {
+        if (track.sourceType === "upload" && track.source.startsWith("blob:")) {
+          await saveProfileMedia(`profile-track:${track.id}`, await blobFromSource(track.source));
+        }
       }
     } catch (error) {
-      console.error(
-        "Could not permanently save profile media:",
-        error,
-      );
+      console.error("Could not permanently save profile media:", error);
     }
-
-    setProfile(nextProfile);
-    persistProfile(nextProfile);
+    setProfile(mergedNext);
+    persistProfile(mergedNext);
     setEditorOpen(false);
   };
 
-  return (
-    <>
-      <section
-        className="your-playground"
-        aria-label={`${profile.displayName} profile`}
-      >
-        <header className="your-playground__profile">
-          <div className="your-playground__identity">
-            <div className="your-playground__avatar">
-              {profile.avatarSrc ? (
-                <img
-                  src={profile.avatarSrc}
-                  alt={`${profile.displayName} profile`}
-                  draggable={false}
-                  style={getAvatarImageStyle(
-                    profile.avatarTransform ??
-                      DEFAULT_AVATAR_TRANSFORM,
-                  )}
-                />
-              ) : (
-                <span aria-hidden="true">
-                  {getInitials(
-                    profile.displayName,
-                  )}
-                </span>
-              )}
-            </div>
+  const hiddenAutoplay = soundtrack.tracks.length > 0 && !profile.showMusicPlayer && soundtrack.autoplay;
 
-            <div className="your-playground__details">
-              <div className="your-playground__name-row">
-                <div>
-                  <h1>
-                    {profile.displayName}
-                  </h1>
-
-                  <p>{profile.username}</p>
-                </div>
-
-                <button
-                  className="your-playground__edit"
-                  type="button"
-                  onClick={() =>
-                    setEditorOpen(true)
-                  }
-                >
-                  Edit profile
-                </button>
-              </div>
-
-              {profile.bio && (
-                <p className="your-playground__bio">
-                  {profile.bio}
-                </p>
-              )}
-
-              <ProfileMusicPlayer
-                track={profileTrack}
-                visible={
-                  profile.showMusicPlayer
-                }
-              />
-            </div>
-          </div>
-
-          <dl className="your-playground__stats">
-            <div>
-              <dt>
-                {formatCount(postCount)}
-              </dt>
-              <dd>Posts</dd>
-            </div>
-
-            <div>
-              <dt>
-                {formatCount(
-                  followerCount,
-                )}
-              </dt>
-              <dd>Followers</dd>
-            </div>
-
-            <div>
-              <dt>
-                {formatCount(
-                  followingCount,
-                )}
-              </dt>
-              <dd>Following</dd>
-            </div>
-          </dl>
-        </header>
-
-        <div className="your-playground__divider" />
-
-        <section
-          className="your-playground__work"
-          aria-label={`${profile.displayName} posts`}
-        >
-          <div className="your-playground__section-heading">
-            <span>YOUR WORK</span>
-            <span>{postCount}</span>
-          </div>
-
-          {children ? (
-            children
-          ) : (
-            <div className="your-playground__empty">
-              <strong>
-                Your Playground is waiting.
-              </strong>
-
-              <p>
-                Work you publish will appear
-                here.
-              </p>
-            </div>
-          )}
-        </section>
-      </section>
-
-      {editorOpen && (
-        <EditProfile
-          profile={profile}
-          onCancel={() =>
-            setEditorOpen(false)
-          }
-          onSave={saveProfile}
-        />
-      )}
-    </>
-  );
+  return <>
+    <ExperienceRenderer
+      themeId={activeTheme.id}
+      className={activeTheme.className}
+      style={getThemeStyle(activeTheme)}
+      profile={{
+        displayName: profile.displayName,
+        username: profile.username,
+        bio: profile.bio,
+        avatarSrc: profile.avatarSrc,
+        avatarTransform: activeAvatarTransform,
+      }}
+      posts={children}
+      postCount={postCount}
+      followerCount={followerCount}
+      followingCount={followingCount}
+      soundtrack={soundtrack}
+      showMusicPlayer={profile.showMusicPlayer}
+      hiddenAutoplay={hiddenAutoplay}
+      onEdit={() => setEditorOpen(true)}
+    />
+    {editorOpen && <EditProfile profile={profile} onCancel={() => setEditorOpen(false)} onSave={saveProfile} />}
+  </>;
 }

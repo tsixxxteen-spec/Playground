@@ -1,0 +1,21 @@
+.soundtrack-editor { display:grid; gap:18px; padding-top:27px; border-top:1px solid rgba(255,255,255,.08); }
+.soundtrack-editor header span { font:7px "Courier New",monospace; letter-spacing:.15em; opacity:.48; }
+.soundtrack-editor header h3 { margin:5px 0 0; font:11px "Courier New",monospace; }
+.soundtrack-editor__toggles { display:flex; flex-wrap:wrap; gap:18px; }
+.soundtrack-editor__toggles label { display:flex; flex-direction:row; align-items:center; gap:8px; font-size:9px; }
+.soundtrack-editor__upload,.soundtrack-editor__link { display:grid; gap:10px; padding:16px; border:1px solid rgba(255,255,255,.09); border-radius:16px; }
+.soundtrack-editor__upload { grid-template-columns:minmax(0,1fr) auto; align-items:center; }
+.soundtrack-editor__upload p,.soundtrack-editor__link small { margin:4px 0 0; font-size:8px; line-height:1.5; opacity:.45; }
+.soundtrack-editor button { min-height:32px; padding:0 12px; border:1px solid rgba(255,255,255,.14); border-radius:999px; background:transparent; color:inherit; cursor:pointer; }
+.soundtrack-editor__link { grid-template-columns:1.4fr 1fr 1fr auto; }
+.soundtrack-editor__link input { min-width:0; height:40px; padding:0 11px; border:1px solid rgba(255,255,255,.11); border-radius:11px; background:rgba(255,255,255,.045); color:#fff; }
+.soundtrack-editor__link small { grid-column:1/-1; }
+.soundtrack-editor__tracks { display:grid; gap:8px; }
+.soundtrack-editor__tracks article { display:grid; grid-template-columns:28px minmax(0,1fr) auto; align-items:center; gap:10px; padding:10px; border:1px solid rgba(255,255,255,.09); border-radius:12px; }
+.soundtrack-editor__tracks article>span,.soundtrack-editor__tracks small { font:7px "Courier New",monospace; opacity:.45; }
+.soundtrack-editor__tracks article>div:nth-child(2) { display:grid; min-width:0; gap:3px; }
+.soundtrack-editor__tracks strong,.soundtrack-editor__tracks small { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.soundtrack-editor__tracks article>div:last-child { display:flex; gap:5px; }
+.soundtrack-editor__tracks button { min-height:26px; padding:0 8px; font-size:8px; }
+.soundtrack-editor__tracks button:disabled { opacity:.25; cursor:not-allowed; }
+@media(max-width:700px){.soundtrack-editor__upload,.soundtrack-editor__link{grid-template-columns:1fr}.soundtrack-editor__tracks article{grid-template-columns:24px minmax(0,1fr)}.soundtrack-editor__tracks article>div:last-child{grid-column:2}}

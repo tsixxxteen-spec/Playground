@@ -1,230 +1,94 @@
-.profile-bio-music {
-  --profile-music-accent: #fff200;
+.profile-soundtrack{--soundtrack-accent:var(--experience-accent,#fff200);width:min(100%,430px);color:inherit;font-family:inherit}.profile-soundtrack button{color:inherit;font:inherit}.profile-soundtrack__header,.profile-soundtrack__controls{display:flex;align-items:center;gap:10px}.profile-soundtrack__header{justify-content:space-between}.profile-soundtrack__identity{display:flex;min-width:0;align-items:center;gap:9px;padding:0;border:0;background:transparent;cursor:pointer;text-align:left}.profile-soundtrack__identity>span:first-child{color:var(--soundtrack-accent)}.profile-soundtrack__identity>span:last-child{display:grid;min-width:0;gap:2px}.profile-soundtrack__identity strong,.profile-soundtrack__identity small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.profile-soundtrack__identity strong{font:700 10px "Courier New",monospace;letter-spacing:.07em;text-transform:uppercase}.profile-soundtrack__identity small,.profile-soundtrack__count{font:7px "Courier New",monospace;opacity:.48}.profile-soundtrack__controls{margin-top:12px}.profile-soundtrack__controls>button{display:grid;width:28px;height:28px;flex:0 0 auto;place-items:center;padding:0;border:1px solid color-mix(in srgb,currentColor 18%,transparent);border-radius:50%;background:transparent;cursor:pointer;font-size:8px}.profile-soundtrack__controls>button:disabled{opacity:.28;cursor:not-allowed}.profile-soundtrack__controls .profile-soundtrack__play{border-color:var(--soundtrack-accent)}.profile-soundtrack__timeline{display:grid;min-width:0;flex:1;gap:4px}.profile-soundtrack__timeline input{width:100%;margin:0;accent-color:var(--soundtrack-accent)}.profile-soundtrack__timeline>div{display:flex;justify-content:space-between;font:7px "Courier New",monospace;opacity:.45}.profile-soundtrack__playlist{display:grid;max-height:0;gap:4px;overflow:hidden;opacity:0;transition:max-height .26s ease,margin-top .26s ease,opacity .18s ease}.profile-soundtrack--expanded .profile-soundtrack__playlist{max-height:320px;margin-top:14px;overflow-y:auto;opacity:1}.profile-soundtrack__playlist>button{display:grid;grid-template-columns:24px minmax(0,1fr) auto;align-items:center;gap:9px;padding:8px;border:1px solid transparent;background:transparent;cursor:pointer;text-align:left}.profile-soundtrack__playlist>button:hover,.profile-soundtrack__playlist>button[data-active="true"]{border-color:color-mix(in srgb,currentColor 16%,transparent);background:color-mix(in srgb,currentColor 6%,transparent)}.profile-soundtrack__playlist>button>span:first-child,.profile-soundtrack__playlist em{font:7px "Courier New",monospace;font-style:normal;opacity:.48}.profile-soundtrack__playlist>button>span:nth-child(2){display:grid;min-width:0;gap:2px}.profile-soundtrack__playlist strong,.profile-soundtrack__playlist small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.profile-soundtrack__playlist strong{font-size:9px}.profile-soundtrack__playlist small{font-size:7px;opacity:.5}.profile-soundtrack>audio{display:none}.profile-soundtrack--editorial{--soundtrack-accent:#9b2f25;padding-top:10px;border-top:1px solid var(--experience-border)}.profile-soundtrack--utility{--soundtrack-accent:#ff4e00;width:100%;padding:9px;border:1px solid #111;background:#fff}.profile-soundtrack--utility .profile-soundtrack__controls>button,.profile-soundtrack--pixel .profile-soundtrack__controls>button{border-radius:0}.profile-soundtrack--graphite{--soundtrack-accent:#e6a23c;width:100%}.profile-soundtrack--pixel{--soundtrack-accent:#ff8ad4;width:100%;font-family:"Courier New",monospace}.profile-soundtrack--stardust{--soundtrack-accent:#ffc9ff;width:100%}.profile-soundtrack--release{--soundtrack-accent:#fff200;width:100%}@media(prefers-reduced-motion:reduce){.profile-soundtrack__playlist{transition:none}}
 
-  width: min(100%, 330px);
-  margin-top: 10px;
+/* Hidden autoplay visitor control */
+.profile-soundtrack--hidden { position: fixed; right: 18px; bottom: 18px; z-index: 12500; width: auto; min-width: 0; padding: 8px; border: 1px solid rgba(255,255,255,.18); border-radius: 999px; background: rgba(11,11,12,.88); box-shadow: 0 12px 38px rgba(0,0,0,.28); backdrop-filter: blur(18px); }
+.profile-soundtrack--hidden .profile-soundtrack__header { display: none; }
+.profile-soundtrack--hidden .profile-soundtrack__controls { margin: 0; }
+.profile-soundtrack--hidden .profile-soundtrack__controls > button:not(.profile-soundtrack__play),
+.profile-soundtrack--hidden .profile-soundtrack__timeline,
+.profile-soundtrack--hidden .profile-soundtrack__playlist { display: none; }
+.profile-soundtrack--hidden .profile-soundtrack__play { width: 34px; height: 34px; }
+@media (max-width: 620px) { .profile-soundtrack--hidden { right: 12px; bottom: 12px; } }
 
-  color: inherit;
-  font-family: inherit;
-}
+/* =========================================================
+   HIDDEN AUTOPLAY — VISIBLE RED PLAY / PAUSE CONTROL
+   ========================================================= */
 
-.profile-bio-music__topline {
-  display: flex;
-  min-height: 28px;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
+.profile-soundtrack--hidden
+.profile-soundtrack__play {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
 
-.profile-bio-music__identity {
-  display: inline-flex;
-  min-width: 0;
-  align-items: center;
-  gap: 7px;
+  padding: 0;
 
-  padding: 3px 0;
+  border: 2px solid #ff241f;
+  border-radius: 999px;
 
-  border: 0;
-  background: transparent;
-  color: inherit;
+  background: rgba(255, 36, 31, 0.08);
+  color: #ff241f;
 
-  cursor: pointer;
-  font: inherit;
-  text-align: left;
-}
-
-.profile-bio-music__note {
-  flex: 0 0 auto;
-
-  color: var(--profile-music-accent);
-
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 14px;
+  font-size: 17px;
+  font-weight: 800;
   line-height: 1;
-}
-
-.profile-bio-music__title {
-  overflow: hidden;
-
-  font-family: "Courier New", monospace;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  line-height: 1.2;
-  text-overflow: ellipsis;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.profile-bio-music__identity:hover
-.profile-bio-music__title {
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-
-.profile-bio-music__actions {
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  gap: 7px;
-}
-
-.profile-bio-music__duration {
-  font-family: "Courier New", monospace;
-  font-size: 8px;
-  opacity: 0.48;
-}
-
-.profile-bio-music__collapse {
-  display: grid;
-  width: 20px;
-  height: 20px;
-  place-items: center;
-
-  padding: 0;
-
-  border: 0;
-  border-radius: 50%;
-
-  background: transparent;
-  color: inherit;
-
-  cursor: pointer;
-  font-size: 15px;
-  opacity: 0.48;
-}
-
-.profile-bio-music__collapse:hover {
-  background: color-mix(
-    in srgb,
-    currentColor 8%,
-    transparent
-  );
-  opacity: 1;
-}
-
-.profile-bio-music__expanded-content {
-  display: grid;
-  grid-template-rows: 0fr;
-
-  overflow: hidden;
-  opacity: 0;
-
-  transition:
-    grid-template-rows 220ms
-      cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 150ms ease;
-}
-
-.profile-bio-music--expanded
-.profile-bio-music__expanded-content {
-  grid-template-rows: 1fr;
-  opacity: 1;
-}
-
-.profile-bio-music__expanded-content > * {
-  min-height: 0;
-}
-
-.profile-bio-music__playback {
-  display: grid;
-  grid-template-columns: 28px minmax(0, 1fr);
-  align-items: center;
-  gap: 9px;
-
-  padding: 5px 0 3px;
-}
-
-.profile-bio-music__play {
-  display: grid;
-  width: 28px;
-  height: 28px;
-  place-items: center;
-
-  padding: 0;
-
-  border: 1px solid color-mix(
-    in srgb,
-    currentColor 16%,
-    transparent
-  );
-  border-radius: 50%;
-
-  background: transparent;
-  color: inherit;
 
   cursor: pointer;
 
+  opacity: 1;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 0 18px rgba(255, 36, 31, 0.42),
+    0 10px 30px rgba(255, 36, 31, 0.18);
+
   transition:
-    border-color 160ms ease,
+    transform 160ms ease,
     background 160ms ease,
     color 160ms ease,
-    transform 160ms ease;
+    border-color 160ms ease,
+    box-shadow 160ms ease;
 }
 
-.profile-bio-music__play:hover {
-  border-color: var(--profile-music-accent);
-  background: var(--profile-music-accent);
-  color: #111;
+.profile-soundtrack--hidden
+.profile-soundtrack__play:hover {
+  transform: scale(1.07);
+
+  border-color: #ff3b36;
+  background: #ff241f;
+  color: #ffffff;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 0 24px rgba(255, 36, 31, 0.7),
+    0 12px 34px rgba(255, 36, 31, 0.32);
 }
 
-.profile-bio-music__play:active {
-  transform: scale(0.92);
+.profile-soundtrack--hidden
+.profile-soundtrack__play:active {
+  transform: scale(0.93);
 }
 
-.profile-bio-music__play span {
-  font-size: 9px;
-  line-height: 1;
-  transform: translateX(1px);
+.profile-soundtrack--hidden
+.profile-soundtrack__play:focus-visible {
+  outline: none;
+
+  box-shadow:
+    0 0 0 4px rgba(255, 36, 31, 0.28),
+    0 0 25px rgba(255, 36, 31, 0.72);
 }
 
-.profile-bio-music__timeline {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.profile-bio-music__timeline input {
-  width: 100%;
-  height: 3px;
-  margin: 0;
-
-  accent-color: var(--profile-music-accent);
-
-  cursor: pointer;
-}
-
-.profile-bio-music__times {
-  display: grid;
-  grid-template-columns: 32px minmax(0, 1fr) 32px;
-  align-items: center;
-  gap: 6px;
-
-  font-family: "Courier New", monospace;
-  font-size: 7px;
-  opacity: 0.48;
-}
-
-.profile-bio-music__times span:nth-child(2) {
-  overflow: hidden;
-
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.profile-bio-music__times span:last-child {
-  text-align: right;
-}
-
-.profile-bio-music > audio {
-  display: none;
+.profile-soundtrack--hidden
+.profile-soundtrack__play:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .profile-bio-music__expanded-content,
-  .profile-bio-music__play {
+  .profile-soundtrack--hidden
+  .profile-soundtrack__play {
     transition: none;
   }
 }
+

@@ -1,0 +1,8 @@
+{
+  "engineVersion": "1.0.0",
+  "projectVersion": "0.15.0",
+  "installedPatches": [
+    "sprint-14",
+    "sprint-15"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "files": [
+    {
+      "file": "src/profile-experiences/experiences/EditorialClassic.tsx",
+      "didExist": false
+    },
+    {
+      "file": "src/profile-experiences/experiences/index.ts",
+      "didExist": true
+    },
+    {
+      "file": "src/profile-experiences/ExperienceRenderer.css",
+      "didExist": true
+    },
+    {
+      "file": "src/themes/index.ts",
+      "didExist": true
+    },
+    {
+      "file": ".playground/upgrade-state.json",
+      "didExist": false
+    },
+    {
+      "file": "package.json",
+      "didExist": true
+    }
+  ]
+}
