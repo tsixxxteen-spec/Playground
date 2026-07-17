@@ -1,7 +1,9 @@
 import { CSSProperties, useEffect, useState, useRef } from "react";
 import "./App.css";
+import YourPlayground from "./components/YourPlayground";
 
 type Theme = "light" | "dark" | "system";
+type AppView = "home" | "profile";
 type Weight = "standard" | "wide" | "tall" | "hero" | "panorama";
 
 type MediaType = "image" | "video" | "audio";
@@ -1763,10 +1765,16 @@ function Navigation({
   open,
   onClose,
   onCreate,
+  onHome,
+  onProfile,
+  currentView,
 }: {
   open: boolean;
   onClose: () => void;
   onCreate: () => void;
+  onHome: () => void;
+  onProfile: () => void;
+  currentView: AppView;
 }) {
   return (
     <>
@@ -1784,11 +1792,34 @@ function Navigation({
         </div>
 
         <nav>
-          <button type="button">Slide</button>
+          <button
+            type="button"
+            className={currentView === "home" ? "active" : ""}
+            aria-current={currentView === "home" ? "page" : undefined}
+            onClick={() => {
+              onClose();
+              onHome();
+            }}
+          >
+            Slide
+          </button>
+
           <button type="button">Explore</button>
           <button type="button">Activity</button>
           <button type="button">Messages</button>
-          <button type="button">Your Playground</button>
+
+          <button
+            type="button"
+            className={currentView === "profile" ? "active" : ""}
+            aria-current={currentView === "profile" ? "page" : undefined}
+            onClick={() => {
+              onClose();
+              onProfile();
+            }}
+          >
+            Your Playground
+          </button>
+
           <button type="button">Settings</button>
         </nav>
 
@@ -1818,6 +1849,8 @@ function Navigation({
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [composerOpen, setComposerOpen] = useState(false);
+  const [currentView, setCurrentView] =
+    useState<AppView>("home");
   const [feedPosts, setFeedPosts] = useState<Post[]>(posts);
   const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
   const [pushedPostIds, setPushedPostIds] = useState<number[]>(() => {
@@ -1987,7 +2020,25 @@ function App() {
         <div className="utility-actions">
           <ThemeControl theme={theme} onChange={setTheme} />
 
-          <button className="user-button" type="button">
+          <button
+            className="user-button"
+            type="button"
+            aria-label="Open Your Playground"
+            aria-current={
+              currentView === "profile"
+                ? "page"
+                : undefined
+            }
+            onClick={() => {
+              setMenuOpen(false);
+              setSelectedPostIndex(null);
+              setCurrentView("profile");
+              window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+              });
+            }}
+          >
             TP
           </button>
         </div>
@@ -1995,21 +2046,97 @@ function App() {
 
       <Navigation
         open={menuOpen}
+        currentView={currentView}
         onClose={() => setMenuOpen(false)}
         onCreate={() => setComposerOpen(true)}
+        onHome={() => {
+          setSelectedPostIndex(null);
+          setCurrentView("home");
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+          });
+        }}
+        onProfile={() => {
+          setSelectedPostIndex(null);
+          setCurrentView("profile");
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+          });
+        }}
       />
 
-      <section className="weighted-wall" aria-label="Slide">
-        {feedPosts.map((post, index) => (
-          <PostTile
-            post={post}
-            key={post.id}
-            pushed={pushedPostIds.includes(post.id)}
-            onPush={() => togglePush(post.id)}
-            onOpen={() => setSelectedPostIndex(index)}
-          />
-        ))}
-      </section>
+      {currentView === "home" ? (
+        <section className="weighted-wall" aria-label="Slide">
+          {feedPosts.map((post, index) => (
+            <PostTile
+              post={post}
+              key={post.id}
+              pushed={pushedPostIds.includes(post.id)}
+              onPush={() => togglePush(post.id)}
+              onOpen={() => setSelectedPostIndex(index)}
+            />
+          ))}
+        </section>
+      ) : (
+        <YourPlayground
+          displayName="Terry Presume"
+          username="@terry"
+          bio="Building worlds."
+          postCount={
+            feedPosts.filter(
+              (post) => post.username === "@terry",
+            ).length
+          }
+          followerCount={0}
+          followingCount={0}
+          musicTrack={{
+            title: "FREE",
+            artist: "Terry Presume",
+            audioSrc: "/music/FREE.mp3",
+          }}
+          showMusicPlayer={true}
+        >
+          {feedPosts.some(
+            (post) => post.username === "@terry",
+          ) ? (
+            <section
+              className="weighted-wall weighted-wall--profile"
+              aria-label="Your posts"
+            >
+              {feedPosts
+                .filter(
+                  (post) => post.username === "@terry",
+                )
+                .map((post) => {
+                  const feedIndex = feedPosts.findIndex(
+                    (candidate) =>
+                      candidate.id === post.id,
+                  );
+
+                  return (
+                    <PostTile
+                      post={post}
+                      key={post.id}
+                      pushed={pushedPostIds.includes(
+                        post.id,
+                      )}
+                      onPush={() =>
+                        togglePush(post.id)
+                      }
+                      onOpen={() =>
+                        setSelectedPostIndex(
+                          feedIndex,
+                        )
+                      }
+                    />
+                  );
+                })}
+            </section>
+          ) : undefined}
+        </YourPlayground>
+      )}
     </main>
   );
 }

@@ -5969,3 +5969,39 @@ body.composer-open {
     font-size: clamp(23px, 8vw, 42px) !important;
   }
 }
+
+/* =========================================================
+   YOUR PLAYGROUND — APP INTEGRATION
+   ========================================================= */
+
+.navigation-panel nav button.active,
+.navigation-panel nav button[aria-current="page"] {
+  opacity: 1;
+  transform: translateX(4px);
+}
+
+.navigation-panel nav button.active::before,
+.navigation-panel nav button[aria-current="page"]::before {
+  margin-right: 8px;
+  color: #fff200;
+  content: "•";
+}
+
+.user-button[aria-current="page"] {
+  border-color: #fff200;
+  box-shadow:
+    0 0 0 3px rgba(255, 242, 0, 0.08);
+}
+
+.weighted-wall--profile {
+  min-height: 320px;
+  background: transparent;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+@media (max-width: 760px) {
+  .your-playground .weighted-wall--profile {
+    min-width: 100%;
+  }
+}
