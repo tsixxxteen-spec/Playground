@@ -1185,7 +1185,6 @@ function CreateComposer({
   const classifyFile = (file: File): MediaType | null => {
     if (file.type.startsWith("image/")) return "image";
     if (file.type.startsWith("video/")) return "video";
-    if (file.type.startsWith("audio/")) return "audio";
 
     const extension = file.name.split(".").pop()?.toLowerCase();
 
@@ -1203,13 +1202,6 @@ function CreateComposer({
       return "video";
     }
 
-    if (
-      extension &&
-      ["mp3", "wav", "m4a", "aac", "ogg", "flac"].includes(extension)
-    ) {
-      return "audio";
-    }
-
     return null;
   };
 
@@ -1219,7 +1211,7 @@ function CreateComposer({
     const nextType = classifyFile(file);
 
     if (!nextType) {
-      window.alert("Please choose an image, video, or audio file.");
+      window.alert("Please choose an image or video file.");
       return;
     }
 
@@ -1364,7 +1356,7 @@ function CreateComposer({
       return (
         <div className="composer-empty">
           <strong>Drop your work here</strong>
-          <span>Image, video, or audio</span>
+          <span>Image or video</span>
         </div>
       );
     }
@@ -1623,7 +1615,7 @@ function CreateComposer({
               ref={primaryInputRef}
               className="composer-file-input"
               type="file"
-              accept="image/*,video/*,audio/*,.mov,.m4v,.m4a,.flac"
+              accept="image/*,video/*,.mov,.m4v"
               onChange={(event) =>
                 loadPrimaryFile(event.target.files?.[0])
               }
@@ -1751,7 +1743,7 @@ function CreateComposer({
 
         <footer className="composer-footer">
           <span>
-            Photos, motion, and sound all belong in Playground.
+            Photos and motion belong in Playground.
           </span>
 
           <button
