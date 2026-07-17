@@ -1,0 +1,247 @@
+.profile-music {
+  display: grid;
+  width: min(100%, 620px);
+  grid-template-columns: 150px minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: color-mix(
+    in srgb,
+    var(--panel) 92%,
+    transparent
+  );
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(30px) saturate(120%);
+}
+
+.profile-music__artwork {
+  position: relative;
+  min-height: 150px;
+  overflow: hidden;
+  background: #111;
+}
+
+.profile-music__artwork img,
+.profile-music__fallback {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-music__fallback {
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(
+      circle at 30% 20%,
+      rgba(255, 242, 0, 0.24),
+      transparent 46%
+    ),
+    #0c0c0d;
+  color: #fff200;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 42px;
+}
+
+.profile-music__play {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff200;
+  color: #111;
+  cursor: pointer;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.36);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.profile-music__play:hover {
+  transform: scale(1.06);
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.42);
+}
+
+.profile-music__play:active {
+  transform: scale(0.94);
+}
+
+.profile-music__play span {
+  font-size: 15px;
+  line-height: 1;
+  transform: translateX(1px);
+}
+
+.profile-music__body {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 19px 20px 17px;
+}
+
+.profile-music__header {
+  display: flex;
+  min-width: 0;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.profile-music__header > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.profile-music__header div > span {
+  color: color-mix(
+    in srgb,
+    var(--foreground) 48%,
+    transparent
+  );
+  font-family: "Courier New", monospace;
+  font-size: 7px;
+  letter-spacing: 0.16em;
+}
+
+.profile-music__header strong {
+  margin-top: 8px;
+  overflow: hidden;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(20px, 2.4vw, 30px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.045em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-music__header small {
+  margin-top: 6px;
+  overflow: hidden;
+  font-size: 10px;
+  opacity: 0.58;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-music__count {
+  flex: 0 0 auto;
+  font-family: "Courier New", monospace;
+  font-size: 8px;
+  opacity: 0.5;
+}
+
+.profile-music__timeline {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 34px;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-music__timeline span {
+  font-family: "Courier New", monospace;
+  font-size: 8px;
+  opacity: 0.58;
+  text-align: center;
+}
+
+.profile-music__timeline input {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  accent-color: #fff200;
+  cursor: pointer;
+}
+
+.profile-music__controls {
+  display: grid;
+  grid-template-columns: 38px minmax(90px, 1fr) 38px;
+  gap: 8px;
+}
+
+.profile-music__controls button {
+  height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 9px;
+  transition:
+    background 180ms ease,
+    color 180ms ease,
+    opacity 180ms ease;
+}
+
+.profile-music__controls button:nth-child(2) {
+  background: var(--foreground);
+  color: var(--background);
+  font-weight: 700;
+}
+
+.profile-music__controls button:hover:not(:disabled) {
+  background: #fff200;
+  color: #111;
+}
+
+.profile-music__controls button:disabled {
+  cursor: default;
+  opacity: 0.24;
+}
+
+.profile-music > audio {
+  display: none;
+}
+
+.profile-music--empty {
+  display: flex;
+  min-height: 110px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 22px;
+}
+
+.profile-music--empty > span {
+  font-family: "Courier New", monospace;
+  font-size: 7px;
+  letter-spacing: 0.16em;
+  opacity: 0.5;
+}
+
+.profile-music--empty p {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 18px;
+}
+
+@media (max-width: 620px) {
+  .profile-music {
+    grid-template-columns: 112px minmax(0, 1fr);
+    border-radius: 17px;
+  }
+
+  .profile-music__artwork {
+    min-height: 144px;
+  }
+
+  .profile-music__body {
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .profile-music__header strong {
+    font-size: 19px;
+  }
+
+  .profile-music__controls {
+    grid-template-columns: 34px minmax(70px, 1fr) 34px;
+  }
+}
