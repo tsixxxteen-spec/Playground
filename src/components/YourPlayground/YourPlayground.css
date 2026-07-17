@@ -255,3 +255,27 @@
     margin-top: 38px;
   }
 }
+
+/* =========================================================
+   EDIT PROFILE INTEGRATION
+   ========================================================= */
+
+.your-playground__edit {
+  opacity: 1;
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.your-playground__edit:hover {
+  border-color: #fff200;
+  background: #fff200;
+  color: #111;
+}
+
+.your-playground__edit:active {
+  transform: scale(0.96);
+}
