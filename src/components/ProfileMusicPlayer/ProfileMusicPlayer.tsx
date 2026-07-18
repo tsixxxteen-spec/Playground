@@ -46,8 +46,25 @@ export default function ProfileMusicPlayer({
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-    audio.pause(); audio.load(); setPlaying(false); setCurrentTime(0); setDuration(0);
-  }, [current?.id]);
+
+    audio.pause();
+    audio.load();
+    setPlaying(false);
+    setCurrentTime(0);
+    setDuration(0);
+
+    if (normalized.autoplay && current && !manuallyPausedRef.current) {
+      const playWhenReady = () => {
+        void audio.play().catch(() => setPlaying(false));
+      };
+
+      audio.addEventListener("canplay", playWhenReady, { once: true });
+
+      return () => {
+        audio.removeEventListener("canplay", playWhenReady);
+      };
+    }
+  }, [current?.id, normalized.autoplay]);
   useEffect(() => {
     if (!visible) { audioRef.current?.pause(); setPlaying(false); setExpanded(false); }
   }, [visible]);
@@ -179,11 +196,40 @@ export default function ProfileMusicPlayer({
     hiddenMode ? "profile-soundtrack--hidden" : "",
   ].filter(Boolean).join(" ")}>
     <header className="profile-soundtrack__header">
-      <button className="profile-soundtrack__identity" type="button" onClick={() => setExpanded((value) => !value)}>
-        <span>♫</span><span><strong>{current?.title ?? "Profile soundtrack"}</strong><small>{current?.artist ?? `${normalized.tracks.length} tracks`}</small></span>
-      </button>
-      <span className="profile-soundtrack__count">{normalized.tracks.length}/25</span>
-    </header>
+  <button
+    className="profile-soundtrack__identity"
+    type="button"
+    onClick={toggle}
+    disabled={!current}
+    aria-label={playing ? "Pause profile music" : "Play profile music"}
+  >
+    <span>♫</span>
+
+    <span>
+      <strong>{current?.title ?? "Profile soundtrack"}</strong>
+
+      <small>
+        {current?.artist ?? `${normalized.tracks.length} tracks`}
+      </small>
+    </span>
+  </button>
+
+  <div className="profile-soundtrack__header-actions">
+    <span className="profile-soundtrack__count">
+      {normalized.tracks.length}/25
+    </span>
+
+    <button
+      className="profile-soundtrack__collapse"
+      type="button"
+      onClick={() => setExpanded((value) => !value)}
+      aria-expanded={expanded}
+      aria-label={expanded ? "Collapse music player" : "Expand music player"}
+    >
+      <span aria-hidden="true">⌄</span>
+    </button>
+  </div>
+</header>
     <div className="profile-soundtrack__controls">
       <button type="button" onClick={previous} disabled={!current} aria-label="Previous track">◀</button>
       <button className="profile-soundtrack__play" type="button" onClick={toggle} disabled={!current} aria-label={playing ? "Pause profile music" : "Play profile music"}>{playing ? "Ⅱ" : "▶"}</button>
@@ -204,10 +250,17 @@ export default function ProfileMusicPlayer({
       ref={audioRef}
       data-profile-soundtrack="true"
       src={current.source}
-      preload="metadata"
+      preload="auto"
+      autoPlay={normalized.autoplay}
+      playsInline
+      onCanPlay={() => {
+        if (normalized.autoplay && !manuallyPausedRef.current) {
+          void audioRef.current?.play().catch(() => setPlaying(false));
+        }
+      }}
       onLoadedMetadata={(event) => setDuration(Number.isFinite(event.currentTarget.duration) ? event.currentTarget.duration : 0)}
       onTimeUpdate={(event) => setCurrentTime(event.currentTarget.currentTime)}
-      onPlay={() => { setPlaying(true); if (!hiddenMode) setExpanded(true); }}
+     onPlay={() => { setPlaying(true); }}
       onPause={() => setPlaying(false)}
       onEnded={() => {
         setPlaying(false); setCurrentTime(0);

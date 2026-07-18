@@ -109,15 +109,26 @@ export function getAvatarImageStyle(
   const safeTransform =
     normalizeAvatarTransform(transform);
 
+  const brightnessFilter =
+    Math.abs(safeTransform.brightness - 1) < 0.001
+      ? undefined
+      : `brightness(${safeTransform.brightness})`;
+
   return {
+    /*
+     * Keep this as a 2D transform. translate3d() plus an always-on
+     * CSS filter can make Chromium cache the avatar as a low-resolution
+     * GPU texture and then enlarge that texture when zooming.
+     */
     transform: [
-      `translate3d(${safeTransform.x * 100}%, ${safeTransform.y * 100}%, 0)`,
+      `translate(${safeTransform.x * 100}%, ${safeTransform.y * 100}%)`,
       `scale(${safeTransform.zoom})`,
       `rotate(${safeTransform.rotation}deg)`,
     ].join(" "),
 
-    filter:
-      `brightness(${safeTransform.brightness})`,
+    transformOrigin: "center center",
+    imageRendering: "auto",
+    filter: brightnessFilter,
   };
 }
 

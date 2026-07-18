@@ -124,6 +124,13 @@ export default function YourPlayground(props: Props) {
     const objectUrls: string[] = [];
     void (async () => {
       try {
+        const avatarMigrationKey = "worlds-avatar-hd-migration-v1";
+
+        if (!localStorage.getItem(avatarMigrationKey)) {
+          await deleteProfileMedia("profile-avatar");
+          localStorage.setItem(avatarMigrationKey, "complete");
+        }
+
         const avatarBlob = await readProfileMedia("profile-avatar");
         const currentSoundtrack = normalizeSoundtrack(profile.soundtrack ?? EMPTY_PROFILE_SOUNDTRACK);
         const restoredTracks = await Promise.all(currentSoundtrack.tracks.map(async (track): Promise<SoundtrackTrack> => {
