@@ -5111,12 +5111,78 @@ body.composer-open {
 
 
 /* =========================================================
-   ADAPTIVE HOME GALLERY — TEMPORARILY DISABLED
-
-   This block conflicted with the original weighted gallery by
-   replacing 8vw rows with 8px rows. It is being kept in the
-   backup file while Home / Explorer / Slide are separated.
+   ADAPTIVE HOME GALLERY — VERIFIED FINAL OVERRIDES
    ========================================================= */
+
+/*
+  Home is an adaptive museum/gallery collage.
+  Slide will remain a separate reel-style experience.
+*/
+
+.weighted-wall {
+  display: grid !important;
+  grid-auto-flow: dense !important;
+  grid-auto-rows: 8px !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  gap: 0 !important;
+  align-items: start !important;
+}
+
+/*
+  Uploaded visual media overrides the old preset weight dimensions.
+  Its real aspect ratio determines its grid height.
+*/
+.post-tile--native-media {
+  grid-column: span var(--tile-columns, 2) !important;
+  grid-row: span var(--tile-rows, 24) !important;
+
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+
+  overflow: hidden !important;
+  background: #080809 !important;
+}
+
+/*
+  Because the tile itself now matches the upload's aspect ratio,
+  cover no longer distorts or meaningfully crops the media.
+*/
+.post-tile--native-media > .feed-media {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.post-tile--native-media > .feed-media > img,
+.post-tile--native-media > .feed-media > video {
+  display: block !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  object-fit: cover !important;
+  object-position: center !important;
+
+  background: #080809 !important;
+  transform: scale(1.001) !important;
+}
+
+.post-tile--native-media:hover > .feed-media > img,
+.post-tile--native-media:hover > .feed-media > video {
+  filter: brightness(0.72) !important;
+  transform: scale(1.018) !important;
+}
+
+/*
+  Audio posts continue using a designed weighted tile because
+  the audio file itself has no visual dimensions.
+*/
+.post-tile--native-media:has(.feed-media--audio) {
+  grid-column: span 2 !important;
+  grid-row: span 40 !important;
+}
 
 /* =========================================================
    RELIABLE FULL-WINDOW DRAG AND DROP

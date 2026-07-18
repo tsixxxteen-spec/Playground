@@ -1,3 +1,4 @@
+import { ProfileAssetStore, } from "../../lib/profileAssetStore";
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import EditProfile from "../EditProfile";
@@ -71,6 +72,9 @@ function readStoredProfile(fallback: EditableProfile): EditableProfile {
           ? parsed.avatarTransform
           : fallback.avatarTransform ?? DEFAULT_AVATAR_TRANSFORM,
       ),
+      avatarTransforms: parsed.avatarTransforms && typeof parsed.avatarTransforms === "object"
+        ? parsed.avatarTransforms
+        : fallback.avatarTransforms,
       soundtrack: normalizeSoundtrack(migratedSoundtrack ?? EMPTY_PROFILE_SOUNDTRACK),
       showMusicPlayer: typeof parsed.showMusicPlayer === "boolean" ? parsed.showMusicPlayer : fallback.showMusicPlayer,
       themeId: typeof parsed.themeId === "string" ? parsed.themeId : fallback.themeId || DEFAULT_THEME_ID,
@@ -89,6 +93,7 @@ function persistProfile(profile: EditableProfile): void {
     bio: profile.bio,
     avatarSrc: canPersistSource(profile.avatarSrc) ? profile.avatarSrc : null,
     avatarTransform: profile.avatarTransform ?? DEFAULT_AVATAR_TRANSFORM,
+    avatarTransforms: profile.avatarTransforms,
     soundtrack: soundtrackForStorage(soundtrack),
     showMusicPlayer: soundtrack.tracks.length > 0 && profile.showMusicPlayer,
     themeId: profile.themeId || DEFAULT_THEME_ID,
@@ -157,7 +162,7 @@ export default function YourPlayground(props: Props) {
 
   const activeTheme = getTheme(profile.themeId || DEFAULT_THEME_ID);
   const activeAvatarTransform = normalizeAvatarTransform(
-    profile.avatarTransform ?? DEFAULT_AVATAR_TRANSFORM,
+    profile.avatarTransforms?.[activeTheme.id] ?? profile.avatarTransform ?? DEFAULT_AVATAR_TRANSFORM,
   );
   const soundtrack = normalizeSoundtrack(profile.soundtrack ?? EMPTY_PROFILE_SOUNDTRACK);
 
@@ -165,6 +170,7 @@ export default function YourPlayground(props: Props) {
     const mergedNext: EditableProfile = {
       ...next,
       avatarSrc: next.avatarSrc ?? profile.avatarSrc,
+      avatarTransforms: next.avatarTransforms ?? profile.avatarTransforms,
       soundtrack: normalizeSoundtrack(next.soundtrack ?? profile.soundtrack),
     };
     try {

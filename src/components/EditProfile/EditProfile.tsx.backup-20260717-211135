@@ -16,10 +16,6 @@ import type {
   AvatarTransform,
 } from "../AvatarStudio";
 
-import BannerStudio, {
-  DEFAULT_BANNER_TRANSFORM,
-  getBannerImageStyle,
-} from "../BannerStudio";
 import type {
   BannerTransform,
 } from "../BannerStudio";
@@ -99,12 +95,6 @@ export default function EditProfile({
   const temporaryAvatarUrlRef =
     useRef<string | null>(null);
 
-  const bannerInputRef =
-    useRef<HTMLInputElement | null>(null);
-
-  const temporaryBannerUrlRef =
-    useRef<string | null>(null);
-
   const [displayName, setDisplayName] =
     useState(profile.displayName);
 
@@ -133,25 +123,6 @@ export default function EditProfile({
   const [avatarStudioOpen, setAvatarStudioOpen] =
     useState(false);
 
-  const [bannerSrc, setBannerSrc] =
-    useState(profile.bannerSrc);
-
-  const [
-    bannerTransform,
-    setBannerTransform,
-  ] = useState<BannerTransform>(
-    profile.bannerTransform ??
-      DEFAULT_BANNER_TRANSFORM,
-  );
-
-  const [
-    pendingBannerSrc,
-    setPendingBannerSrc,
-  ] = useState<string | null>(null);
-
-  const [bannerStudioOpen, setBannerStudioOpen] =
-    useState(false);
-
   const [showMusicPlayer, setShowMusicPlayer] =
     useState(profile.showMusicPlayer);
 
@@ -168,10 +139,6 @@ export default function EditProfile({
   const activeAvatarTransform =
     avatarTransform ??
     DEFAULT_AVATAR_TRANSFORM;
-
-  const activeBannerTransform =
-    bannerTransform ??
-    DEFAULT_BANNER_TRANSFORM;
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -206,11 +173,6 @@ export default function EditProfile({
         );
       }
 
-      if (temporaryBannerUrlRef.current) {
-        URL.revokeObjectURL(
-          temporaryBannerUrlRef.current,
-        );
-      }
     };
   }, []);
 
@@ -246,38 +208,6 @@ export default function EditProfile({
     setError("");
   };
 
-  const loadBanner = (
-    event: ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = event.target.files?.[0];
-
-    if (!file) {
-      return;
-    }
-
-    if (!file.type.startsWith("image/")) {
-      setError(
-        "Please choose an image for your profile banner.",
-      );
-      event.target.value = "";
-      return;
-    }
-
-    if (temporaryBannerUrlRef.current) {
-      URL.revokeObjectURL(
-        temporaryBannerUrlRef.current,
-      );
-    }
-
-    const nextUrl = URL.createObjectURL(file);
-
-    temporaryBannerUrlRef.current = nextUrl;
-
-    setPendingBannerSrc(nextUrl);
-    setBannerStudioOpen(true);
-    setError("");
-  };
-
   const submit = (
     event: FormEvent<HTMLFormElement>,
   ) => {
@@ -307,21 +237,12 @@ export default function EditProfile({
       temporaryAvatarUrlRef.current = null;
     }
 
-    if (
-      temporaryBannerUrlRef.current ===
-      bannerSrc
-    ) {
-      temporaryBannerUrlRef.current = null;
-    }
-
     onSave({
       displayName: nextDisplayName,
       username: nextUsername,
       bio: bio.trim(),
       avatarSrc: avatarSrc ?? profile.avatarSrc,
       avatarTransform: activeAvatarTransform,
-      bannerSrc: bannerSrc ?? profile.bannerSrc,
-      bannerTransform: activeBannerTransform,
       soundtrack,
       showMusicPlayer:
         soundtrack.tracks.length > 0 &&
@@ -369,75 +290,6 @@ export default function EditProfile({
         </header>
 
         <div className="edit-profile__content">
-          <section className="edit-profile__banner-section">
-            <div
-              className="edit-profile__banner-preview"
-              aria-label="Profile banner preview"
-            >
-              {bannerSrc ? (
-                <img
-                  src={bannerSrc}
-                  alt=""
-                  draggable={false}
-                  style={getBannerImageStyle(
-                    activeBannerTransform,
-                  )}
-                />
-              ) : (
-                <div
-                  className="edit-profile__banner-placeholder"
-                  aria-hidden="true"
-                >
-                  <span>Profile Banner</span>
-                </div>
-              )}
-            </div>
-
-            <div className="edit-profile__banner-meta">
-              <div>
-                <strong>Profile banner</strong>
-
-                <p>
-                  Choose a wide JPG, PNG, WEBP, or
-                  another image format.
-                </p>
-              </div>
-
-              <div className="edit-profile__banner-buttons">
-                <button
-                  type="button"
-                  onClick={() =>
-                    bannerInputRef.current?.click()
-                  }
-                >
-                  Change banner
-                </button>
-
-                {bannerSrc && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPendingBannerSrc(
-                        bannerSrc,
-                      );
-                      setBannerStudioOpen(true);
-                    }}
-                  >
-                    Adjust position
-                  </button>
-                )}
-              </div>
-
-              <input
-                ref={bannerInputRef}
-                type="file"
-                accept="image/*"
-                onChange={loadBanner}
-                hidden
-              />
-            </div>
-          </section>
-
           <section className="edit-profile__identity">
             <div
               className="edit-profile__avatar"
@@ -692,64 +544,6 @@ export default function EditProfile({
               );
               setPendingAvatarSrc(null);
               setAvatarStudioOpen(false);
-            }}
-          />
-        )}
-
-      {bannerStudioOpen &&
-        pendingBannerSrc && (
-          <BannerStudio
-            imageSrc={pendingBannerSrc}
-            initialTransform={
-              pendingBannerSrc === bannerSrc
-                ? activeBannerTransform
-                : DEFAULT_BANNER_TRANSFORM
-            }
-            onCancel={() => {
-              if (
-                pendingBannerSrc !==
-                  bannerSrc &&
-                pendingBannerSrc.startsWith(
-                  "blob:",
-                )
-              ) {
-                URL.revokeObjectURL(
-                  pendingBannerSrc,
-                );
-
-                if (
-                  temporaryBannerUrlRef.current ===
-                  pendingBannerSrc
-                ) {
-                  temporaryBannerUrlRef.current =
-                    null;
-                }
-              }
-
-              setPendingBannerSrc(null);
-              setBannerStudioOpen(false);
-
-              if (bannerInputRef.current) {
-                bannerInputRef.current.value =
-                  "";
-              }
-            }}
-            onSave={(
-              nextTransform: BannerTransform,
-            ) => {
-              setBannerSrc(
-                pendingBannerSrc,
-              );
-              setBannerTransform(
-                nextTransform,
-              );
-              setPendingBannerSrc(null);
-              setBannerStudioOpen(false);
-
-              if (bannerInputRef.current) {
-                bannerInputRef.current.value =
-                  "";
-              }
             }}
           />
         )}
