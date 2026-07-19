@@ -1,0 +1,42 @@
+.world-history-controls {
+  position: absolute;
+  top: 20px;
+  left: 154px;
+  z-index: 1200;
+  display: flex;
+  gap: 6px;
+  pointer-events: auto;
+}
+
+.world-history-controls button {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(18, 18, 21, 0.84);
+  color: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(18px);
+  cursor: pointer;
+  font: inherit;
+  font-size: 20px;
+}
+
+.world-history-controls button:hover:not(:disabled) {
+  background: rgba(31, 31, 36, 0.96);
+}
+
+.world-history-controls button:disabled {
+  cursor: default;
+  opacity: 0.32;
+}
+
+@media (max-width: 700px) {
+  .world-history-controls {
+    top: 12px;
+    left: 146px;
+  }
+}

@@ -10,11 +10,6 @@ import { DEFAULT_THEME_ID, getTheme, getThemeStyle } from "../../themes";
 import { EMPTY_PROFILE_SOUNDTRACK, normalizeSoundtrack } from "../../lib/profileSoundtrack";
 import type { ProfileSoundtrack, SoundtrackTrack } from "../../lib/profileSoundtrack";
 import { ExperienceRenderer } from "../../profile-experiences";
-import {
-  EMPTY_PLAYGROUND,
-  normalizePlayground,
-} from "../../world/types/playground";
-import type { PlaygroundData } from "../../world/types/playground";
 import "./YourPlayground.css";
 
 type Props = {
@@ -29,7 +24,6 @@ type StoredProfile = {
   displayName: string; username: string; bio: string; avatarSrc?: string | null;
   avatarTransform?: AvatarTransform; avatarTransforms?: Record<string, AvatarTransform>;
   soundtrack?: ProfileSoundtrack; showMusicPlayer: boolean; themeId: string;
-  playground?: PlaygroundData;
 };
 
 function canPersistSource(source?: string): boolean {
@@ -80,7 +74,6 @@ function readStoredProfile(fallback: EditableProfile): EditableProfile {
       soundtrack: normalizeSoundtrack(migratedSoundtrack ?? EMPTY_PROFILE_SOUNDTRACK),
       showMusicPlayer: typeof parsed.showMusicPlayer === "boolean" ? parsed.showMusicPlayer : fallback.showMusicPlayer,
       themeId: typeof parsed.themeId === "string" ? parsed.themeId : fallback.themeId || DEFAULT_THEME_ID,
-      playground: normalizePlayground(parsed.playground ?? fallback.playground),
     };
   } catch (error) {
     console.error("Could not read saved profile settings:", error);
@@ -99,7 +92,6 @@ function persistProfile(profile: EditableProfile): void {
     soundtrack: soundtrackForStorage(soundtrack),
     showMusicPlayer: soundtrack.tracks.length > 0 && profile.showMusicPlayer,
     themeId: profile.themeId || DEFAULT_THEME_ID,
-    playground: normalizePlayground(profile.playground),
   };
   window.localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(stored));
 }
@@ -122,22 +114,6 @@ export default function YourPlayground(props: Props) {
     } : EMPTY_PROFILE_SOUNDTRACK,
     showMusicPlayer: Boolean(musicTrack) && showMusicPlayer,
     themeId: DEFAULT_THEME_ID,
-    playground: {
-      enabled: true,
-      objects: [
-        {
-          id: "profile-retro-folder",
-          objectId: "retro-folder",
-          lane: "music",
-          enabled: true,
-          position: { x: 84, y: 32 },
-          rotation: -3,
-          scale: 1,
-          zIndex: 1,
-          action: { type: "open-music" },
-        },
-      ],
-    },
   }), [avatarSrc, bio, displayName, musicTrack, showMusicPlayer, username]);
 
   const [profile, setProfile] = useState<EditableProfile>(() => readStoredProfile(fallbackProfile));
@@ -197,7 +173,6 @@ export default function YourPlayground(props: Props) {
       ...next,
       avatarSrc: next.avatarSrc ?? profile.avatarSrc,
       soundtrack: normalizeSoundtrack(next.soundtrack ?? profile.soundtrack),
-      playground: normalizePlayground(next.playground ?? profile.playground),
     };
     try {
       if (mergedNext.avatarSrc?.startsWith("blob:")) {
@@ -239,7 +214,6 @@ export default function YourPlayground(props: Props) {
       soundtrack={soundtrack}
       showMusicPlayer={profile.showMusicPlayer}
       hiddenAutoplay={hiddenAutoplay}
-      playground={profile.playground ?? EMPTY_PLAYGROUND}
       onEdit={() => setEditorOpen(true)}
     />
     {editorOpen && <EditProfile profile={profile} onCancel={() => setEditorOpen(false)} onSave={saveProfile} />}

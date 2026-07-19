@@ -29,7 +29,6 @@ import ProfileSoundtrackEditor from "../ProfileSoundtrackEditor";
 import { EMPTY_PROFILE_SOUNDTRACK, normalizeSoundtrack } from "../../lib/profileSoundtrack";
 import type { ProfileSoundtrack } from "../../lib/profileSoundtrack";
 import { DEFAULT_THEME_ID } from "../../themes";
-import type { PlaygroundData } from "../../world/types/playground";
 
 import "./EditProfile.css";
 
@@ -49,8 +48,6 @@ export type EditableProfile = {
   showMusicPlayer: boolean;
 
   themeId: string;
-
-  playground: PlaygroundData;
 };
 
 type EditProfileProps = {
@@ -330,7 +327,6 @@ export default function EditProfile({
         soundtrack.tracks.length > 0 &&
         showMusicPlayer,
       themeId,
-      playground: profile.playground,
     });
   };
 
