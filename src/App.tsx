@@ -3,7 +3,11 @@ import "./App.css";
 import YourPlayground from "./components/YourPlayground";
 
 type Theme = "light" | "dark" | "system";
-type AppView = "home" | "profile";
+type AppView =
+  | "home"
+  | "profile"
+  | "world-library"
+  | "world-workspace";
 type Weight = "standard" | "wide" | "tall" | "hero" | "panorama";
 
 type MediaType = "image" | "video" | "audio";
