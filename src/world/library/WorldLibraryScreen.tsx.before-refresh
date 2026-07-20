@@ -1,0 +1,214 @@
+import { useContext } from "react";
+
+import { WorldLibrary } from "./components/WorldLibrary";
+import {
+  WorldLibraryContext,
+  type WorldLibraryContextValue,
+} from "../storage/WorldLibraryContext";
+
+import type { WorldPackage } from "../types";
+
+type WorldLibraryScreenProps = {
+  onWorldOpened?: (world: WorldPackage) => void;
+  templateWorldIds?: string[];
+};
+
+function useWorldLibraryContext(): WorldLibraryContextValue {
+  const context = useContext(WorldLibraryContext);
+
+  if (!context) {
+    throw new Error(
+      "WorldLibraryScreen must be rendered inside WorldLibraryProvider.",
+    );
+  }
+
+  return context;
+}
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return "An unexpected World Library error occurred.";
+}
+
+export function WorldLibraryScreen({
+  onWorldOpened,
+  templateWorldIds = [],
+}: WorldLibraryScreenProps) {
+  const {
+    worlds,
+    favoriteWorldIds,
+    loading,
+    error,
+    createWorld,
+    openWorld,
+    renameWorld,
+    duplicateWorld,
+    deleteWorld,
+    toggleFavorite,
+    clearError,
+  } = useWorldLibraryContext();
+
+  const handleCreateWorld = async (): Promise<void> => {
+    try {
+      clearError();
+
+      const world = await createWorld();
+      onWorldOpened?.(world);
+    } catch (createError) {
+      console.error(
+        "Failed to create a World.",
+        getErrorMessage(createError),
+      );
+    }
+  };
+
+  const handleOpenWorld = async (
+    world: WorldPackage,
+  ): Promise<void> => {
+    clearError();
+
+    const openedWorld = await openWorld(world.id);
+
+    if (openedWorld) {
+      onWorldOpened?.(openedWorld);
+    }
+  };
+
+  const handleRenameWorld = async (
+    world: WorldPackage,
+  ): Promise<void> => {
+    const currentTitle = world.title.trim() || "Untitled World";
+
+    const requestedTitle = window.prompt(
+      "Rename World",
+      currentTitle,
+    );
+
+    if (requestedTitle === null) {
+      return;
+    }
+
+    const normalizedTitle = requestedTitle.trim();
+
+    if (
+      !normalizedTitle ||
+      normalizedTitle === world.title.trim()
+    ) {
+      return;
+    }
+
+    try {
+      clearError();
+      await renameWorld(world.id, normalizedTitle);
+    } catch (renameError) {
+      console.error(
+        "Failed to rename the World.",
+        getErrorMessage(renameError),
+      );
+    }
+  };
+
+  const handleDuplicateWorld = async (
+    world: WorldPackage,
+  ): Promise<void> => {
+    try {
+      clearError();
+      await duplicateWorld(world.id);
+    } catch (duplicateError) {
+      console.error(
+        "Failed to duplicate the World.",
+        getErrorMessage(duplicateError),
+      );
+    }
+  };
+
+  const handleDeleteWorld = async (
+    world: WorldPackage,
+  ): Promise<void> => {
+    const title = world.title.trim() || "Untitled World";
+
+    const confirmed = window.confirm(
+      `Delete “${title}”? This cannot be undone.`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      clearError();
+      await deleteWorld(world.id);
+    } catch (deleteError) {
+      console.error(
+        "Failed to delete the World.",
+        getErrorMessage(deleteError),
+      );
+    }
+  };
+
+  const handleToggleFavorite = (
+    world: WorldPackage,
+  ): void => {
+    clearError();
+    toggleFavorite(world.id);
+  };
+
+  if (loading && worlds.length === 0) {
+    return (
+      <section
+        className="world-library-screen world-library-screen--loading"
+        aria-live="polite"
+        aria-busy="true"
+      >
+        <div className="world-library-screen__status">
+          <span aria-hidden="true">◇</span>
+          <p>Loading your Worlds…</p>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="world-library-screen">
+      {error ? (
+        <div
+          className="world-library-screen__error"
+          role="alert"
+        >
+          <span>{error}</span>
+
+          <button type="button" onClick={clearError}>
+            Dismiss
+          </button>
+        </div>
+      ) : null}
+
+      <WorldLibrary
+        worlds={worlds}
+        favoriteWorldIds={favoriteWorldIds}
+        templateWorldIds={templateWorldIds}
+        onCreateWorld={() => {
+          void handleCreateWorld();
+        }}
+        onOpenWorld={(world) => {
+          void handleOpenWorld(world);
+        }}
+        onRenameWorld={(world) => {
+          void handleRenameWorld(world);
+        }}
+        onDuplicateWorld={(world) => {
+          void handleDuplicateWorld(world);
+        }}
+        onDeleteWorld={(world) => {
+          void handleDeleteWorld(world);
+        }}
+        onToggleFavorite={handleToggleFavorite}
+      />
+    </section>
+  );
+}
+
+export default WorldLibraryScreen;

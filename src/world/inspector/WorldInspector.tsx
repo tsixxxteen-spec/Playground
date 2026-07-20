@@ -20,6 +20,14 @@ type WorldInspectorProps = {
   onRedo?: () => void;
   onDuplicate?: (objectId: string) => string | null;
   onDelete?: (objectId: string) => boolean;
+  snapEnabled?: boolean;
+  gridSize?: number;
+  onSnapEnabledChange?: (enabled: boolean) => void;
+  onGridSizeChange?: (size: number) => void;
+  onBringForward?: (objectId: string) => void;
+  onSendBackward?: (objectId: string) => void;
+  onCenterHorizontal?: (objectId: string) => void;
+  onCenterVertical?: (objectId: string) => void;
 };
 
 type SliderFieldProps = {
@@ -80,6 +88,14 @@ export default function WorldInspector({
   onRedo,
   onDuplicate,
   onDelete,
+  snapEnabled = true,
+  gridSize = 5,
+  onSnapEnabledChange,
+  onGridSizeChange,
+  onBringForward,
+  onSendBackward,
+  onCenterHorizontal,
+  onCenterVertical,
 }: WorldInspectorProps) {
   const {
     selectedObjectId,
@@ -404,6 +420,28 @@ export default function WorldInspector({
           suffix="°"
           onChange={updateRotation}
         />
+      </section>
+
+
+      <section className="world-inspector__section">
+        <div className="world-inspector__section-heading"><h3>Precision</h3></div>
+        <label className="world-inspector__toggle-row">
+          <span>Snap to grid</span>
+          <input type="checkbox" checked={snapEnabled} onChange={(event) => onSnapEnabledChange?.(event.target.checked)} />
+        </label>
+        <label className="world-inspector__select-row">
+          <span>Grid size</span>
+          <select value={gridSize} onChange={(event) => onGridSizeChange?.(Number(event.target.value))}>
+            <option value={1}>1%</option><option value={2.5}>2.5%</option><option value={5}>5%</option><option value={10}>10%</option>
+          </select>
+        </label>
+        <div className="world-inspector__button-grid">
+          <button type="button" onClick={() => onCenterHorizontal?.(selectedObject.id)}>Center X</button>
+          <button type="button" onClick={() => onCenterVertical?.(selectedObject.id)}>Center Y</button>
+          <button type="button" onClick={() => onBringForward?.(selectedObject.id)}>Bring Forward</button>
+          <button type="button" onClick={() => onSendBackward?.(selectedObject.id)}>Send Back</button>
+        </div>
+        <p className="world-inspector__hint">Arrow keys nudge 1%. Hold Shift to nudge 5%.</p>
       </section>
 
       <div className="world-inspector__meta">

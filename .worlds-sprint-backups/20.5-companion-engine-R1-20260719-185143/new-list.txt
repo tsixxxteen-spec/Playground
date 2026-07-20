@@ -1,0 +1,7 @@
+src/personalization/companions/types.ts
+src/personalization/companions/registry.ts
+src/personalization/companions/CompanionStudio.tsx
+src/personalization/companions/CompanionStudio.css
+src/personalization/companions/CompanionLayer.tsx
+src/personalization/companions/CompanionLayer.css
+src/personalization/companions/index.ts

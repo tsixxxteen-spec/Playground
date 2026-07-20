@@ -15,6 +15,12 @@ import {
   normalizePlayground,
 } from "../../world/types/playground";
 import type { PlaygroundData } from "../../world/types/playground";
+import { DEFAULT_ENVIRONMENT_SETTINGS, normalizeEnvironmentSettings } from "../../personalization/environments";
+import type { EnvironmentSettings } from "../../personalization/environments";
+import { DEFAULT_COMPANION_SETTINGS, normalizeCompanionSettings } from "../../personalization/companions";
+import type { CompanionSettings } from "../../personalization/companions";
+import { DEFAULT_WIDGET_SETTINGS, normalizeWidgetSettings } from "../../personalization/widgets";
+import type { WidgetSettings } from "../../personalization/widgets";
 import "./YourPlayground.css";
 
 type Props = {
@@ -30,6 +36,9 @@ type StoredProfile = {
   avatarTransform?: AvatarTransform; avatarTransforms?: Record<string, AvatarTransform>;
   soundtrack?: ProfileSoundtrack; showMusicPlayer: boolean; themeId: string;
   playground?: PlaygroundData;
+  environment?: EnvironmentSettings;
+  companions?: CompanionSettings;
+  widgets?: WidgetSettings;
 };
 
 function canPersistSource(source?: string): boolean {
@@ -81,6 +90,9 @@ function readStoredProfile(fallback: EditableProfile): EditableProfile {
       showMusicPlayer: typeof parsed.showMusicPlayer === "boolean" ? parsed.showMusicPlayer : fallback.showMusicPlayer,
       themeId: typeof parsed.themeId === "string" ? parsed.themeId : fallback.themeId || DEFAULT_THEME_ID,
       playground: normalizePlayground(parsed.playground ?? fallback.playground),
+      environment: normalizeEnvironmentSettings(parsed.environment ?? fallback.environment),
+      companions: normalizeCompanionSettings(parsed.companions ?? fallback.companions),
+      widgets: normalizeWidgetSettings(parsed.widgets ?? fallback.widgets),
     };
   } catch (error) {
     console.error("Could not read saved profile settings:", error);
@@ -100,6 +112,9 @@ function persistProfile(profile: EditableProfile): void {
     showMusicPlayer: soundtrack.tracks.length > 0 && profile.showMusicPlayer,
     themeId: profile.themeId || DEFAULT_THEME_ID,
     playground: normalizePlayground(profile.playground),
+    environment: normalizeEnvironmentSettings(profile.environment),
+    companions: normalizeCompanionSettings(profile.companions),
+    widgets: normalizeWidgetSettings(profile.widgets),
   };
   window.localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(stored));
 }
@@ -122,6 +137,9 @@ export default function YourPlayground(props: Props) {
     } : EMPTY_PROFILE_SOUNDTRACK,
     showMusicPlayer: Boolean(musicTrack) && showMusicPlayer,
     themeId: DEFAULT_THEME_ID,
+    environment: DEFAULT_ENVIRONMENT_SETTINGS,
+    companions: DEFAULT_COMPANION_SETTINGS,
+    widgets: DEFAULT_WIDGET_SETTINGS,
     playground: {
       enabled: true,
       objects: [
@@ -198,6 +216,9 @@ export default function YourPlayground(props: Props) {
       avatarSrc: next.avatarSrc ?? profile.avatarSrc,
       soundtrack: normalizeSoundtrack(next.soundtrack ?? profile.soundtrack),
       playground: normalizePlayground(next.playground ?? profile.playground),
+      environment: normalizeEnvironmentSettings(next.environment ?? profile.environment),
+      companions: normalizeCompanionSettings(next.companions ?? profile.companions),
+      widgets: normalizeWidgetSettings(next.widgets ?? profile.widgets),
     };
     try {
       if (mergedNext.avatarSrc?.startsWith("blob:")) {
@@ -240,6 +261,9 @@ export default function YourPlayground(props: Props) {
       showMusicPlayer={profile.showMusicPlayer}
       hiddenAutoplay={hiddenAutoplay}
       playground={profile.playground ?? EMPTY_PLAYGROUND}
+      environment={profile.environment}
+      companions={profile.companions}
+      widgets={profile.widgets}
       onEdit={() => setEditorOpen(true)}
     />
     {editorOpen && <EditProfile profile={profile} onCancel={() => setEditorOpen(false)} onSave={saveProfile} />}

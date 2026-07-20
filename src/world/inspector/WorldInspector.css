@@ -272,3 +272,7 @@
     padding: 6px 9px;
   }
 }
+
+
+/* Sprint 20.2 Precision Editor */
+.world-inspector__toggle-row,.world-inspector__select-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px;color:rgba(255,255,255,.72);font-size:11px;font-weight:650}.world-inspector__toggle-row input{accent-color:rgba(117,164,255,.95)}.world-inspector__select-row select{min-width:88px;padding:6px 8px;border:1px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(255,255,255,.06);color:inherit}.world-inspector__button-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.world-inspector__button-grid button{padding:8px;border:1px solid rgba(255,255,255,.12);border-radius:9px;background:rgba(255,255,255,.055);color:rgba(255,255,255,.88);cursor:pointer;font:inherit;font-size:10px;font-weight:700}.world-inspector__button-grid button:hover{background:rgba(255,255,255,.11)}.world-inspector__hint{margin:10px 0 0;color:rgba(255,255,255,.42);font-size:10px;line-height:1.45}

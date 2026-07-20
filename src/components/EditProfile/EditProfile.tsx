@@ -24,12 +24,20 @@ import type {
   BannerTransform,
 } from "../BannerStudio";
 
-import ThemeSelector from "../ThemeSelector";
+import { AppearanceEditor } from "../../personalization/appearance";
+import type { AppearanceValue } from "../../personalization/appearance";
 import ProfileSoundtrackEditor from "../ProfileSoundtrackEditor";
 import { EMPTY_PROFILE_SOUNDTRACK, normalizeSoundtrack } from "../../lib/profileSoundtrack";
 import type { ProfileSoundtrack } from "../../lib/profileSoundtrack";
 import { DEFAULT_THEME_ID } from "../../themes";
+import { normalizePlayground } from "../../world/types/playground";
 import type { PlaygroundData } from "../../world/types/playground";
+import { DEFAULT_ENVIRONMENT_SETTINGS, normalizeEnvironmentSettings } from "../../personalization/environments";
+import type { EnvironmentSettings } from "../../personalization/environments";
+import { DEFAULT_COMPANION_SETTINGS, normalizeCompanionSettings } from "../../personalization/companions";
+import type { CompanionSettings } from "../../personalization/companions";
+import { DEFAULT_WIDGET_SETTINGS, normalizeWidgetSettings } from "../../personalization/widgets";
+import type { WidgetSettings } from "../../personalization/widgets";
 
 import "./EditProfile.css";
 
@@ -51,6 +59,12 @@ export type EditableProfile = {
   themeId: string;
 
   playground: PlaygroundData;
+
+  environment: EnvironmentSettings;
+
+  companions: CompanionSettings;
+
+  widgets: WidgetSettings;
 };
 
 type EditProfileProps = {
@@ -160,6 +174,22 @@ export default function EditProfile({
 
   const [themeId, setThemeId] = useState(
     profile.themeId || DEFAULT_THEME_ID,
+  );
+
+  const [playground, setPlayground] = useState(() =>
+    normalizePlayground(profile.playground),
+  );
+
+  const [environment, setEnvironment] = useState(() =>
+    normalizeEnvironmentSettings(profile.environment ?? DEFAULT_ENVIRONMENT_SETTINGS),
+  );
+
+  const [companions, setCompanions] = useState(() =>
+    normalizeCompanionSettings(profile.companions ?? DEFAULT_COMPANION_SETTINGS),
+  );
+
+  const [widgets, setWidgets] = useState(() =>
+    normalizeWidgetSettings(profile.widgets ?? DEFAULT_WIDGET_SETTINGS),
   );
 
   const [soundtrack, setSoundtrack] = useState<ProfileSoundtrack>(() =>
@@ -330,7 +360,10 @@ export default function EditProfile({
         soundtrack.tracks.length > 0 &&
         showMusicPlayer,
       themeId,
-      playground: profile.playground,
+      playground,
+      environment,
+      companions,
+      widgets,
     });
   };
 
@@ -562,9 +595,15 @@ export default function EditProfile({
             </label>
           </section>
 
-          <ThemeSelector
-            value={themeId}
-            onChange={setThemeId}
+          <AppearanceEditor
+            value={{ themeId, playground, environment, companions, widgets }}
+            onChange={(appearance: AppearanceValue) => {
+              setThemeId(appearance.themeId);
+              setPlayground(appearance.playground);
+              setEnvironment(appearance.environment);
+              setCompanions(appearance.companions);
+              setWidgets(appearance.widgets);
+            }}
           />
 
           <ProfileSoundtrackEditor

@@ -1,0 +1,8 @@
+
+> worlds@0.1.0 build
+> tsc && vite build
+
+src/App.tsx(2,1): error TS6133: 'WorldPackage' is declared but its value is never read.
+src/App.tsx(2053,8): error TS2741: Property 'onWorldLibrary' is missing in type '{ open: boolean; currentView: AppView; onClose: () => void; onCreate: () => void; onHome: () => void; onProfile: () => void; }' but required in type '{ open: boolean; onClose: () => void; onCreate: () => void; onHome: () => void; onProfile: () => void; onWorldLibrary: () => void; currentView: AppView; }'.
+src/main.tsx(16,6): error TS2304: Cannot find name 'WorldLibraryProvider'.
+src/main.tsx(18,7): error TS2304: Cannot find name 'WorldLibraryProvider'.

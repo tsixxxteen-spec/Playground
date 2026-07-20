@@ -18,6 +18,10 @@ export type PlaygroundActionType =
   | "open-photos"
   | "open-videos"
   | "open-url"
+  | "toggle-light"
+  | "water-plant"
+  | "sip-coffee"
+  | "pet-companion"
   | "none";
 
 export type PlaygroundPosition = {

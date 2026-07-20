@@ -1,0 +1,21 @@
+.personalization-object-glyph {
+  display: grid;
+  width: 82px;
+  height: 82px;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.34);
+  border-radius: 22px;
+  background: linear-gradient(145deg, rgba(255,255,255,.24), rgba(255,255,255,.07));
+  box-shadow: 0 18px 32px rgba(0,0,0,.22), inset 0 1px rgba(255,255,255,.35);
+  color: white;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  transition: transform 160ms ease, filter 160ms ease;
+}
+.personalization-object-glyph[data-state="hovered"] { transform: translateY(-4px) rotate(-1deg); filter: brightness(1.12); }
+.personalization-object-glyph[data-state="open"],
+.personalization-object-glyph[data-state="opening"] { transform: scale(1.05); }
+
+.personalization-object-glyph[data-object="personal-moon-lamp"][data-state="open"],.personalization-object-glyph[data-object="personal-moon-lamp"][data-state="opening"]{box-shadow:0 0 34px rgba(209,220,255,.72),inset 0 1px rgba(255,255,255,.6)}.personalization-object-glyph[data-object="personal-plant"][data-state="open"]{animation:worlds-plant-sway 520ms ease both}.personalization-object-glyph[data-object="personal-pixel-cat"][data-state="open"]{animation:worlds-cat-hop 420ms cubic-bezier(.2,.8,.2,1) both}.personalization-object-glyph[data-object="personal-coffee"][data-state="open"]{filter:brightness(1.15) saturate(1.08)}@keyframes worlds-plant-sway{35%{transform:rotate(-5deg) translateY(-2px)}70%{transform:rotate(4deg)}}@keyframes worlds-cat-hop{45%{transform:translateY(-10px) scale(1.06)}}@media(prefers-reduced-motion:reduce){.personalization-object-glyph{animation:none!important;transition:none}}
