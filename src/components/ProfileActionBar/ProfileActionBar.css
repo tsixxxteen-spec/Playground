@@ -1,0 +1,197 @@
+.profile-action-bar-shell {
+  position: fixed;
+  z-index: 10950;
+  top: 72px;
+  right: 22px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 9px;
+
+  max-width: calc(100vw - 44px);
+
+  font-family:
+    "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif;
+}
+
+.profile-action-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 6px;
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+
+  background: rgba(14, 14, 16, 0.82);
+  box-shadow:
+    0 14px 45px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.profile-action-bar__button {
+  min-height: 36px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  padding: 0 15px;
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.94);
+
+  cursor: pointer;
+
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+
+  transition:
+    transform 150ms ease,
+    border-color 150ms ease,
+    background 150ms ease,
+    color 150ms ease,
+    opacity 150ms ease;
+}
+
+.profile-action-bar__button:hover {
+  border-color: rgba(255, 255, 255, 0.48);
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.profile-action-bar__button:active {
+  transform: scale(0.96);
+}
+
+.profile-action-bar__button:focus-visible {
+  outline: 2px solid #fff200;
+  outline-offset: 3px;
+}
+
+.profile-action-bar__button--primary {
+  border-color: #fff200;
+  background: #fff200;
+  color: #111;
+}
+
+.profile-action-bar__button--primary:hover {
+  border-color: #fff65d;
+  background: #fff65d;
+  color: #111;
+}
+
+.profile-action-bar__button--following {
+  border-color: rgba(255, 255, 255, 0.34);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.profile-action-bar__button--following:hover {
+  border-color: rgba(255, 115, 115, 0.75);
+  background: rgba(255, 80, 80, 0.16);
+  color: #ffd7d7;
+}
+
+.profile-action-bar__button--pending {
+  position: relative;
+}
+
+.profile-action-bar__button--pending::after {
+  width: 5px;
+  height: 5px;
+
+  margin-left: 1px;
+
+  border-radius: 50%;
+  background: currentColor;
+
+  content: "";
+  opacity: 0.7;
+}
+
+.profile-action-bar__notice {
+  max-width: min(340px, calc(100vw - 44px));
+
+  padding: 10px 14px;
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 13px;
+
+  background: rgba(14, 14, 16, 0.92);
+  color: rgba(255, 255, 255, 0.94);
+
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.24);
+
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.35;
+
+  animation: profile-action-notice-in 180ms ease both;
+}
+
+@keyframes profile-action-notice-in {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 700px) {
+  .profile-action-bar-shell {
+    top: auto;
+    right: 12px;
+    bottom: calc(14px + env(safe-area-inset-bottom));
+    left: 12px;
+
+    align-items: stretch;
+
+    max-width: none;
+  }
+
+  .profile-action-bar {
+    width: 100%;
+    justify-content: center;
+
+    box-sizing: border-box;
+  }
+
+  .profile-action-bar__button {
+    min-width: 0;
+    flex: 1;
+
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  .profile-action-bar__notice {
+    align-self: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-action-bar__button,
+  .profile-action-bar__notice {
+    animation: none;
+    transition: none;
+  }
+}

@@ -1,0 +1,121 @@
+.invite-dialog-backdrop {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.58);
+  backdrop-filter: blur(14px);
+}
+
+.invite-dialog {
+  width: min(430px, 100%);
+  padding: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+  background: #171719;
+  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.5);
+  color: #ffffff;
+}
+
+.invite-dialog__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.invite-dialog__header p {
+  margin: 0 0 4px;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.invite-dialog__header h2 {
+  margin: 0;
+  font-size: 23px;
+  letter-spacing: -0.03em;
+}
+
+.invite-dialog__close {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.invite-dialog__form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.invite-dialog__form label {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.invite-dialog__form input {
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  outline: none;
+  background: rgba(255, 255, 255, 0.055);
+  color: #ffffff;
+  font: inherit;
+}
+
+.invite-dialog__form input:focus {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.invite-dialog__hint {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.invite-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.invite-dialog__actions button {
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 13px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.invite-dialog__cancel {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: transparent;
+  color: #ffffff;
+}
+
+.invite-dialog__submit {
+  border: 0;
+  background: #ffffff;
+  color: #111113;
+}
+
+.invite-dialog__submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}

@@ -3,12 +3,14 @@ import {
   useRef,
   useState,
   type KeyboardEvent,
+  type MouseEvent,
 } from "react";
 import {
   getTheme,
   playgroundThemes,
   type EditorialCategory,
 } from "../../themes";
+import { ThemeMarketplace } from "../ThemeMarketplace";
 import "./ThemeSelector.css";
 
 type Props = {
@@ -16,22 +18,13 @@ type Props = {
   onChange: (themeId: string) => void;
 };
 
-const RECENT_EDITORIALS_KEY = "playground.editorials.recent.v1";
-const MAX_RECENT_EDITORIALS = 3;
+const RECENT_KEY = "playground.editorials.recent.v2";
+const FAVORITES_KEY = "playground.editorials.favorites.v1";
+const MAX_RECENT = 4;
 
-const categories: Array<EditorialCategory | "All"> = [
-  "All",
-  "Editorial",
-  "Fashion",
-  "Music",
-  "Cinema",
-  "Portfolio",
-  "Archive",
-];
-
-function readRecentEditorials(): string[] {
+function readStringArray(key: string): string[] {
   try {
-    const raw = window.localStorage.getItem(RECENT_EDITORIALS_KEY);
+    const raw = window.localStorage.getItem(key);
     if (!raw) return [];
 
     const parsed = JSON.parse(raw) as unknown;
@@ -43,296 +36,389 @@ function readRecentEditorials(): string[] {
   }
 }
 
+function uniqueCategories(): Array<EditorialCategory | "All"> {
+  const values = Array.from(
+    new Set(playgroundThemes.map((theme) => theme.category)),
+  ).sort((a, b) => a.localeCompare(b));
+
+  return ["All", ...values];
+}
+
+function initials(value: string): string {
+  return value
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
 export default function ThemeSelector({ value, onChange }: Props) {
   const selected = getTheme(value);
+  const categories = useMemo(uniqueCategories, []);
   const [category, setCategory] =
     useState<EditorialCategory | "All">("All");
   const [query, setQuery] = useState("");
+  const [marketplaceOpen, setMarketplaceOpen] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [recentIds, setRecentIds] = useState<string[]>(readRecentEditorials);
+  const [recentIds, setRecentIds] = useState<string[]>(() =>
+    readStringArray(RECENT_KEY),
+  );
+  const [favoriteIds, setFavoriteIds] = useState<string[]>(() =>
+    readStringArray(FAVORITES_KEY),
+  );
   const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
   const normalizedQuery = query.trim().toLowerCase();
 
-  const visibleEditorials = useMemo(() => {
-    return playgroundThemes.filter((editorial) => {
+  const visibleThemes = useMemo(() => {
+    return playgroundThemes.filter((theme) => {
       const matchesCategory =
-        category === "All" || editorial.category === category;
+        category === "All" || theme.category === category;
 
-      const searchableText = [
-        editorial.name,
-        editorial.category,
-        editorial.description,
+      const searchable = [
+        theme.name,
+        theme.category,
+        theme.description,
+        theme.layout,
+        theme.musicPlacement,
       ]
         .join(" ")
         .toLowerCase();
 
-      const matchesQuery =
-        normalizedQuery.length === 0 ||
-        searchableText.includes(normalizedQuery);
-
-      return matchesCategory && matchesQuery;
+      return (
+        matchesCategory &&
+        (normalizedQuery.length === 0 ||
+          searchable.includes(normalizedQuery))
+      );
     });
   }, [category, normalizedQuery]);
 
-  const featuredEditorials = useMemo(
-    () => playgroundThemes.filter((editorial) => editorial.featured),
-    [],
+  const favoriteThemes = useMemo(
+    () =>
+      favoriteIds
+        .map((id) => playgroundThemes.find((theme) => theme.id === id))
+        .filter(
+          (theme): theme is (typeof playgroundThemes)[number] =>
+            Boolean(theme),
+        ),
+    [favoriteIds],
   );
 
-  const recentEditorials = useMemo(
+  const recentThemes = useMemo(
     () =>
       recentIds
-        .map((id) => playgroundThemes.find((editorial) => editorial.id === id))
-        .filter((editorial): editorial is (typeof playgroundThemes)[number] =>
-          Boolean(editorial),
+        .map((id) => playgroundThemes.find((theme) => theme.id === id))
+        .filter(
+          (theme): theme is (typeof playgroundThemes)[number] =>
+            Boolean(theme),
         ),
     [recentIds],
   );
 
   const inspected = getTheme(hoveredId ?? selected.id);
 
-  const chooseEditorial = (editorialId: string) => {
-    onChange(editorialId);
+  const chooseTheme = (themeId: string) => {
+    document.documentElement.dataset.playgroundThemeChanging = "true";
 
-    const nextRecentIds = [
-      editorialId,
-      ...recentIds.filter((id) => id !== editorialId),
-    ].slice(0, MAX_RECENT_EDITORIALS);
+    window.setTimeout(() => {
+      onChange(themeId);
 
-    setRecentIds(nextRecentIds);
-    window.localStorage.setItem(
-      RECENT_EDITORIALS_KEY,
-      JSON.stringify(nextRecentIds),
-    );
+      const next = [
+        themeId,
+        ...recentIds.filter((id) => id !== themeId),
+      ].slice(0, MAX_RECENT);
+
+      setRecentIds(next);
+      window.localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+
+      window.setTimeout(() => {
+        delete document.documentElement.dataset.playgroundThemeChanging;
+      }, 180);
+    }, 80);
+  };
+
+  const toggleFavorite = (
+    event: MouseEvent<HTMLButtonElement>,
+    themeId: string,
+  ) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const next = favoriteIds.includes(themeId)
+      ? favoriteIds.filter((id) => id !== themeId)
+      : [themeId, ...favoriteIds];
+
+    setFavoriteIds(next);
+    window.localStorage.setItem(FAVORITES_KEY, JSON.stringify(next));
   };
 
   const handleGridKeyDown = (
     event: KeyboardEvent<HTMLDivElement>,
   ) => {
-    if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)) {
-      return;
-    }
-
-    const currentIndex = optionRefs.current.findIndex(
-      (element) => element === document.activeElement,
-    );
-
-    if (currentIndex < 0 || visibleEditorials.length === 0) {
+    if (
+      !["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(
+        event.key,
+      )
+    ) {
       return;
     }
 
     event.preventDefault();
 
-    const computedColumns =
-      window.innerWidth <= 420 ? 1 : window.innerWidth <= 760 ? 2 : 3;
+    const currentIndex = optionRefs.current.findIndex(
+      (element) => element === document.activeElement,
+    );
+
+    if (currentIndex < 0) {
+      optionRefs.current[0]?.focus();
+      return;
+    }
+
+    const columns =
+      window.innerWidth >= 1100 ? 3 : window.innerWidth >= 720 ? 2 : 1;
+
     const delta =
       event.key === "ArrowLeft"
         ? -1
         : event.key === "ArrowRight"
           ? 1
           : event.key === "ArrowUp"
-            ? -computedColumns
-            : computedColumns;
+            ? -columns
+            : columns;
 
     const nextIndex = Math.min(
-      visibleEditorials.length - 1,
+      visibleThemes.length - 1,
       Math.max(0, currentIndex + delta),
     );
 
     optionRefs.current[nextIndex]?.focus();
   };
 
+  const renderCompactTheme = (
+    theme: (typeof playgroundThemes)[number],
+    label: "Favorite" | "Recent",
+  ) => (
+    <button
+      key={theme.id}
+      type="button"
+      className="theme-selector__compact-card"
+      onClick={() => chooseTheme(theme.id)}
+      aria-pressed={theme.id === selected.id}
+    >
+      <span
+        className="theme-selector__compact-swatch"
+        style={{
+          background: `linear-gradient(135deg, ${theme.colors.background} 0 52%, ${theme.colors.accent} 52% 100%)`,
+        }}
+      />
+      <span>
+        <small>{label}</small>
+        <strong>{theme.name}</strong>
+      </span>
+    </button>
+  );
+
   return (
-    <section className="theme-selector">
+    <section className="theme-selector theme-selector--v2">
       <header className="theme-selector__header">
         <div>
-          <span>EDITORIAL</span>
-          <h3>{inspected.name}</h3>
+          <p className="theme-selector__eyebrow">Profile experience</p>
+          <h2>Choose a theme</h2>
         </div>
-        <p>{inspected.description}</p>
+
+        <div className="theme-selector__selected">
+          <span
+            style={{ background: inspected.colors.accent }}
+            aria-hidden="true"
+          />
+          <div>
+            <small>Previewing</small>
+            <strong>{inspected.name}</strong>
+          </div>
+        </div>
+
+        <button
+          className="theme-selector__marketplace-button"
+          type="button"
+          onClick={() => setMarketplaceOpen(true)}
+        >
+          Browse marketplace
+        </button>
       </header>
 
-      <label className="theme-selector__search">
-        <span aria-hidden="true">⌕</span>
-        <input
-          type="search"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search editorials"
-          aria-label="Search editorials"
-        />
-        {query && (
-          <button type="button" onClick={() => setQuery("")}>
-            Clear
-          </button>
-        )}
-      </label>
+      <div className="theme-selector__toolbar">
+        <label className="theme-selector__search">
+          <span>Search</span>
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search themes, layouts, moods..."
+          />
+        </label>
 
-      <nav
-        className="theme-selector__filters"
-        aria-label="Editorial categories"
-      >
-        {categories.map((item) => (
-          <button
-            key={item}
-            type="button"
-            data-active={category === item}
-            onClick={() => setCategory(item)}
-          >
-            {item}
-          </button>
-        ))}
-      </nav>
+        <div className="theme-selector__categories" aria-label="Theme categories">
+          {categories.map((item) => (
+            <button
+              key={item}
+              type="button"
+              className={item === category ? "is-active" : ""}
+              onClick={() => setCategory(item)}
+              aria-pressed={item === category}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+      </div>
 
-      {category === "All" && normalizedQuery.length === 0 && (
-        <>
-          <section className="theme-selector__collection">
-            <header>
-              <span>FEATURED</span>
-              <small>{featuredEditorials.length} editorials</small>
-            </header>
-
-            <div className="theme-selector__featured-row">
-              {featuredEditorials.map((editorial) => (
-                <button
-                  key={editorial.id}
-                  type="button"
-                  data-selected={editorial.id === selected.id}
-                  onMouseEnter={() => setHoveredId(editorial.id)}
-                  onMouseLeave={() => setHoveredId(null)}
-                  onFocus={() => setHoveredId(editorial.id)}
-                  onBlur={() => setHoveredId(null)}
-                  onClick={() => chooseEditorial(editorial.id)}
-                >
-                  <span
-                    style={{
-                      background: editorial.colors.background,
-                      color: editorial.colors.foreground,
-                      borderColor: editorial.colors.border,
-                      fontFamily: editorial.headingFont,
-                    }}
-                  >
-                    <small>{editorial.category}</small>
-                    <strong>{editorial.name}</strong>
-                    <i
-                      style={{ background: editorial.colors.accent }}
-                      aria-hidden="true"
-                    />
-                  </span>
-                </button>
-              ))}
-            </div>
-          </section>
-
-          {recentEditorials.length > 0 && (
-            <section className="theme-selector__collection">
-              <header>
-                <span>RECENTLY USED</span>
-                <small>Stored on this device</small>
-              </header>
-
-              <div className="theme-selector__recent-row">
-                {recentEditorials.map((editorial) => (
-                  <button
-                    key={editorial.id}
-                    type="button"
-                    data-selected={editorial.id === selected.id}
-                    onMouseEnter={() => setHoveredId(editorial.id)}
-                    onMouseLeave={() => setHoveredId(null)}
-                    onFocus={() => setHoveredId(editorial.id)}
-                    onBlur={() => setHoveredId(null)}
-                    onClick={() => chooseEditorial(editorial.id)}
-                  >
-                    <i style={{ background: editorial.colors.accent }} />
-                    <span>
-                      <strong>{editorial.name}</strong>
-                      <small>{editorial.category}</small>
-                    </span>
-                  </button>
-                ))}
+      {(favoriteThemes.length > 0 || recentThemes.length > 0) && (
+        <div className="theme-selector__quick-access">
+          {favoriteThemes.length > 0 && (
+            <div>
+              <div className="theme-selector__section-title">
+                <span>Favorites</span>
+                <span>{favoriteThemes.length}</span>
               </div>
-            </section>
+              <div className="theme-selector__compact-row">
+                {favoriteThemes.map((theme) =>
+                  renderCompactTheme(theme, "Favorite"),
+                )}
+              </div>
+            </div>
           )}
-        </>
+
+          {recentThemes.length > 0 && (
+            <div>
+              <div className="theme-selector__section-title">
+                <span>Recently used</span>
+                <span>{recentThemes.length}</span>
+              </div>
+              <div className="theme-selector__compact-row">
+                {recentThemes.map((theme) =>
+                  renderCompactTheme(theme, "Recent"),
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       )}
 
-      <section className="theme-selector__collection">
-        <header>
-          <span>{normalizedQuery ? "SEARCH RESULTS" : category}</span>
-          <small>
-            {visibleEditorials.length} {visibleEditorials.length === 1 ? "editorial" : "editorials"}
-          </small>
-        </header>
+      <div
+        className="theme-selector__grid"
+        role="listbox"
+        aria-label="Available profile themes"
+        onKeyDown={handleGridKeyDown}
+      >
+        {visibleThemes.map((theme, index) => {
+          const isSelected = theme.id === selected.id;
+          const isFavorite = favoriteIds.includes(theme.id);
 
-        {visibleEditorials.length > 0 ? (
-          <div
-            className="theme-selector__grid"
-            role="radiogroup"
-            onKeyDown={handleGridKeyDown}
-          >
-            {visibleEditorials.map((editorial, index) => (
+          return (
+            <article
+              key={theme.id}
+              className={[
+                "theme-selector__card",
+                isSelected ? "is-selected" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              onMouseEnter={() => setHoveredId(theme.id)}
+              onMouseLeave={() => setHoveredId(null)}
+              style={{
+                "--preview-bg": theme.colors.background,
+                "--preview-surface": theme.colors.surface,
+                "--preview-fg": theme.colors.foreground,
+                "--preview-muted": theme.colors.muted,
+                "--preview-accent": theme.colors.accent,
+                "--preview-border": theme.colors.border,
+              } as React.CSSProperties}
+            >
               <button
-                key={editorial.id}
                 ref={(element) => {
                   optionRefs.current[index] = element;
                 }}
-                className="theme-selector__option"
                 type="button"
-                role="radio"
-                aria-checked={editorial.id === selected.id}
-                data-selected={editorial.id === selected.id}
-                onMouseEnter={() => setHoveredId(editorial.id)}
-                onMouseLeave={() => setHoveredId(null)}
-                onFocus={() => setHoveredId(editorial.id)}
-                onBlur={() => setHoveredId(null)}
-                onClick={() => chooseEditorial(editorial.id)}
+                role="option"
+                aria-selected={isSelected}
+                className="theme-selector__card-main"
+                onClick={() => chooseTheme(theme.id)}
               >
-                <span
-                  className="theme-selector__preview"
-                  style={{
-                    background: editorial.colors.background,
-                    color: editorial.colors.foreground,
-                    borderColor: editorial.colors.border,
-                    fontFamily: editorial.headingFont,
-                  }}
-                >
-                  <span className="theme-selector__preview-kicker">
-                    {editorial.category}
+                <span className="theme-selector__miniature" aria-hidden="true">
+                  <span className="theme-selector__miniature-top" />
+                  <span className="theme-selector__miniature-body">
+                    <span className="theme-selector__miniature-profile">
+                      {initials(theme.name)}
+                    </span>
+                    <span className="theme-selector__miniature-copy">
+                      <i />
+                      <i />
+                      <i />
+                    </span>
                   </span>
-                  <strong>{editorial.name}</strong>
-                  <i
-                    style={{ background: editorial.colors.accent }}
-                    aria-hidden="true"
-                  />
-                  <small aria-hidden="true">
-                    <b />
-                    <b />
-                    <b />
-                  </small>
+                  <span className="theme-selector__miniature-grid">
+                    <i />
+                    <i />
+                    <i />
+                  </span>
                 </span>
 
-                <span className="theme-selector__meta">
-                  <span>
-                    <strong>{editorial.name}</strong>
-                    <small>{editorial.category}</small>
+                <span className="theme-selector__card-copy">
+                  <span className="theme-selector__card-meta">
+                    <small>{theme.category}</small>
+                    <small>{theme.layout}</small>
                   </span>
-                  {editorial.featured && <em>Featured</em>}
-                </span>
-
-                <span className="theme-selector__description">
-                  {editorial.description}
+                  <strong>{theme.name}</strong>
+                  <span>{theme.description}</span>
                 </span>
               </button>
-            ))}
-          </div>
-        ) : (
-          <div className="theme-selector__empty">
-            <strong>No editorials found.</strong>
-            <span>Try another search or category.</span>
-          </div>
-        )}
-      </section>
+
+              <button
+                type="button"
+                className={[
+                  "theme-selector__favorite",
+                  isFavorite ? "is-favorite" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                onClick={(event) => toggleFavorite(event, theme.id)}
+                aria-label={
+                  isFavorite
+                    ? `Remove ${theme.name} from favorites`
+                    : `Add ${theme.name} to favorites`
+                }
+                aria-pressed={isFavorite}
+              >
+                {isFavorite ? "★" : "☆"}
+              </button>
+
+              {isSelected && (
+                <span className="theme-selector__active-badge">Current</span>
+              )}
+            </article>
+          );
+        })}
+      </div>
+
+      {visibleThemes.length === 0 && (
+        <div className="theme-selector__empty">
+          <strong>No themes found</strong>
+          <span>Try another search or category.</span>
+        </div>
+      )}
+
+      <ThemeMarketplace
+        open={marketplaceOpen}
+        activeThemeId={selected.id}
+        onClose={() => setMarketplaceOpen(false)}
+        onApplyTheme={chooseTheme}
+      />
+
+      <footer className="theme-selector__footer">
+        <span>{visibleThemes.length} themes shown</span>
+        <span>{playgroundThemes.length} total</span>
+      </footer>
     </section>
   );
 }

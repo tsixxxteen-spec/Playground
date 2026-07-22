@@ -1,0 +1,2677 @@
+===== ExperienceRenderer.tsx =====
+import { getTheme } from "../themes";
+import WorldCanvas from "../world/engine/WorldCanvas";
+import { registerWorld } from "../world/registerWorld";
+import { dispatchWorldInteraction, WorldInteractionFeedback } from "../world/interactions";
+import type { PlaygroundData } from "../world/types/playground";
+import { EnvironmentLayer } from "../personalization/environments";
+import type { EnvironmentSettings } from "../personalization/environments";
+import { CompanionLayer } from "../personalization/companions";
+import type { CompanionSettings } from "../personalization/companions";
+import { WidgetLayer } from "../personalization/widgets";
+import type { WidgetSettings } from "../personalization/widgets";
+import type { ExperienceProfile, ExperienceProps } from "./shared";
+import "./ExperienceRenderer.css";
+
+export type { ExperienceProfile };
+
+type WorldExperienceProps = ExperienceProps & {
+  playground?: PlaygroundData;
+  environment?: EnvironmentSettings;
+  companions?: CompanionSettings;
+  widgets?: WidgetSettings;
+};
+
+registerWorld();
+
+export default function ExperienceRenderer(props: WorldExperienceProps) {
+  const activeEditorial = getTheme(props.themeId);
+  const Experience = activeEditorial.component;
+  const { playground, environment, companions, widgets, ...experienceProps } = props;
+
+  return (
+    <section
+      className={`profile-experience-root ${props.className ?? ""}`.trim()}
+      style={{ ...props.style, position: "relative" }}
+      data-experience={activeEditorial.id}
+      aria-label={`${props.profile.displayName} profile`}
+    >
+      <EnvironmentLayer settings={environment} />
+      <CompanionLayer settings={companions} />
+      <WidgetLayer settings={widgets} />
+
+      <WorldCanvas
+        playground={playground}
+        onObjectAction={(event) => {
+          void dispatchWorldInteraction(event);
+        }}
+      />
+      <WorldInteractionFeedback />
+      <Experience
+        {...experienceProps}
+        themeId={activeEditorial.id}
+      />
+    </section>
+  );
+}
+===== ExperienceRenderer.css =====
+.profile-experience-root{--xp-bg:var(--pg-background,#f3efe6);--xp-surface:var(--pg-surface,#fff);--xp-alt:var(--pg-surface-alt,#e8e3da);--xp-fg:var(--pg-foreground,#161616);--xp-muted:var(--pg-muted,#777);--xp-accent:var(--pg-accent,#fff200);--xp-border:var(--pg-border,rgba(0,0,0,.16));--xp-heading:var(--pg-heading-font,Georgia,serif);--xp-body:var(--pg-body-font,Arial,sans-serif);width:100%;min-height:100vh;overflow:clip;background:var(--xp-bg);color:var(--xp-fg);font-family:var(--xp-body)}
+.profile-experience-root button{color:inherit;font:inherit}.xp{min-height:100vh}.xp-avatar{display:grid;place-items:center;overflow:hidden;background:var(--xp-alt);font-family:var(--xp-heading)}.xp-avatar img{width:100%;height:100%;object-fit:cover;transform-origin:center}.xp-stats{display:flex;flex-wrap:wrap;gap:28px;margin:0}.xp-stats div{display:grid;gap:4px}.xp-stats dt{font-family:var(--xp-heading);font-size:21px}.xp-stats dd{margin:0;font:7px "Courier New",monospace;letter-spacing:.12em;text-transform:uppercase;opacity:.55}.xp-music__label{display:block;margin-bottom:7px;font:7px "Courier New",monospace;letter-spacing:.14em;text-transform:uppercase;opacity:.58}.xp-posts>header{display:flex;justify-content:space-between;margin-bottom:17px;font:8px "Courier New",monospace;letter-spacing:.14em;text-transform:uppercase}.xp-empty{display:grid;min-height:280px;place-items:center;align-content:center;gap:8px;border:1px dashed var(--xp-border)}.xp-empty strong{font:500 24px var(--xp-heading)}.xp-empty p{margin:0;font-size:10px;opacity:.5}
+
+.xp--ivory{padding:34px clamp(22px,5vw,76px) 72px}.xp-ivory__nav{display:flex;justify-content:space-between;padding-bottom:18px;border-bottom:1px solid var(--xp-border);font:8px "Courier New",monospace;letter-spacing:.14em}.xp-ivory__nav button{border:0;background:transparent;cursor:pointer}.xp-ivory__hero{display:grid;grid-template-columns:150px minmax(0,1fr) auto;gap:clamp(28px,5vw,72px);align-items:end;max-width:1180px;margin:110px auto 90px}.xp-ivory__hero .xp-avatar{width:150px;height:188px;border:1px solid var(--xp-border)}.xp-ivory__hero>div>p{margin:0 0 15px;font:9px "Courier New",monospace}.xp-ivory__hero h1{max-width:760px;margin:0;font:italic 400 clamp(58px,10vw,142px)/.78 var(--xp-heading);letter-spacing:-.08em}.xp-ivory__hero blockquote{max-width:560px;margin:36px 0 0;font:20px/1.45 var(--xp-heading)}.xp-ivory__hero .xp-music{max-width:480px;margin-top:28px}.xp--ivory>.xp-posts{max-width:1180px;margin:auto;padding-top:24px;border-top:1px solid var(--xp-border)}
+
+.xp--contact{display:grid;grid-template-columns:210px minmax(0,1fr);background:#f5f5f1;color:#111}.xp-contact__rail{position:sticky;top:0;display:flex;height:100vh;flex-direction:column;gap:18px;padding:18px 22px 28px;border-right:1px solid #0002;background:#fff}.xp-contact__menu{align-self:flex-start;padding:0;border:0;background:transparent;cursor:pointer}.xp-contact__rail .xp-avatar{width:76px;height:96px;margin-top:30px}.xp-contact__rail h1{margin:0;font:700 19px/1 Arial,sans-serif;text-transform:uppercase}.xp-contact__rail p{margin:7px 0 0;font:8px/1.5 "Courier New",monospace}.xp-contact__rail .xp-stats{gap:12px}.xp-contact__rail .xp-stats dt{font-size:14px}.xp-contact__vertical{margin-top:auto;font-size:20px;font-weight:800;writing-mode:vertical-rl;transform:rotate(180deg)}.xp--contact>.xp-posts{padding:34px 22px 60px}.xp--contact .weighted-wall--profile{gap:8px!important}
+
+.xp--graphite{padding:24px clamp(22px,4vw,58px) 70px;background:radial-gradient(circle at 83% 16%,#e6a23c1f,transparent 25%),#0c0c0d;color:#f3f0e9}.xp-graphite__nav{display:flex;align-items:center;gap:24px;padding-bottom:20px;border-bottom:1px solid #fff2;font:8px "Courier New",monospace}.xp-graphite__nav strong{font-size:11px;letter-spacing:.16em}.xp-graphite__nav span{opacity:.5}.xp-graphite__nav button{margin-left:auto;border:0;background:transparent;cursor:pointer}.xp-graphite__hero{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:26px;max-width:1200px;margin:48px auto 70px}.xp-graphite__copy{display:flex;min-height:460px;flex-direction:column;padding:40px;border:1px solid #fff2;border-radius:22px;background:linear-gradient(145deg,#171719,#232326)}.xp-graphite__copy>p{margin:0;color:#e6a23c;font:9px "Courier New",monospace}.xp-graphite__copy h1{margin:24px 0 0;font:500 clamp(54px,8vw,110px)/.82 Georgia,serif;letter-spacing:-.08em}.xp-graphite__copy h2{max-width:600px;margin:28px 0;font-size:18px;font-weight:400;line-height:1.45;opacity:.7}.xp-graphite__copy .xp-stats{margin-top:auto}.xp-graphite__hero>.xp-avatar{width:100%;height:460px;border-radius:22px}.xp-graphite__hero>.xp-music{grid-column:1/-1;padding:22px;border:1px solid #fff2;border-radius:18px;background:#171719}.xp--graphite>.xp-posts{max-width:1200px;margin:auto}
+
+.xp--eight-bit{padding:14px 18px 90px;background:linear-gradient(90deg,#ffffff24 1px,transparent 1px),linear-gradient(#ffffff24 1px,transparent 1px),linear-gradient(#4268d9,#c55ac8);background-size:32px 32px,32px 32px,auto;color:#fff;font-family:"Courier New",monospace}.xp-eight__top{display:flex;justify-content:space-between;max-width:1220px;margin:0 auto 18px;padding:11px 14px;border:2px solid #fff;background:#342667;font-size:11px}.xp-eight__top button{border:0;background:transparent;cursor:pointer}.xp-eight__desktop{display:grid;grid-template-columns:260px minmax(0,1fr);gap:18px;max-width:1220px;margin:auto}.xp-eight__window{border:2px solid #fff;background:#493078e6;box-shadow:8px 8px 0 #24184c8c}.xp-eight__bar{padding:8px 10px;border-bottom:2px solid #fff;background:#6e3e99;font-size:9px}.xp-eight__profile{align-self:start;padding-bottom:20px}.xp-eight__profile .xp-avatar{width:128px;height:128px;margin:24px auto 18px;border:2px solid #fff}.xp-eight__profile h1,.xp-eight__profile>p,.xp-eight__profile blockquote,.xp-eight__profile .xp-stats{margin-right:18px;margin-left:18px}.xp-eight__profile h1{font-size:20px}.xp-eight__profile>p{font-size:9px}.xp-eight__profile blockquote{padding:10px;border:1px dashed #fff;font-size:10px;line-height:1.5}.xp-eight__feed>.xp-posts{padding:18px}.xp--eight-bit>.xp-music{position:fixed;z-index:300;right:18px;bottom:18px;width:min(360px,calc(100vw - 36px));padding:10px;border:2px solid #fff;background:#3b2b6c;box-shadow:7px 7px 0 #24184c8c}
+
+.xp--stardust{padding-bottom:70px;background:radial-gradient(circle,#ffffffbf 0 1px,transparent 1.5px) 0 0/68px 62px,linear-gradient(#284fd3,#c052c7);color:#fff}.xp-star__banner{padding:16px 20px 12px;border-bottom:2px solid #ffffffb8;background:#2e2270d1;text-align:center}.xp-star__banner>p{margin:0 0 14px;font:clamp(18px,4vw,36px) "Courier New",monospace;text-shadow:2px 2px #5b3f9b}.xp-star__banner nav{display:flex;justify-content:center;gap:26px;font:8px "Courier New",monospace}.xp-star__banner button{border:0;background:transparent;cursor:pointer}.xp-star__layout{display:grid;grid-template-columns:250px minmax(0,1fr);gap:18px;max-width:1120px;margin:22px auto 0;padding:0 18px}.xp-star__side{align-self:start;padding:18px;border:2px solid #ffffffc7;background:#2c1c5bc4;backdrop-filter:blur(8px)}.xp-star__side .xp-avatar{width:100%;aspect-ratio:1;border:2px solid #fff}.xp-star__side h1{margin:16px 0 4px;font:18px "Courier New",monospace}.xp-star__side>p{margin:0;font-size:9px}.xp-star__side blockquote{margin:15px 0;padding:10px;border:1px dashed #fff;font-size:10px;line-height:1.5}.xp-star__side .xp-music,.xp-star__widget{margin-top:16px;padding:12px;border:1px solid #ffffffa6;background:#ffffff1a}.xp-star__widget span{font-size:7px;letter-spacing:.12em}.xp-star__widget strong{display:block;margin-top:6px;font-size:9px}.xp-star__layout>.xp-posts>header{padding:12px;border:2px solid #fff;background:#2c1c5bc4}
+
+.xp--press{padding:0 34px 72px;background:#0b0b0c;color:#fff}.xp-press__nav{display:flex;align-items:center;justify-content:space-between;max-width:1260px;margin:auto;padding:20px 0;border-bottom:1px solid #fff2}.xp-press__nav>strong{text-transform:uppercase}.xp-press__nav>div{display:flex;align-items:center;gap:22px;font-size:8px}.xp-press__nav button{padding:8px 13px;border:1px solid #fff200;border-radius:999px;background:transparent;cursor:pointer}.xp-press__hero{display:grid;grid-template-columns:minmax(300px,.78fr) minmax(0,1.22fr);gap:clamp(34px,6vw,86px);align-items:center;max-width:1260px;margin:56px auto 86px}.xp-press__hero>.xp-avatar{width:100%;min-height:620px}.xp-press__copy>p{margin:0;color:#fff200;font:9px "Courier New",monospace}.xp-press__copy h1{margin:22px 0 0;font:800 clamp(60px,9vw,134px)/.76 Arial,sans-serif;letter-spacing:-.09em;text-transform:uppercase}.xp-press__copy h2{max-width:620px;margin:34px 0 0;font-size:20px;font-weight:400;line-height:1.45}.xp-press__copy .xp-music{margin:34px 0;padding:20px;border-left:5px solid #fff200;background:#18181a}.xp--press>.xp-posts{max-width:1260px;margin:auto}
+
+.xp-music--editorial .profile-bio-music{--profile-music-accent:var(--xp-accent);width:100%;padding-top:8px;border-top:1px solid var(--xp-border)}.xp-music--utility .profile-bio-music{--profile-music-accent:#ff4e00;width:100%;padding:8px;border:1px solid #111;background:#fff}.xp-music--graphite .profile-bio-music{--profile-music-accent:#e6a23c;width:100%;margin:0}.xp-music--graphite .profile-bio-music__title{font:18px Georgia,serif;text-transform:none;letter-spacing:-.02em}.xp-music--pixel .profile-bio-music{--profile-music-accent:#ff8ad4;width:100%;margin:0}.xp-music--pixel .profile-bio-music__play{border-radius:0}.xp-music--stardust .profile-bio-music{--profile-music-accent:#ffc9ff;width:100%;margin:0}.xp-music--release .profile-bio-music{--profile-music-accent:#fff200;width:100%;margin:0}.xp-music--release .profile-bio-music__title{font:800 18px Arial,sans-serif;letter-spacing:-.03em}.xp-music--release .profile-bio-music__play{width:46px;height:46px;border-color:#fff200}
+
+@media(max-width:820px){.xp-ivory__hero,.xp-graphite__hero,.xp-press__hero{grid-template-columns:1fr}.xp-ivory__hero{margin-top:62px}.xp--contact{display:block}.xp-contact__rail{position:relative;height:auto;border-right:0;border-bottom:1px solid #0002}.xp-contact__vertical{display:none}.xp-eight__desktop,.xp-star__layout{grid-template-columns:1fr}.xp-press__hero>.xp-avatar{min-height:420px}}@media(max-width:560px){.xp--press{padding-left:18px;padding-right:18px}.xp-ivory__hero h1,.xp-graphite__copy h1,.xp-press__copy h1{font-size:52px}.xp-graphite__copy{min-height:0;padding:24px}.xp-graphite__hero>.xp-avatar{height:360px}.xp-press__nav span{display:none}}
+
+/* =========================================================
+   OWNER EDIT PROFILE CONTROL
+   ========================================================= */
+
+.profile-experience-owner-edit {
+  position: fixed;
+  z-index: 11000;
+  top: 76px;
+  right: 22px;
+
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 8px;
+
+  padding: 0 15px;
+
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+
+  background: rgba(13, 13, 15, 0.82);
+  color: #fff;
+
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(16px);
+
+  cursor: pointer;
+
+  font-family:
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.profile-experience-owner-edit:hover {
+  border-color: #fff200;
+  background: #fff200;
+  color: #111;
+  transform: translateY(-1px);
+}
+
+.profile-experience-owner-edit:active {
+  transform: scale(0.96);
+}
+
+.profile-experience-owner-edit span {
+  font-size: 11px;
+}
+
+@media (max-width: 700px) {
+  .profile-experience-owner-edit {
+    top: 68px;
+    right: 12px;
+
+    min-height: 34px;
+    padding: 0 12px;
+  }
+}
+
+
+/* ===== CINEMA EDITORIAL ===== */
+.xp--cinema-editorial {
+  min-height: 100vh;
+  padding: 24px clamp(18px, 3vw, 52px) 28px;
+  background: var(--xp-bg);
+  color: var(--xp-fg);
+}
+
+.xp-cinema__topline {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 24px;
+  padding: 10px 0 14px;
+  border-top: 2px solid var(--xp-fg);
+  border-bottom: 1px solid var(--xp-border);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.xp-cinema__topline button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: uppercase;
+}
+
+.xp-cinema__hero {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(320px, 1.05fr);
+  gap: clamp(28px, 5vw, 88px);
+  align-items: end;
+  padding: clamp(48px, 8vw, 120px) 0 46px;
+}
+
+.xp-cinema__hero-copy {
+  align-self: center;
+}
+
+.xp-cinema__kicker,
+.xp-cinema__handle {
+  margin: 0;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.xp-cinema__kicker {
+  margin-bottom: 20px;
+  color: var(--xp-accent);
+}
+
+.xp-cinema__hero h1 {
+  margin: 0;
+  font-family: var(--xp-heading);
+  font-size: clamp(70px, 12vw, 188px);
+  font-weight: 800;
+  line-height: 0.78;
+  letter-spacing: -0.075em;
+  text-transform: uppercase;
+}
+
+.xp-cinema__handle {
+  margin-top: 24px;
+  color: var(--xp-muted);
+}
+
+.xp-cinema__hero-image {
+  position: relative;
+}
+
+.xp-cinema__hero-image .xp-avatar {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: 0;
+  background: #d8d5ce;
+  font-size: clamp(48px, 8vw, 110px);
+  overflow: hidden;
+}
+
+.xp-cinema__hero-image span {
+  display: block;
+  margin-top: 8px;
+  font-size: 7px;
+  letter-spacing: 0.16em;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.xp-cinema__statement {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) minmax(240px, auto);
+  gap: clamp(24px, 4vw, 60px);
+  align-items: start;
+  padding: 34px 0 54px;
+  border-top: 1px solid var(--xp-fg);
+}
+
+.xp-cinema__issue-number {
+  display: grid;
+  gap: 2px;
+}
+
+.xp-cinema__issue-number span {
+  font-size: 7px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.xp-cinema__issue-number strong {
+  font-family: var(--xp-heading);
+  font-size: 76px;
+  line-height: 0.85;
+}
+
+.xp-cinema__quote blockquote {
+  max-width: 940px;
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(28px, 4vw, 62px);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+
+.xp-cinema__statement .xp-stats {
+  border-left: 1px solid var(--xp-border);
+  padding-left: 24px;
+}
+
+.xp-cinema__sound {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.55fr) minmax(0, 1.45fr);
+  gap: clamp(28px, 5vw, 80px);
+  align-items: center;
+  padding: 38px 0;
+  border-top: 1px solid var(--xp-fg);
+  border-bottom: 1px solid var(--xp-fg);
+}
+
+.xp-cinema__sound p,
+.xp-cinema__works-heading p {
+  margin: 0 0 8px;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.xp-cinema__sound h2,
+.xp-cinema__works-heading h2 {
+  margin: 0;
+  font-family: var(--xp-heading);
+  text-transform: uppercase;
+}
+
+.xp-cinema__sound h2 {
+  font-size: clamp(40px, 5vw, 80px);
+  line-height: 0.9;
+}
+
+.xp-cinema__sound .xp-music {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.xp-cinema__works {
+  padding: clamp(58px, 8vw, 110px) 0 42px;
+}
+
+.xp-cinema__works-heading {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: clamp(24px, 4vw, 64px);
+  margin-bottom: 42px;
+}
+
+.xp-cinema__works-heading h2 {
+  max-width: 1000px;
+  font-size: clamp(48px, 7vw, 112px);
+  line-height: 0.86;
+  letter-spacing: -0.055em;
+}
+
+.xp-cinema__works .xp-posts > header {
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--xp-fg);
+}
+
+.xp-cinema__footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding-top: 18px;
+  border-top: 2px solid var(--xp-fg);
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 900px) {
+  .xp-cinema__hero {
+    grid-template-columns: 1fr;
+  }
+
+  .xp-cinema__hero-image {
+    max-width: 680px;
+  }
+
+  .xp-cinema__statement {
+    grid-template-columns: 90px minmax(0, 1fr);
+  }
+
+  .xp-cinema__statement .xp-stats {
+    grid-column: 1 / -1;
+    border-left: 0;
+    border-top: 1px solid var(--xp-border);
+    padding: 22px 0 0;
+  }
+}
+
+@media (max-width: 680px) {
+  .xp--cinema-editorial {
+    padding: 16px 14px 22px;
+  }
+
+  .xp-cinema__topline {
+    grid-template-columns: 1fr auto;
+  }
+
+  .xp-cinema__topline > span:nth-child(2) {
+    display: none;
+  }
+
+  .xp-cinema__hero {
+    padding: 42px 0 28px;
+  }
+
+  .xp-cinema__hero h1 {
+    font-size: clamp(64px, 22vw, 118px);
+  }
+
+  .xp-cinema__statement {
+    grid-template-columns: 1fr;
+  }
+
+  .xp-cinema__issue-number {
+    grid-template-columns: auto auto;
+    justify-content: start;
+    align-items: end;
+    gap: 8px;
+  }
+
+  .xp-cinema__issue-number strong {
+    font-size: 48px;
+  }
+
+  .xp-cinema__sound {
+    grid-template-columns: 1fr;
+  }
+
+  .xp-cinema__works-heading {
+    grid-template-columns: 1fr;
+  }
+
+  .xp-cinema__footer {
+    flex-direction: column;
+    gap: 6px;
+  }
+}
+
+/* ===== CINEMA EDITORIAL ===== */
+.xp--cinema-editorial {
+  min-height: 100vh;
+  padding: 24px clamp(18px, 3vw, 52px) 28px;
+  background: var(--xp-bg);
+  color: var(--xp-fg);
+}
+
+.xp-cinema__topline {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 24px;
+  padding: 10px 0 14px;
+  border-top: 2px solid var(--xp-fg);
+  border-bottom: 1px solid var(--xp-border);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.xp-cinema__topline button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: uppercase;
+}
+
+.xp-cinema__hero {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(320px, 1.05fr);
+  gap: clamp(28px, 5vw, 88px);
+  align-items: end;
+  padding: clamp(48px, 8vw, 120px) 0 46px;
+}
+
+.xp-cinema__hero-copy {
+  align-self: center;
+}
+
+.xp-cinema__kicker,
+.xp-cinema__handle {
+  margin: 0;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.xp-cinema__kicker {
+  margin-bottom: 20px;
+  color: var(--xp-accent);
+}
+
+.xp-cinema__hero h1 {
+  margin: 0;
+  font-family: var(--xp-heading);
+  font-size: clamp(70px, 12vw, 188px);
+  font-weight: 800;
+  line-height: 0.78;
+  letter-spacing: -0.075em;
+  text-transform: uppercase;
+}
+
+.xp-cinema__handle {
+  margin-top: 24px;
+  color: var(--xp-muted);
+}
+
+.xp-cinema__hero-image {
+  position: relative;
+}
+
+.xp-cinema__hero-image .xp-avatar {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: 0;
+  background: #d8d5ce;
+  font-size: clamp(48px, 8vw, 110px);
+  overflow: hidden;
+}
+
+.xp-cinema__hero-image span {
+  display: block;
+  margin-top: 8px;
+  font-size: 7px;
+  letter-spacing: 0.16em;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.xp-cinema__statement {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) minmax(240px, auto);
+  gap: clamp(24px, 4vw, 60px);
+  align-items: start;
+  padding: 34px 0 54px;
+  border-top: 1px solid var(--xp-fg);
+}
+
+.xp-cinema__issue-number {
+  display: grid;
+  gap: 2px;
+}
+
+.xp-cinema__issue-number span {
+  font-size: 7px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.xp-cinema__issue-number strong {
+  font-family: var(--xp-heading);
+  font-size: 76px;
+  line-height: 0.85;
+}
+
+.xp-cinema__quote blockquote {
+  max-width: 940px;
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(28px, 4vw, 62px);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+
+.xp-cinema__statement .xp-stats {
+  border-left: 1px solid var(--xp-border);
+  padding-left: 24px;
+}
+
+.xp-cinema__sound {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.55fr) minmax(0, 1.45fr);
+  gap: clamp(28px, 5vw, 80px);
+  align-items: center;
+  padding: 38px 0;
+  border-top: 1px solid var(--xp-fg);
+  border-bottom: 1px solid var(--xp-fg);
+}
+
+.xp-cinema__sound p,
+.xp-cinema__works-heading p {
+  margin: 0 0 8px;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.xp-cinema__sound h2,
+.xp-cinema__works-heading h2 {
+  margin: 0;
+  font-family: var(--xp-heading);
+  text-transform: uppercase;
+}
+
+.xp-cinema__sound h2 {
+  font-size: clamp(40px, 5vw, 80px);
+  line-height: 0.9;
+}
+
+.xp-cinema__sound .xp-music {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.xp-cinema__works {
+  padding: clamp(58px, 8vw, 110px) 0 42px;
+}
+
+.xp-cinema__works-heading {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: clamp(24px, 4vw, 64px);
+  margin-bottom: 42px;
+}
+
+.xp-cinema__works-heading h2 {
+  max-width: 1000px;
+  font-size: clamp(48px, 7vw, 112px);
+  line-height: 0.86;
+  letter-spacing: -0.055em;
+}
+
+.xp-cinema__works .xp-posts > header {
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--xp-fg);
+}
+
+.xp-cinema__footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding-top: 18px;
+  border-top: 2px solid var(--xp-fg);
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 900px) {
+  .xp-cinema__hero {
+    grid-template-columns: 1fr;
+  }
+
+  .xp-cinema__hero-image {
+    max-width: 680px;
+  }
+
+  .xp-cinema__statement {
+    grid-template-columns: 90px minmax(0, 1fr);
+  }
+
+  .xp-cinema__statement .xp-stats {
+    grid-column: 1 / -1;
+    border-left: 0;
+    border-top: 1px solid var(--xp-border);
+    padding: 22px 0 0;
+  }
+}
+
+@media (max-width: 680px) {
+  .xp--cinema-editorial {
+    padding: 16px 14px 22px;
+  }
+
+  .xp-cinema__topline {
+    grid-template-columns: 1fr auto;
+  }
+
+  .xp-cinema__topline > span:nth-child(2) {
+    display: none;
+  }
+
+  .xp-cinema__hero {
+    padding: 42px 0 28px;
+  }
+
+  .xp-cinema__hero h1 {
+    font-size: clamp(64px, 22vw, 118px);
+  }
+
+  .xp-cinema__statement {
+    grid-template-columns: 1fr;
+  }
+
+  .xp-cinema__issue-number {
+    grid-template-columns: auto auto;
+    justify-content: start;
+    align-items: end;
+    gap: 8px;
+  }
+
+  .xp-cinema__issue-number strong {
+    font-size: 48px;
+  }
+
+  .xp-cinema__sound {
+    grid-template-columns: 1fr;
+  }
+
+  .xp-cinema__works-heading {
+    grid-template-columns: 1fr;
+  }
+
+  .xp-cinema__footer {
+    flex-direction: column;
+    gap: 6px;
+  }
+}
+
+/* ===== FASHION EDITORIAL ===== */
+.xp--fashion-editorial { min-height: 100vh; padding: 18px clamp(18px, 3vw, 48px) 28px; background: var(--xp-bg); color: var(--xp-fg); }
+.xp-fashion__header { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 10px 0 14px; border-bottom: 1px solid var(--xp-fg); font-size: 8px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+.xp-fashion__brand { font-family: var(--xp-heading); font-size: 18px; letter-spacing: -.02em; }
+.xp-fashion__issue { justify-self: center; }
+.xp-fashion__header button { justify-self: end; border: 0; background: transparent; color: inherit; cursor: pointer; font: inherit; letter-spacing: inherit; text-transform: uppercase; }
+.xp-fashion__cover { position: relative; display: grid; grid-template-columns: minmax(300px, .88fr) minmax(360px, 1.12fr); gap: clamp(30px, 5vw, 90px); align-items: center; min-height: 78vh; padding: clamp(46px, 7vw, 100px) 0; }
+.xp-fashion__cover-image .xp-avatar { width: 100%; aspect-ratio: 3 / 4; border-radius: 0; overflow: hidden; background: #ddd8d0; font-size: clamp(52px, 8vw, 110px); }
+.xp-fashion__cover-copy { position: relative; z-index: 2; margin-left: clamp(-80px, -5vw, -24px); }
+.xp-fashion__eyebrow, .xp-fashion__handle { margin: 0; font-size: 8px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+.xp-fashion__eyebrow { margin-bottom: 20px; color: var(--xp-accent); }
+.xp-fashion__cover h1 { margin: 0; font-family: var(--xp-heading); font-size: clamp(70px, 11vw, 172px); font-weight: 400; line-height: .82; letter-spacing: -.065em; }
+.xp-fashion__handle { margin-top: 24px; color: var(--xp-muted); }
+.xp-fashion__vertical-note { position: absolute; right: 0; bottom: 58px; margin: 0; font-size: 7px; letter-spacing: .16em; text-transform: uppercase; writing-mode: vertical-rl; }
+.xp-fashion__intro { display: grid; grid-template-columns: 110px minmax(0, 1fr) minmax(240px, auto); gap: clamp(24px, 4vw, 70px); align-items: start; padding: 36px 0 70px; border-top: 1px solid var(--xp-fg); }
+.xp-fashion__intro-label { display: grid; gap: 2px; }
+.xp-fashion__intro-label span { font-size: 7px; letter-spacing: .16em; text-transform: uppercase; }
+.xp-fashion__intro-label strong { font-family: var(--xp-heading); font-size: 66px; font-weight: 400; line-height: .85; }
+.xp-fashion__intro-copy p { max-width: 850px; margin: 0; font-family: var(--xp-heading); font-size: clamp(27px, 3.7vw, 56px); line-height: 1.05; letter-spacing: -.03em; }
+.xp-fashion__intro .xp-stats { border-left: 1px solid var(--xp-border); padding-left: 24px; }
+.xp-fashion__feature-grid { display: grid; grid-template-columns: .82fr 1.18fr; gap: clamp(28px, 5vw, 78px); padding: 70px 0 100px; border-top: 1px solid var(--xp-fg); }
+.xp-fashion__feature-title { align-self: start; position: sticky; top: 24px; }
+.xp-fashion__feature-title p, .xp-fashion__soundtrack p, .xp-fashion__work-heading span { margin: 0 0 12px; font-size: 8px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+.xp-fashion__feature-title h2 { max-width: 620px; margin: 0; font-family: var(--xp-heading); font-size: clamp(42px, 6vw, 94px); font-weight: 400; line-height: .95; letter-spacing: -.045em; }
+.xp-fashion__feature-image { grid-column: 2; }
+.xp-fashion__feature-image .xp-avatar { width: 100%; aspect-ratio: 4 / 5; border-radius: 0; overflow: hidden; background: #d8d3ca; }
+.xp-fashion__feature-image span { display: block; margin-top: 8px; font-size: 7px; letter-spacing: .16em; text-align: right; text-transform: uppercase; }
+.xp-fashion__feature-image--offset { width: 72%; margin-top: 20px; margin-left: -22%; }
+.xp-fashion__soundtrack { display: grid; grid-template-columns: minmax(240px, .6fr) minmax(0, 1.4fr); gap: clamp(28px, 5vw, 80px); align-items: center; padding: 40px 0; border-top: 1px solid var(--xp-fg); border-bottom: 1px solid var(--xp-fg); }
+.xp-fashion__soundtrack h2 { margin: 0; font-family: var(--xp-heading); font-size: clamp(42px, 5vw, 76px); font-weight: 400; line-height: .9; }
+.xp-fashion__soundtrack .xp-music { margin: 0; }
+.xp-fashion__work { padding: clamp(66px, 9vw, 120px) 0 44px; }
+.xp-fashion__work-heading { display: grid; grid-template-columns: 150px minmax(0, .8fr) minmax(220px, .5fr); gap: clamp(24px, 4vw, 60px); align-items: end; margin-bottom: 44px; }
+.xp-fashion__work-heading h2 { margin: 0; font-family: var(--xp-heading); font-size: clamp(64px, 9vw, 142px); font-weight: 400; line-height: .78; letter-spacing: -.06em; }
+.xp-fashion__work-heading p { margin: 0; color: var(--xp-muted); font-size: 12px; line-height: 1.55; }
+.xp-fashion__work .xp-posts > header { padding-bottom: 14px; border-bottom: 1px solid var(--xp-fg); }
+.xp-fashion__footer { display: flex; justify-content: space-between; gap: 24px; padding-top: 18px; border-top: 1px solid var(--xp-fg); font-size: 7px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+@media (max-width: 900px) { .xp-fashion__cover { grid-template-columns: 1fr; min-height: auto; } .xp-fashion__cover-copy { margin-left: 0; margin-top: -10vw; } .xp-fashion__cover-image { max-width: 680px; } .xp-fashion__intro { grid-template-columns: 90px minmax(0, 1fr); } .xp-fashion__intro .xp-stats { grid-column: 1 / -1; border-left: 0; border-top: 1px solid var(--xp-border); padding: 22px 0 0; } .xp-fashion__feature-grid { grid-template-columns: 1fr; } .xp-fashion__feature-title { position: static; } .xp-fashion__feature-image { grid-column: 1; } .xp-fashion__feature-image--offset { width: 74%; margin-left: auto; } .xp-fashion__work-heading { grid-template-columns: 1fr 1fr; } .xp-fashion__work-heading span { grid-column: 1 / -1; } }
+@media (max-width: 680px) { .xp--fashion-editorial { padding: 14px; } .xp-fashion__header { grid-template-columns: 1fr auto; } .xp-fashion__issue { display: none; } .xp-fashion__cover { padding: 38px 0 54px; } .xp-fashion__cover h1 { font-size: clamp(66px, 22vw, 118px); } .xp-fashion__vertical-note { display: none; } .xp-fashion__intro, .xp-fashion__soundtrack, .xp-fashion__work-heading { grid-template-columns: 1fr; } .xp-fashion__intro-label { grid-template-columns: auto auto; align-items: end; justify-content: start; gap: 8px; } .xp-fashion__intro-label strong { font-size: 46px; } .xp-fashion__feature-image--offset { width: 84%; } .xp-fashion__footer { flex-direction: column; gap: 6px; } }
+
+/* ===== FASHION EDITORIAL ===== */
+.xp--fashion-editorial{min-height:100vh;padding:18px clamp(18px,3vw,48px) 28px;background:var(--xp-bg);color:var(--xp-fg)}
+.xp-fashion__bar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:10px 0 14px;border-bottom:1px solid var(--xp-fg);font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+.xp-fashion__bar button{justify-self:end;border:0;background:transparent;color:inherit;font:inherit;letter-spacing:inherit;text-transform:uppercase;cursor:pointer}
+.xp-fashion__cover{display:grid;grid-template-columns:minmax(300px,.9fr) minmax(360px,1.1fr);gap:clamp(30px,5vw,90px);align-items:center;min-height:78vh;padding:clamp(46px,7vw,100px) 0}
+.xp-fashion__portrait .xp-avatar,.xp-fashion__look .xp-avatar{width:100%;aspect-ratio:3/4;border-radius:0;overflow:hidden;background:#ddd8d0}
+.xp-fashion__title{position:relative;z-index:2;margin-left:clamp(-80px,-5vw,-24px)}
+.xp-fashion__title p,.xp-fashion__title span,.xp-fashion__statement span,.xp-fashion__music span,.xp-fashion__portfolio header>span{font-size:8px;font-weight:700;letter-spacing:.18em;text-transform:uppercase}
+.xp-fashion__title p{color:var(--xp-accent)}
+.xp-fashion__title h1{margin:20px 0 24px;font-family:var(--xp-heading);font-size:clamp(70px,11vw,172px);font-weight:400;line-height:.82;letter-spacing:-.065em}
+.xp-fashion__intro{display:grid;grid-template-columns:110px minmax(0,1fr) minmax(240px,auto);gap:clamp(24px,4vw,70px);padding:36px 0 70px;border-top:1px solid var(--xp-fg)}
+.xp-fashion__number{display:grid}.xp-fashion__number span{font-size:7px;letter-spacing:.16em}.xp-fashion__number strong{font:400 66px/.85 var(--xp-heading)}
+.xp-fashion__intro>p{margin:0;font:400 clamp(27px,3.7vw,56px)/1.05 var(--xp-heading);letter-spacing:-.03em}
+.xp-fashion__spread{display:grid;grid-template-columns:.82fr 1.18fr;gap:clamp(28px,5vw,78px);padding:70px 0 100px;border-top:1px solid var(--xp-fg)}
+.xp-fashion__statement{position:sticky;top:24px;align-self:start}.xp-fashion__statement h2{margin:12px 0 0;font:400 clamp(42px,6vw,94px)/.95 var(--xp-heading);letter-spacing:-.045em}
+.xp-fashion__look{grid-column:2}.xp-fashion__look small{display:block;margin-top:8px;text-align:right;font-size:7px;letter-spacing:.16em}.xp-fashion__look--small{width:72%;margin-left:-22%}
+.xp-fashion__music{display:grid;grid-template-columns:minmax(240px,.6fr) minmax(0,1.4fr);gap:clamp(28px,5vw,80px);align-items:center;padding:40px 0;border-top:1px solid var(--xp-fg);border-bottom:1px solid var(--xp-fg)}
+.xp-fashion__music h2{margin:8px 0 0;font:400 clamp(42px,5vw,76px)/.9 var(--xp-heading)}
+.xp-fashion__portfolio{padding:clamp(66px,9vw,120px) 0 44px}.xp-fashion__portfolio>header{display:grid;grid-template-columns:150px minmax(0,.8fr) minmax(220px,.5fr);gap:clamp(24px,4vw,60px);align-items:end;margin-bottom:44px}.xp-fashion__portfolio h2{margin:0;font:400 clamp(64px,9vw,142px)/.78 var(--xp-heading);letter-spacing:-.06em}.xp-fashion__portfolio p{margin:0;color:var(--xp-muted);font-size:12px;line-height:1.55}
+.xp-fashion__footer{display:flex;justify-content:space-between;gap:24px;padding-top:18px;border-top:1px solid var(--xp-fg);font-size:7px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+@media(max-width:900px){.xp-fashion__cover,.xp-fashion__spread{grid-template-columns:1fr}.xp-fashion__title{margin:0}.xp-fashion__intro{grid-template-columns:90px 1fr}.xp-fashion__look{grid-column:1}.xp-fashion__statement{position:static}.xp-fashion__portfolio>header{grid-template-columns:1fr 1fr}}
+@media(max-width:680px){.xp--fashion-editorial{padding:14px}.xp-fashion__bar{grid-template-columns:1fr auto}.xp-fashion__bar span:nth-child(2){display:none}.xp-fashion__intro,.xp-fashion__music,.xp-fashion__portfolio>header{grid-template-columns:1fr}.xp-fashion__title h1{font-size:clamp(66px,22vw,118px)}.xp-fashion__footer{flex-direction:column;gap:6px}}
+
+/* ===== MUSIC EDITORIAL / SPRINT 12 ===== */
+.xp--music-editorial{min-height:100vh;padding:18px clamp(18px,3vw,48px) 28px;background:var(--xp-bg);color:var(--xp-fg)}
+.xp-music-editorial__bar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:10px 0 14px;border-bottom:1px solid var(--xp-border);font:700 8px "Courier New",monospace;letter-spacing:.16em;text-transform:uppercase}
+.xp-music-editorial__bar strong{font:800 18px var(--xp-body);letter-spacing:-.04em}.xp-music-editorial__bar button{justify-self:end;border:0;background:transparent;cursor:pointer;letter-spacing:inherit;text-transform:uppercase}
+.xp-music-editorial__cover{display:grid;grid-template-columns:minmax(340px,1.1fr) minmax(320px,.9fr);gap:clamp(32px,5vw,88px);align-items:end;padding:clamp(46px,7vw,96px) 0 70px}.xp-music-editorial__portrait{position:relative}.xp-music-editorial__portrait .xp-avatar{width:100%;aspect-ratio:4/5;border-radius:0;background:#1b1b1b;font-size:clamp(56px,8vw,120px)}.xp-music-editorial__portrait>span{position:absolute;top:14px;right:14px;font:8px "Courier New",monospace;letter-spacing:.18em}
+.xp-music-editorial__headline{padding-bottom:clamp(0px,4vw,60px)}.xp-music-editorial__headline>p,.xp-music-editorial__headline>small{margin:0;font:700 8px "Courier New",monospace;letter-spacing:.18em;text-transform:uppercase}.xp-music-editorial__headline>p{margin-bottom:18px;color:var(--xp-accent)}.xp-music-editorial__headline h1{margin:0;font-size:clamp(74px,11vw,170px);font-weight:800;line-height:.79;letter-spacing:-.075em;text-transform:uppercase}.xp-music-editorial__headline blockquote{max-width:560px;margin:28px 0;color:var(--xp-muted);font-size:clamp(18px,2vw,30px);line-height:1.15}
+.xp-music-editorial__release{display:grid;grid-template-columns:minmax(240px,.55fr) minmax(0,1.45fr);gap:clamp(28px,5vw,80px);align-items:center;padding:38px 0;border-top:1px solid var(--xp-fg);border-bottom:1px solid var(--xp-fg)}.xp-music-editorial__release span,.xp-music-editorial__story-copy>span,.xp-music-editorial__archive>header span{display:block;margin-bottom:10px;font:700 8px "Courier New",monospace;letter-spacing:.16em;text-transform:uppercase}.xp-music-editorial__release h2,.xp-music-editorial__archive h2{margin:0;font-size:clamp(46px,6vw,94px);line-height:.85;letter-spacing:-.05em;text-transform:uppercase}.xp-music-editorial__release .xp-music{margin:0}
+.xp-music-editorial__profile{display:grid;grid-template-columns:110px minmax(0,1fr) minmax(240px,auto);gap:clamp(24px,4vw,64px);align-items:start;padding:44px 0 72px}.xp-music-editorial__number{display:grid;gap:3px}.xp-music-editorial__number span{font:7px "Courier New",monospace;letter-spacing:.16em}.xp-music-editorial__number strong{font-size:74px;line-height:.82}.xp-music-editorial__profile>p{max-width:900px;margin:0;font:clamp(30px,4.6vw,70px)/1.02 Georgia,"Times New Roman",serif;letter-spacing:-.04em}.xp-music-editorial__profile .xp-stats{padding-left:24px;border-left:1px solid var(--xp-border)}
+.xp-music-editorial__story{display:grid;grid-template-columns:minmax(260px,.58fr) minmax(0,1.42fr);gap:clamp(32px,5vw,88px);padding:72px 0 104px;border-top:1px solid var(--xp-border)}.xp-music-editorial__story-copy{position:sticky;top:24px;align-self:start}.xp-music-editorial__story-copy h2{margin:0;font-size:clamp(48px,6vw,96px);line-height:.87;letter-spacing:-.055em;text-transform:uppercase}.xp-music-editorial__story-copy p{max-width:460px;margin:24px 0 0;color:var(--xp-muted);font-size:13px;line-height:1.55}.xp-music-editorial__images{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}.xp-music-editorial__image .xp-avatar{width:100%;aspect-ratio:1;border-radius:0;background:#1b1b1b}.xp-music-editorial__image--tall .xp-avatar{aspect-ratio:3/4}.xp-music-editorial__image--wide{grid-column:1/-1}.xp-music-editorial__image--wide .xp-avatar{aspect-ratio:2/1}.xp-music-editorial__image small{display:block;margin-top:7px;font:7px "Courier New",monospace;letter-spacing:.15em}
+.xp-music-editorial__archive{padding:72px 0 42px;border-top:1px solid var(--xp-fg)}.xp-music-editorial__archive>header{display:grid;grid-template-columns:180px minmax(0,1fr);align-items:end;gap:28px;margin-bottom:42px}.xp-music-editorial__footer{display:flex;justify-content:space-between;gap:24px;padding-top:18px;border-top:1px solid var(--xp-fg);font:700 7px "Courier New",monospace;letter-spacing:.16em;text-transform:uppercase}
+@media(max-width:900px){.xp-music-editorial__cover,.xp-music-editorial__story{grid-template-columns:1fr}.xp-music-editorial__profile{grid-template-columns:90px minmax(0,1fr)}.xp-music-editorial__profile .xp-stats{grid-column:1/-1;padding:22px 0 0;border-top:1px solid var(--xp-border);border-left:0}.xp-music-editorial__story-copy{position:static}}
+@media(max-width:680px){.xp--music-editorial{padding:14px}.xp-music-editorial__bar{grid-template-columns:1fr auto}.xp-music-editorial__bar>span{display:none}.xp-music-editorial__cover{padding:38px 0 52px}.xp-music-editorial__headline h1{font-size:clamp(68px,22vw,118px)}.xp-music-editorial__release,.xp-music-editorial__profile,.xp-music-editorial__archive>header{grid-template-columns:1fr}.xp-music-editorial__images{grid-template-columns:1fr}.xp-music-editorial__image--wide{grid-column:1}.xp-music-editorial__footer{flex-direction:column;gap:6px}}
+/* ===== END MUSIC EDITORIAL / SPRINT 12 ===== */
+
+/* ===== EDITORIAL CLASSIC / SPRINT 14 ===== */
+.xp--editorial-classic {
+  min-height: 100vh;
+  padding: 18px clamp(18px, 3vw, 54px) 30px;
+  background: var(--pg-background);
+  color: var(--pg-foreground);
+}
+
+.xp-editorial-classic__masthead {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
+  gap: 24px;
+  padding: 10px 0 16px;
+  border-top: 3px double currentColor;
+  border-bottom: 1px solid currentColor;
+}
+
+.xp-editorial-classic__masthead > div {
+  display: grid;
+  gap: 4px;
+}
+
+.xp-editorial-classic__masthead span,
+.xp-editorial-classic__masthead p,
+.xp-editorial-classic__masthead button,
+.xp-editorial-classic__eyebrow,
+.xp-editorial-classic__music header span,
+.xp-editorial-classic__archive header span {
+  margin: 0;
+  font: 700 8px "Courier New", monospace;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.xp-editorial-classic__masthead strong {
+  font: 600 clamp(18px, 2vw, 28px) Georgia, "Times New Roman", serif;
+}
+
+.xp-editorial-classic__masthead button {
+  justify-self: end;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.xp-editorial-classic__hero {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(380px, 1.1fr);
+  gap: clamp(36px, 6vw, 100px);
+  align-items: end;
+  padding: clamp(52px, 8vw, 118px) 0 78px;
+}
+
+.xp-editorial-classic__copy h1 {
+  margin: 12px 0 26px;
+  font: 500 clamp(70px, 10vw, 158px)/0.82 Georgia, "Times New Roman", serif;
+  letter-spacing: -0.07em;
+}
+
+.xp-editorial-classic__copy > p {
+  max-width: 660px;
+  color: var(--pg-muted);
+  font: clamp(18px, 2vw, 28px)/1.25 Georgia, "Times New Roman", serif;
+}
+
+.xp-editorial-classic__copy > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--pg-border);
+  font: 700 8px "Courier New", monospace;
+  letter-spacing: 0.15em;
+}
+
+.xp-editorial-classic__portrait .xp-avatar {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: 0;
+}
+
+.xp-editorial-classic__portrait small {
+  display: block;
+  margin-top: 8px;
+  font: 8px "Courier New", monospace;
+  letter-spacing: 0.16em;
+}
+
+.xp-editorial-classic__quote {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) minmax(230px, auto);
+  gap: clamp(26px, 5vw, 78px);
+  align-items: start;
+  padding: 46px 0 76px;
+  border-top: 1px solid currentColor;
+  border-bottom: 1px solid var(--pg-border);
+}
+
+.xp-editorial-classic__quote > div {
+  display: grid;
+}
+
+.xp-editorial-classic__quote > div span {
+  font: 8px "Courier New", monospace;
+  letter-spacing: 0.16em;
+}
+
+.xp-editorial-classic__quote > div strong {
+  font: 500 74px/0.82 Georgia, "Times New Roman", serif;
+}
+
+.xp-editorial-classic__quote blockquote {
+  margin: 0;
+  font: italic clamp(32px, 4.5vw, 72px)/1 Georgia, "Times New Roman", serif;
+  letter-spacing: -0.045em;
+}
+
+.xp-editorial-classic__music {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.55fr) minmax(0, 1.45fr);
+  gap: clamp(32px, 6vw, 100px);
+  align-items: center;
+  padding: 70px 0;
+  border-bottom: 1px solid currentColor;
+}
+
+.xp-editorial-classic__music h2,
+.xp-editorial-classic__archive h2 {
+  margin: 8px 0 0;
+  font: 500 clamp(46px, 6vw, 92px)/0.88 Georgia, "Times New Roman", serif;
+  letter-spacing: -0.05em;
+}
+
+.xp-editorial-classic__archive {
+  padding: 72px 0 48px;
+}
+
+.xp-editorial-classic__archive > header {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  align-items: end;
+  gap: 34px;
+  margin-bottom: 44px;
+}
+
+.xp-editorial-classic__footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding-top: 18px;
+  border-top: 3px double currentColor;
+  font: 700 8px "Courier New", monospace;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 900px) {
+  .xp-editorial-classic__hero,
+  .xp-editorial-classic__music {
+    grid-template-columns: 1fr;
+  }
+
+  .xp-editorial-classic__quote {
+    grid-template-columns: 96px minmax(0, 1fr);
+  }
+
+  .xp-editorial-classic__quote .xp-stats {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 680px) {
+  .xp--editorial-classic {
+    padding: 14px;
+  }
+
+  .xp-editorial-classic__masthead {
+    grid-template-columns: 1fr auto;
+  }
+
+  .xp-editorial-classic__masthead > p {
+    display: none;
+  }
+
+  .xp-editorial-classic__hero {
+    padding: 42px 0 58px;
+  }
+
+  .xp-editorial-classic__quote,
+  .xp-editorial-classic__archive > header {
+    grid-template-columns: 1fr;
+  }
+
+  .xp-editorial-classic__footer {
+    flex-direction: column;
+    gap: 6px;
+  }
+}
+/* ===== END EDITORIAL CLASSIC / SPRINT 14 ===== */
+
+/* ===== EDITORIAL DESIGN SYSTEM / SPRINT 15 ===== */
+/*
+  PLAYGROUND EDITORIAL DESIGN SYSTEM
+  Sprint 15
+*/
+
+:root {
+  /* Editorial spacing */
+  --ed-space-1: 0.25rem;
+  --ed-space-2: 0.5rem;
+  --ed-space-3: 0.75rem;
+  --ed-space-4: 1rem;
+  --ed-space-5: 1.5rem;
+  --ed-space-6: 2rem;
+  --ed-space-7: 3rem;
+  --ed-space-8: 4.5rem;
+  --ed-space-9: 6rem;
+  --ed-space-10: 8rem;
+
+  /* Editorial typography */
+  --ed-font-display: Georgia, "Times New Roman", serif;
+  --ed-font-body: "Helvetica Neue", Arial, sans-serif;
+  --ed-font-label: "Courier New", monospace;
+
+  --ed-text-label: 0.5rem;
+  --ed-text-caption: 0.75rem;
+  --ed-text-body: clamp(0.95rem, 1.1vw, 1.1rem);
+  --ed-text-lead: clamp(1.15rem, 1.8vw, 1.65rem);
+  --ed-text-heading: clamp(2.5rem, 6vw, 6rem);
+  --ed-text-display: clamp(4rem, 11vw, 10rem);
+
+  /* Editorial line lengths */
+  --ed-measure-narrow: 32rem;
+  --ed-measure-body: 44rem;
+  --ed-measure-wide: 72rem;
+
+  /* Editorial rhythm */
+  --ed-leading-tight: 0.9;
+  --ed-leading-heading: 1;
+  --ed-leading-body: 1.55;
+
+  /* Editorial surfaces */
+  --ed-border-thin: 1px solid var(--pg-border);
+  --ed-border-strong: 1px solid var(--pg-foreground);
+  --ed-border-double: 3px double var(--pg-foreground);
+
+  /* Motion */
+  --ed-duration-fast: 140ms;
+  --ed-duration-base: 260ms;
+  --ed-duration-slow: 520ms;
+  --ed-ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Shared editorial shell */
+.ed-shell {
+  width: min(100%, var(--pg-content-width, 1440px));
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 3vw, 3.5rem);
+}
+
+.ed-section {
+  padding-block: clamp(var(--ed-space-7), 7vw, var(--ed-space-10));
+  border-top: var(--ed-border-thin);
+}
+
+.ed-section--compact {
+  padding-block: clamp(var(--ed-space-6), 4vw, var(--ed-space-8));
+}
+
+.ed-section--flush {
+  padding-block: 0;
+}
+
+/* Reusable labels */
+.ed-label {
+  margin: 0;
+  font-family: var(--ed-font-label);
+  font-size: var(--ed-text-label);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.ed-caption {
+  margin: 0;
+  color: var(--pg-muted);
+  font-family: var(--ed-font-label);
+  font-size: var(--ed-text-caption);
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+}
+
+/* Reusable editorial typography */
+.ed-display {
+  margin: 0;
+  max-width: var(--ed-measure-wide);
+  font-family: var(--ed-font-display);
+  font-size: var(--ed-text-display);
+  font-weight: 500;
+  letter-spacing: -0.065em;
+  line-height: var(--ed-leading-tight);
+}
+
+.ed-heading {
+  margin: 0;
+  max-width: var(--ed-measure-wide);
+  font-family: var(--ed-font-display);
+  font-size: var(--ed-text-heading);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: var(--ed-leading-heading);
+}
+
+.ed-lead {
+  margin: 0;
+  max-width: var(--ed-measure-body);
+  color: var(--pg-muted);
+  font-family: var(--ed-font-display);
+  font-size: var(--ed-text-lead);
+  line-height: 1.28;
+}
+
+.ed-body {
+  margin: 0;
+  max-width: var(--ed-measure-body);
+  font-family: var(--ed-font-body);
+  font-size: var(--ed-text-body);
+  line-height: var(--ed-leading-body);
+}
+
+/* Shared masthead */
+.ed-masthead {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
+  gap: var(--ed-space-5);
+  padding-block: var(--ed-space-4);
+  border-top: var(--ed-border-double);
+  border-bottom: var(--ed-border-strong);
+}
+
+.ed-masthead__end {
+  justify-self: end;
+}
+
+/* Shared feature grids */
+.ed-feature-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(20rem, 1.1fr);
+  gap: clamp(var(--ed-space-7), 6vw, var(--ed-space-10));
+  align-items: center;
+}
+
+.ed-feature-grid--reverse > :first-child {
+  order: 2;
+}
+
+/* Shared image treatment */
+.ed-image {
+  position: relative;
+  overflow: hidden;
+  background: var(--pg-surface);
+}
+
+.ed-image img,
+.ed-image .xp-avatar {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition:
+    transform var(--ed-duration-slow) var(--ed-ease-standard),
+    filter var(--ed-duration-base) var(--ed-ease-standard);
+}
+
+.ed-image:hover img,
+.ed-image:hover .xp-avatar {
+  transform: scale(1.015);
+}
+
+/* Shared pull quote */
+.ed-quote {
+  display: grid;
+  grid-template-columns: minmax(5rem, 0.18fr) minmax(0, 1fr);
+  gap: clamp(var(--ed-space-5), 4vw, var(--ed-space-8));
+  align-items: start;
+}
+
+.ed-quote blockquote {
+  margin: 0;
+  font-family: var(--ed-font-display);
+  font-size: clamp(2rem, 4.5vw, 4.75rem);
+  font-style: italic;
+  letter-spacing: -0.045em;
+  line-height: 1;
+}
+
+/* Shared metadata row */
+.ed-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--ed-space-4);
+  padding-top: var(--ed-space-4);
+  border-top: var(--ed-border-thin);
+  font-family: var(--ed-font-label);
+  font-size: var(--ed-text-label);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Shared editorial button */
+.ed-action {
+  appearance: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-family: var(--ed-font-label);
+  font-size: var(--ed-text-label);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.ed-action::after {
+  content: " ↗";
+  display: inline-block;
+  transition: transform var(--ed-duration-fast) var(--ed-ease-standard);
+}
+
+.ed-action:hover::after,
+.ed-action:focus-visible::after {
+  transform: translate(0.15rem, -0.15rem);
+}
+
+/* Shared reveal utility */
+.ed-reveal {
+  animation: ed-reveal var(--ed-duration-slow) var(--ed-ease-standard) both;
+}
+
+@keyframes ed-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ed-reveal {
+    animation: none;
+  }
+
+  .ed-image img,
+  .ed-image .xp-avatar,
+  .ed-action::after {
+    transition: none;
+  }
+}
+
+@media (max-width: 820px) {
+  .ed-feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ed-feature-grid--reverse > :first-child {
+    order: initial;
+  }
+
+  .ed-quote {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .ed-masthead {
+    grid-template-columns: 1fr auto;
+  }
+
+  .ed-masthead > :nth-child(2) {
+    display: none;
+  }
+
+  .ed-shell {
+    padding-inline: 0.875rem;
+  }
+}
+/* ===== END EDITORIAL DESIGN SYSTEM / SPRINT 15 ===== */
+
+
+/* Sprint 3: private owner-only network controls */
+.xp-stat--interactive {
+  cursor: pointer;
+  outline: none;
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease;
+}
+
+.xp-stat--interactive:hover {
+  opacity: 0.72;
+  transform: translateY(-1px);
+}
+
+.xp-stat--interactive:focus-visible {
+  border-radius: 5px;
+  box-shadow: 0 0 0 2px currentColor;
+}
+
+.xp-stat__arrow {
+  display: inline-block;
+  margin-left: 5px;
+  opacity: 0.6;
+  transition: transform 140ms ease;
+}
+
+.xp-stat--interactive:hover .xp-stat__arrow {
+  transform: translateX(2px);
+}
+===== ExperienceTypes.ts =====
+import type { CSSProperties, ReactNode } from "react";
+import type { AvatarTransform } from "../../components/AvatarStudio";
+import type { ProfileSoundtrack } from "../../lib/profileSoundtrack";
+
+export type AccountVisibility = "public" | "private";
+
+export type FollowRelationship =
+  | "none"
+  | "requested"
+  | "following";
+
+export type ExperienceProfile = {
+  displayName: string;
+  username: string;
+  bio: string;
+  avatarSrc?: string;
+  avatarTransform: AvatarTransform;
+};
+
+export type ExperienceProps = {
+  themeId: string;
+  className?: string;
+  style?: CSSProperties;
+  profile: ExperienceProfile;
+  posts: ReactNode;
+  postCount: number;
+  followerCount: number;
+  followingCount: number;
+  isOwner?: boolean;
+  accountVisibility?: AccountVisibility;
+  followRelationship?: FollowRelationship;
+  onFollowersClick?: () => void;
+  onFollowingClick?: () => void;
+  soundtrack: ProfileSoundtrack;
+  showMusicPlayer: boolean;
+  hiddenAutoplay: boolean;
+  onEdit: () => void;
+};
+===== experiences/index.ts =====
+export { default as CinemaEditorial } from "./CinemaEditorial";
+export { default as ContactSheet } from "./ContactSheet";
+export { default as EightBit } from "./EightBit";
+export { default as FashionEditorial } from "./FashionEditorial";
+export { default as Graphite } from "./Graphite";
+export { default as IvoryIndex } from "./IvoryIndex";
+export { default as MusicEditorial } from "./MusicEditorial";
+export { default as PressKit } from "./PressKit";
+export { default as Stardust } from "./Stardust";
+export { default as EditorialClassic } from "./EditorialClassic";
+===== ThemeSelector.tsx =====
+import {
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent,
+} from "react";
+import {
+  getTheme,
+  playgroundThemes,
+  type EditorialCategory,
+} from "../../themes";
+import "./ThemeSelector.css";
+
+type Props = {
+  value: string;
+  onChange: (themeId: string) => void;
+};
+
+const RECENT_EDITORIALS_KEY = "playground.editorials.recent.v1";
+const MAX_RECENT_EDITORIALS = 3;
+
+const categories: Array<EditorialCategory | "All"> = [
+  "All",
+  "Editorial",
+  "Fashion",
+  "Music",
+  "Cinema",
+  "Portfolio",
+  "Archive",
+];
+
+function readRecentEditorials(): string[] {
+  try {
+    const raw = window.localStorage.getItem(RECENT_EDITORIALS_KEY);
+    if (!raw) return [];
+
+    const parsed = JSON.parse(raw) as unknown;
+    return Array.isArray(parsed)
+      ? parsed.filter((item): item is string => typeof item === "string")
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+export default function ThemeSelector({ value, onChange }: Props) {
+  const selected = getTheme(value);
+  const [category, setCategory] =
+    useState<EditorialCategory | "All">("All");
+  const [query, setQuery] = useState("");
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [recentIds, setRecentIds] = useState<string[]>(readRecentEditorials);
+  const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
+
+  const normalizedQuery = query.trim().toLowerCase();
+
+  const visibleEditorials = useMemo(() => {
+    return playgroundThemes.filter((editorial) => {
+      const matchesCategory =
+        category === "All" || editorial.category === category;
+
+      const searchableText = [
+        editorial.name,
+        editorial.category,
+        editorial.description,
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      const matchesQuery =
+        normalizedQuery.length === 0 ||
+        searchableText.includes(normalizedQuery);
+
+      return matchesCategory && matchesQuery;
+    });
+  }, [category, normalizedQuery]);
+
+  const featuredEditorials = useMemo(
+    () => playgroundThemes.filter((editorial) => editorial.featured),
+    [],
+  );
+
+  const recentEditorials = useMemo(
+    () =>
+      recentIds
+        .map((id) => playgroundThemes.find((editorial) => editorial.id === id))
+        .filter((editorial): editorial is (typeof playgroundThemes)[number] =>
+          Boolean(editorial),
+        ),
+    [recentIds],
+  );
+
+  const inspected = getTheme(hoveredId ?? selected.id);
+
+  const chooseEditorial = (editorialId: string) => {
+    onChange(editorialId);
+
+    const nextRecentIds = [
+      editorialId,
+      ...recentIds.filter((id) => id !== editorialId),
+    ].slice(0, MAX_RECENT_EDITORIALS);
+
+    setRecentIds(nextRecentIds);
+    window.localStorage.setItem(
+      RECENT_EDITORIALS_KEY,
+      JSON.stringify(nextRecentIds),
+    );
+  };
+
+  const handleGridKeyDown = (
+    event: KeyboardEvent<HTMLDivElement>,
+  ) => {
+    if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)) {
+      return;
+    }
+
+    const currentIndex = optionRefs.current.findIndex(
+      (element) => element === document.activeElement,
+    );
+
+    if (currentIndex < 0 || visibleEditorials.length === 0) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const computedColumns =
+      window.innerWidth <= 420 ? 1 : window.innerWidth <= 760 ? 2 : 3;
+    const delta =
+      event.key === "ArrowLeft"
+        ? -1
+        : event.key === "ArrowRight"
+          ? 1
+          : event.key === "ArrowUp"
+            ? -computedColumns
+            : computedColumns;
+
+    const nextIndex = Math.min(
+      visibleEditorials.length - 1,
+      Math.max(0, currentIndex + delta),
+    );
+
+    optionRefs.current[nextIndex]?.focus();
+  };
+
+  return (
+    <section className="theme-selector">
+      <header className="theme-selector__header">
+        <div>
+          <span>EDITORIAL</span>
+          <h3>{inspected.name}</h3>
+        </div>
+        <p>{inspected.description}</p>
+      </header>
+
+      <label className="theme-selector__search">
+        <span aria-hidden="true">⌕</span>
+        <input
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Search editorials"
+          aria-label="Search editorials"
+        />
+        {query && (
+          <button type="button" onClick={() => setQuery("")}>
+            Clear
+          </button>
+        )}
+      </label>
+
+      <nav
+        className="theme-selector__filters"
+        aria-label="Editorial categories"
+      >
+        {categories.map((item) => (
+          <button
+            key={item}
+            type="button"
+            data-active={category === item}
+            onClick={() => setCategory(item)}
+          >
+            {item}
+          </button>
+        ))}
+      </nav>
+
+      {category === "All" && normalizedQuery.length === 0 && (
+        <>
+          <section className="theme-selector__collection">
+            <header>
+              <span>FEATURED</span>
+              <small>{featuredEditorials.length} editorials</small>
+            </header>
+
+            <div className="theme-selector__featured-row">
+              {featuredEditorials.map((editorial) => (
+                <button
+                  key={editorial.id}
+                  type="button"
+                  data-selected={editorial.id === selected.id}
+                  onMouseEnter={() => setHoveredId(editorial.id)}
+                  onMouseLeave={() => setHoveredId(null)}
+                  onFocus={() => setHoveredId(editorial.id)}
+                  onBlur={() => setHoveredId(null)}
+                  onClick={() => chooseEditorial(editorial.id)}
+                >
+                  <span
+                    style={{
+                      background: editorial.colors.background,
+                      color: editorial.colors.foreground,
+                      borderColor: editorial.colors.border,
+                      fontFamily: editorial.headingFont,
+                    }}
+                  >
+                    <small>{editorial.category}</small>
+                    <strong>{editorial.name}</strong>
+                    <i
+                      style={{ background: editorial.colors.accent }}
+                      aria-hidden="true"
+                    />
+                  </span>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {recentEditorials.length > 0 && (
+            <section className="theme-selector__collection">
+              <header>
+                <span>RECENTLY USED</span>
+                <small>Stored on this device</small>
+              </header>
+
+              <div className="theme-selector__recent-row">
+                {recentEditorials.map((editorial) => (
+                  <button
+                    key={editorial.id}
+                    type="button"
+                    data-selected={editorial.id === selected.id}
+                    onMouseEnter={() => setHoveredId(editorial.id)}
+                    onMouseLeave={() => setHoveredId(null)}
+                    onFocus={() => setHoveredId(editorial.id)}
+                    onBlur={() => setHoveredId(null)}
+                    onClick={() => chooseEditorial(editorial.id)}
+                  >
+                    <i style={{ background: editorial.colors.accent }} />
+                    <span>
+                      <strong>{editorial.name}</strong>
+                      <small>{editorial.category}</small>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
+        </>
+      )}
+
+      <section className="theme-selector__collection">
+        <header>
+          <span>{normalizedQuery ? "SEARCH RESULTS" : category}</span>
+          <small>
+            {visibleEditorials.length} {visibleEditorials.length === 1 ? "editorial" : "editorials"}
+          </small>
+        </header>
+
+        {visibleEditorials.length > 0 ? (
+          <div
+            className="theme-selector__grid"
+            role="radiogroup"
+            onKeyDown={handleGridKeyDown}
+          >
+            {visibleEditorials.map((editorial, index) => (
+              <button
+                key={editorial.id}
+                ref={(element) => {
+                  optionRefs.current[index] = element;
+                }}
+                className="theme-selector__option"
+                type="button"
+                role="radio"
+                aria-checked={editorial.id === selected.id}
+                data-selected={editorial.id === selected.id}
+                onMouseEnter={() => setHoveredId(editorial.id)}
+                onMouseLeave={() => setHoveredId(null)}
+                onFocus={() => setHoveredId(editorial.id)}
+                onBlur={() => setHoveredId(null)}
+                onClick={() => chooseEditorial(editorial.id)}
+              >
+                <span
+                  className="theme-selector__preview"
+                  style={{
+                    background: editorial.colors.background,
+                    color: editorial.colors.foreground,
+                    borderColor: editorial.colors.border,
+                    fontFamily: editorial.headingFont,
+                  }}
+                >
+                  <span className="theme-selector__preview-kicker">
+                    {editorial.category}
+                  </span>
+                  <strong>{editorial.name}</strong>
+                  <i
+                    style={{ background: editorial.colors.accent }}
+                    aria-hidden="true"
+                  />
+                  <small aria-hidden="true">
+                    <b />
+                    <b />
+                    <b />
+                  </small>
+                </span>
+
+                <span className="theme-selector__meta">
+                  <span>
+                    <strong>{editorial.name}</strong>
+                    <small>{editorial.category}</small>
+                  </span>
+                  {editorial.featured && <em>Featured</em>}
+                </span>
+
+                <span className="theme-selector__description">
+                  {editorial.description}
+                </span>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="theme-selector__empty">
+            <strong>No editorials found.</strong>
+            <span>Try another search or category.</span>
+          </div>
+        )}
+      </section>
+    </section>
+  );
+}
+===== ThemeSelector.css =====
+.theme-selector {
+  display: grid;
+  gap: 20px;
+  padding-top: 27px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.theme-selector__header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.theme-selector__header span,
+.theme-selector__collection > header span {
+  font: 7px "Courier New", monospace;
+  letter-spacing: 0.15em;
+  opacity: 0.48;
+}
+
+.theme-selector__header h3 {
+  margin: 5px 0 0;
+  font: 11px "Courier New", monospace;
+  letter-spacing: 0.08em;
+}
+
+.theme-selector__header p {
+  width: min(100%, 360px);
+  margin: 0;
+  font-size: 9px;
+  line-height: 1.5;
+  text-align: right;
+  opacity: 0.5;
+  transition: opacity 160ms ease;
+}
+
+.theme-selector__search {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.theme-selector__search > span {
+  font-size: 15px;
+  opacity: 0.42;
+}
+
+.theme-selector__search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  font: 9px "Courier New", monospace;
+}
+
+.theme-selector__search input::placeholder {
+  color: inherit;
+  opacity: 0.35;
+}
+
+.theme-selector__search button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: 7px "Courier New", monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.58;
+}
+
+.theme-selector__filters {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.theme-selector__filters::-webkit-scrollbar,
+.theme-selector__featured-row::-webkit-scrollbar {
+  display: none;
+}
+
+.theme-selector__filters button {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.035);
+  color: inherit;
+  cursor: pointer;
+  font: 7px "Courier New", monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.theme-selector__filters button[data-active="true"] {
+  border-color: #fff200;
+  background: #fff200;
+  color: #111;
+}
+
+.theme-selector__collection {
+  display: grid;
+  gap: 11px;
+}
+
+.theme-selector__collection > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.theme-selector__collection > header small {
+  font: 6px "Courier New", monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.36;
+}
+
+.theme-selector__featured-row {
+  display: grid;
+  grid-auto-columns: minmax(220px, 0.82fr);
+  grid-auto-flow: column;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 1px 1px 5px;
+  scrollbar-width: none;
+}
+
+.theme-selector__featured-row > button {
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  text-align: left;
+  transition: transform 160ms ease, border-color 160ms ease;
+}
+
+.theme-selector__featured-row > button:hover,
+.theme-selector__featured-row > button:focus-visible {
+  border-color: rgba(255, 255, 255, 0.34);
+  transform: translateY(-2px);
+}
+
+.theme-selector__featured-row > button[data-selected="true"] {
+  border-color: #fff200;
+}
+
+.theme-selector__featured-row > button > span {
+  position: relative;
+  display: flex;
+  min-height: 132px;
+  overflow: hidden;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 14px;
+  border: 1px solid;
+  border-radius: 13px;
+}
+
+.theme-selector__featured-row small {
+  position: relative;
+  z-index: 1;
+  font: 6px "Courier New", monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.theme-selector__featured-row strong {
+  position: relative;
+  z-index: 1;
+  max-width: 82%;
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 0.88;
+  letter-spacing: -0.06em;
+}
+
+.theme-selector__featured-row i {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.theme-selector__recent-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.theme-selector__recent-row button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 150px;
+  padding: 9px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.theme-selector__recent-row button[data-selected="true"] {
+  border-color: #fff200;
+}
+
+.theme-selector__recent-row i {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+}
+
+.theme-selector__recent-row span {
+  display: grid;
+  gap: 2px;
+}
+
+.theme-selector__recent-row strong {
+  font-size: 8px;
+}
+
+.theme-selector__recent-row small {
+  font: 6px "Courier New", monospace;
+  opacity: 0.45;
+}
+
+.theme-selector__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.theme-selector__option {
+  display: grid;
+  gap: 9px;
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.035);
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+.theme-selector__option:hover,
+.theme-selector__option:focus-visible {
+  border-color: rgba(255, 255, 255, 0.28);
+  transform: translateY(-2px);
+}
+
+.theme-selector__option[data-selected="true"] {
+  border-color: #fff200;
+  background: rgba(255, 242, 0, 0.075);
+}
+
+.theme-selector__preview {
+  position: relative;
+  display: flex;
+  aspect-ratio: 1.42;
+  overflow: hidden;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 12px;
+  border: 1px solid;
+  border-radius: 8px;
+}
+
+.theme-selector__preview::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(110deg, transparent 52%, currentColor 52% 53%, transparent 53%),
+    linear-gradient(180deg, transparent 62%, currentColor 62% 63%, transparent 63%);
+  content: "";
+  opacity: 0.12;
+}
+
+.theme-selector__preview-kicker {
+  position: absolute;
+  z-index: 1;
+  top: 10px;
+  left: 11px;
+  font: 6px "Courier New", monospace;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.theme-selector__preview > strong {
+  position: relative;
+  z-index: 1;
+  max-width: 82%;
+  font-size: clamp(14px, 1.4vw, 23px);
+  font-weight: 500;
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+}
+
+.theme-selector__preview > i {
+  position: absolute;
+  z-index: 1;
+  top: 10px;
+  right: 10px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.theme-selector__preview > small {
+  position: absolute;
+  z-index: 1;
+  right: 10px;
+  bottom: 10px;
+  display: grid;
+  width: 22%;
+  gap: 3px;
+}
+
+.theme-selector__preview > small b {
+  height: 2px;
+  background: currentColor;
+  opacity: 0.45;
+}
+
+.theme-selector__meta {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.theme-selector__meta > span {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.theme-selector__meta strong {
+  overflow: hidden;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.theme-selector__meta small,
+.theme-selector__meta em {
+  font: 6px "Courier New", monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.48;
+}
+
+.theme-selector__meta em {
+  color: #fff200;
+  font-style: normal;
+  opacity: 1;
+}
+
+.theme-selector__description {
+  display: -webkit-box;
+  overflow: hidden;
+  color: inherit;
+  font-size: 7px;
+  line-height: 1.45;
+  opacity: 0.42;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.theme-selector__empty {
+  display: grid;
+  place-items: center;
+  min-height: 150px;
+  gap: 6px;
+  border: 1px dashed rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  text-align: center;
+}
+
+.theme-selector__empty strong {
+  font-size: 10px;
+}
+
+.theme-selector__empty span {
+  font-size: 8px;
+  opacity: 0.45;
+}
+
+@media (max-width: 760px) {
+  .theme-selector__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .theme-selector__header {
+    align-items: start;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .theme-selector__header p {
+    text-align: left;
+  }
+}
+
+@media (max-width: 420px) {
+  .theme-selector__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .theme-selector__featured-row {
+    grid-auto-columns: minmax(200px, 88%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-selector__option,
+  .theme-selector__featured-row > button {
+    transition: none;
+  }
+}
+===== themes/index.ts =====
+import type { ComponentType, CSSProperties } from "react";
+import {
+  CinemaEditorial,
+  ContactSheet,
+  EditorialClassic,
+  EightBit,
+  FashionEditorial,
+  Graphite,
+  IvoryIndex,
+  MusicEditorial,
+  PressKit,
+  Stardust,
+} from "../profile-experiences/experiences";
+import type { ExperienceProps } from "../profile-experiences/shared";
+
+export type ThemeLayout = "editorial" | "grid" | "cinematic" | "desktop" | "sidebar" | "press";
+export type MusicPlacement = "inline" | "compact" | "card" | "floating" | "sidebar" | "hero";
+export type EditorialCategory = "Editorial" | "Fashion" | "Music" | "Cinema" | "Portfolio" | "Archive";
+
+export type PlaygroundTheme = {
+  id: string;
+  name: string;
+  description: string;
+  category: EditorialCategory;
+  order: number;
+  featured?: boolean;
+  layout: ThemeLayout;
+  musicPlacement: MusicPlacement;
+  className: string;
+  component: ComponentType<ExperienceProps>;
+  colors: {
+    background: string;
+    surface: string;
+    foreground: string;
+    muted: string;
+    accent: string;
+    border: string;
+  };
+  radius: string;
+  headingFont: string;
+  bodyFont: string;
+  contentWidth: string;
+};
+
+export const DEFAULT_THEME_ID = "ivory-index";
+
+const editorialRegistry = [
+{
+    id: "editorial-classic",
+    name: "Editorial Classic",
+    description: "A timeless magazine profile with a formal masthead, cover portrait, pull quote, listening room, and selected archive.",
+    category: "Editorial",
+    order: 5,
+    featured: true,
+    layout: "editorial",
+    musicPlacement: "card",
+    className: "theme-editorial-classic",
+    component: EditorialClassic,
+    colors: {
+      background: "#eee9df",
+      surface: "#f8f4ec",
+      foreground: "#171512",
+      muted: "#706a61",
+      accent: "#8b2323",
+      border: "rgba(23, 21, 18, 0.22)",
+    },
+    radius: "0px",
+    headingFont: 'Georgia, "Times New Roman", serif',
+    bodyFont: '"Helvetica Neue", Arial, sans-serif',
+    contentWidth: "1440px",
+  },
+
+  { id:"ivory-index", name:"Ivory Index", description:"Warm editorial whitespace and a restrained inline player.", category:"Editorial", order:10, featured:true, layout:"editorial", musicPlacement:"inline", className:"theme-ivory-index", component:IvoryIndex, colors:{background:"#f3efe6",surface:"#faf7f0",foreground:"#1e1c18",muted:"#7d756a",accent:"#9b2f25",border:"rgba(30, 28, 24, 0.18)"}, radius:"2px", headingFont:'Georgia, "Times New Roman", serif', bodyFont:'Georgia, "Times New Roman", serif', contentWidth:"980px" },
+  { id:"cinema-editorial", name:"Cinema Editorial", description:"Oversized type, portrait-led storytelling, pull quotes, and film-journal pacing.", category:"Cinema", order:20, featured:true, layout:"editorial", musicPlacement:"hero", className:"theme-cinema-editorial", component:CinemaEditorial, colors:{background:"#f3f0e8",surface:"#ffffff",foreground:"#111111",muted:"#77736b",accent:"#9c241f",border:"rgba(17, 17, 17, 0.22)"}, radius:"0px", headingFont:'"Arial Narrow", "Helvetica Neue", Arial, sans-serif', bodyFont:'"Helvetica Neue", Arial, sans-serif', contentWidth:"1440px" },
+  { id:"fashion-editorial", name:"Fashion Editorial", description:"Refined serif typography, asymmetrical portrait layouts, and campaign pacing.", category:"Fashion", order:30, featured:true, layout:"editorial", musicPlacement:"card", className:"theme-fashion-editorial", component:FashionEditorial, colors:{background:"#f7f5f0",surface:"#ffffff",foreground:"#111111",muted:"#76716a",accent:"#8b1f2d",border:"rgba(17, 17, 17, 0.18)"}, radius:"0px", headingFont:'Georgia, "Times New Roman", serif', bodyFont:'"Helvetica Neue", Arial, sans-serif', contentWidth:"1440px" },
+  { id:"music-editorial", name:"Music Editorial", description:"A bold cover story, featured release, pull quote, visual sequence, and artist archive.", category:"Music", order:40, featured:true, layout:"editorial", musicPlacement:"hero", className:"theme-music-editorial", component:MusicEditorial, colors:{background:"#0d0d0d",surface:"#171717",foreground:"#f2efe7",muted:"#9a978f",accent:"#d9ff4b",border:"rgba(242, 239, 231, 0.18)"}, radius:"0px", headingFont:'"Helvetica Neue", Arial, sans-serif', bodyFont:'"Helvetica Neue", Arial, sans-serif', contentWidth:"1440px" },
+  { id:"contact-sheet", name:"Contact Sheet", description:"A photography-first grid with a compact utility player.", category:"Portfolio", order:50, layout:"grid", musicPlacement:"compact", className:"theme-contact-sheet", component:ContactSheet, colors:{background:"#eeeeea",surface:"#ffffff",foreground:"#151515",muted:"#6f6f68",accent:"#ff4e00",border:"rgba(21, 21, 21, 0.24)"}, radius:"0px", headingFont:'"Helvetica Neue", Arial, sans-serif', bodyFont:'"Courier New", monospace', contentWidth:"1240px" },
+  { id:"graphite", name:"Graphite", description:"Layered black panels with a dedicated music card.", category:"Editorial", order:60, layout:"cinematic", musicPlacement:"card", className:"theme-graphite", component:Graphite, colors:{background:"#101010",surface:"#1a1a1a",foreground:"#f1eee8",muted:"#96928b",accent:"#e6a23c",border:"rgba(255, 255, 255, 0.12)"}, radius:"18px", headingFont:'Georgia, "Times New Roman", serif', bodyFont:'"Helvetica Neue", Arial, sans-serif', contentWidth:"1120px" },
+  { id:"press-kit", name:"Press Kit", description:"An artist-facing hero layout with prominent music.", category:"Music", order:70, layout:"press", musicPlacement:"hero", className:"theme-press-kit", component:PressKit, colors:{background:"#0c0c0d",surface:"#151517",foreground:"#ffffff",muted:"#a0a0a6",accent:"#fff200",border:"rgba(255, 255, 255, 0.14)"}, radius:"24px", headingFont:'"Helvetica Neue", Arial, sans-serif', bodyFont:'"Helvetica Neue", Arial, sans-serif', contentWidth:"1180px" },
+  { id:"stardust", name:"Stardust", description:"A dreamy sidebar profile with music living in the rail.", category:"Archive", order:80, layout:"sidebar", musicPlacement:"sidebar", className:"theme-stardust", component:Stardust, colors:{background:"#17142a",surface:"#211d38",foreground:"#f6efff",muted:"#b8add0",accent:"#c59cff",border:"rgba(197, 156, 255, 0.35)"}, radius:"18px", headingFont:'Georgia, "Times New Roman", serif', bodyFont:'"Helvetica Neue", Arial, sans-serif', contentWidth:"1160px" },
+  { id:"eight-bit", name:"Eight Bit", description:"A nostalgic windowed profile with a floating player.", category:"Archive", order:90, layout:"desktop", musicPlacement:"floating", className:"theme-eight-bit", component:EightBit, colors:{background:"#f2dce6",surface:"#fff8fc",foreground:"#493746",muted:"#8b657c",accent:"#c73f7c",border:"#9f4d78"}, radius:"14px", headingFont:'"Courier New", monospace', bodyFont:'"Courier New", monospace', contentWidth:"1040px" },
+] satisfies PlaygroundTheme[];
+
+export const playgroundThemes: PlaygroundTheme[] =
+  [...editorialRegistry].sort((a, b) => a.order - b.order);
+
+export function getTheme(themeId?: string): PlaygroundTheme {
+  return playgroundThemes.find((theme) => theme.id === themeId)
+    ?? playgroundThemes.find((theme) => theme.id === DEFAULT_THEME_ID)
+    ?? playgroundThemes[0];
+}
+
+export type ThemeStyle = CSSProperties & Record<`--pg-${string}`, string>;
+export function getThemeStyle(theme: PlaygroundTheme): ThemeStyle {
+  return {
+    "--pg-background": theme.colors.background,
+    "--pg-surface": theme.colors.surface,
+    "--pg-foreground": theme.colors.foreground,
+    "--pg-muted": theme.colors.muted,
+    "--pg-accent": theme.colors.accent,
+    "--pg-border": theme.colors.border,
+    "--pg-radius": theme.radius,
+    "--pg-heading-font": theme.headingFont,
+    "--pg-body-font": theme.bodyFont,
+    "--pg-content-width": theme.contentWidth,
+  };
+}
+===== YourPlayground.tsx =====
+import { useEffect, useMemo, useState } from "react";
+import FollowDrawer from "../FollowDrawer";
+import ProfileActionBar from "../ProfileActionBar";
+import { PresenceProvider } from "../../presence/PresenceContext";
+import PresenceLayer from "../../presence/PresenceLayer";
+import PresenceSettings from "../../presence/PresenceSettings";
+import type {
+  FollowDrawerMode,
+  FollowUser,
+} from "../FollowDrawer";
+import type { ReactNode } from "react";
+import type {
+  AccountVisibility,
+  FollowRelationship,
+} from "../../profile-experiences/shared/ExperienceTypes";
+import EditProfile from "../EditProfile";
+import type { EditableProfile } from "../EditProfile";
+import type { ProfileTrack } from "../ProfileMusicPlayer";
+import { DEFAULT_AVATAR_TRANSFORM, normalizeAvatarTransform } from "../AvatarStudio";
+import type { AvatarTransform } from "../AvatarStudio";
+import { blobFromSource, deleteProfileMedia, readProfileMedia, saveProfileMedia } from "../../lib/profileMediaStore";
+import { DEFAULT_THEME_ID, getTheme, getThemeStyle } from "../../themes";
+import { EMPTY_PROFILE_SOUNDTRACK, normalizeSoundtrack } from "../../lib/profileSoundtrack";
+import type { ProfileSoundtrack, SoundtrackTrack } from "../../lib/profileSoundtrack";
+import { ExperienceRenderer } from "../../profile-experiences";
+import {
+  EMPTY_PLAYGROUND,
+  normalizePlayground,
+} from "../../world/types/playground";
+import type { PlaygroundData } from "../../world/types/playground";
+import { DEFAULT_ENVIRONMENT_SETTINGS, normalizeEnvironmentSettings } from "../../personalization/environments";
+import type { EnvironmentSettings } from "../../personalization/environments";
+import { DEFAULT_COMPANION_SETTINGS, normalizeCompanionSettings } from "../../personalization/companions";
+import type { CompanionSettings } from "../../personalization/companions";
+import { DEFAULT_WIDGET_SETTINGS, normalizeWidgetSettings } from "../../personalization/widgets";
+import type { WidgetSettings } from "../../personalization/widgets";
+import "./YourPlayground.css";
+
+type Props = {
+  displayName: string;
+  username: string;
+  bio: string;
+  avatarSrc?: string;
+  postCount: number;
+  followerCount: number;
+  followingCount: number;
+  isOwner?: boolean;
+  accountVisibility?: AccountVisibility;
+  followRelationship?: FollowRelationship;
+  followers?: FollowUser[];
+  following?: FollowUser[];
+  musicTrack: ProfileTrack | null;
+  showMusicPlayer: boolean;
+  children?: ReactNode;
+};
+
+const PROFILE_STORAGE_KEY = "playground.profile.settings.v2";
+
+type StoredProfile = {
+  displayName: string; username: string; bio: string; avatarSrc?: string | null;
+  avatarTransform?: AvatarTransform; avatarTransforms?: Record<string, AvatarTransform>;
+  soundtrack?: ProfileSoundtrack; showMusicPlayer: boolean; themeId: string;
+  playground?: PlaygroundData;
+  environment?: EnvironmentSettings;
+  companions?: CompanionSettings;
+  widgets?: WidgetSettings;
+};
+
+function canPersistSource(source?: string): boolean {
+  return Boolean(source && !source.startsWith("blob:"));
+}
+
+function soundtrackForStorage(soundtrack: ProfileSoundtrack): ProfileSoundtrack {
+  return {
+    ...soundtrack,
+    tracks: soundtrack.tracks.map((track) => ({
+      ...track,
+      source: track.sourceType === "upload" && track.source.startsWith("blob:") ? "" : track.source,
+    })),
+  };
+}
+
+function readStoredProfile(fallback: EditableProfile): EditableProfile {
+  try {
+    const raw = window.localStorage.getItem(PROFILE_STORAGE_KEY) ?? window.localStorage.getItem("playground.profile.settings.v1");
+    if (!raw) return fallback;
+    const parsed = JSON.parse(raw) as Partial<StoredProfile> & {
+      musicTitle?: string; musicArtist?: string; musicSrc?: string | null;
+    };
+    const migratedSoundtrack = parsed.soundtrack ??
+      (parsed.musicSrc && parsed.musicTitle ? {
+        ...EMPTY_PROFILE_SOUNDTRACK,
+        tracks: [{
+          id: "migrated-profile-track",
+          title: parsed.musicTitle,
+          artist: parsed.musicArtist ?? fallback.displayName,
+          sourceType: "upload" as const,
+          source: parsed.musicSrc,
+        }],
+      } : fallback.soundtrack);
+
+    return {
+      displayName: typeof parsed.displayName === "string" ? parsed.displayName : fallback.displayName,
+      username: typeof parsed.username === "string" ? parsed.username : fallback.username,
+      bio: typeof parsed.bio === "string" ? parsed.bio : fallback.bio,
+      avatarSrc: Object.prototype.hasOwnProperty.call(parsed, "avatarSrc")
+        ? typeof parsed.avatarSrc === "string" ? parsed.avatarSrc : undefined
+        : fallback.avatarSrc,
+      avatarTransform: normalizeAvatarTransform(
+        parsed.avatarTransform && typeof parsed.avatarTransform === "object"
+          ? parsed.avatarTransform
+          : fallback.avatarTransform ?? DEFAULT_AVATAR_TRANSFORM,
+      ),
+      soundtrack: normalizeSoundtrack(migratedSoundtrack ?? EMPTY_PROFILE_SOUNDTRACK),
+      showMusicPlayer: typeof parsed.showMusicPlayer === "boolean" ? parsed.showMusicPlayer : fallback.showMusicPlayer,
+      themeId: typeof parsed.themeId === "string" ? parsed.themeId : fallback.themeId || DEFAULT_THEME_ID,
+      playground: normalizePlayground(parsed.playground ?? fallback.playground),
+      environment: normalizeEnvironmentSettings(parsed.environment ?? fallback.environment),
+      companions: normalizeCompanionSettings(parsed.companions ?? fallback.companions),
+      widgets: normalizeWidgetSettings(parsed.widgets ?? fallback.widgets),
+    };
+  } catch (error) {
+    console.error("Could not read saved profile settings:", error);
+    return fallback;
+  }
+}
+
+function persistProfile(profile: EditableProfile): void {
+  const soundtrack = normalizeSoundtrack(profile.soundtrack ?? EMPTY_PROFILE_SOUNDTRACK);
+  const stored: StoredProfile = {
+    displayName: profile.displayName,
+    username: profile.username,
+    bio: profile.bio,
+    avatarSrc: canPersistSource(profile.avatarSrc) ? profile.avatarSrc : null,
+    avatarTransform: profile.avatarTransform ?? DEFAULT_AVATAR_TRANSFORM,
+    soundtrack: soundtrackForStorage(soundtrack),
+    showMusicPlayer: soundtrack.tracks.length > 0 && profile.showMusicPlayer,
+    themeId: profile.themeId || DEFAULT_THEME_ID,
+    playground: normalizePlayground(profile.playground),
+    environment: normalizeEnvironmentSettings(profile.environment),
+    companions: normalizeCompanionSettings(profile.companions),
+    widgets: normalizeWidgetSettings(profile.widgets),
+  };
+  window.localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(stored));
+}
+
+export default function YourPlayground(props: Props) {
+  const {
+    displayName,
+    username,
+    bio,
+    avatarSrc,
+    postCount,
+    followerCount,
+    followingCount,
+    isOwner = true,
+    accountVisibility = "public",
+    followRelationship = "none",
+    followers = [],
+    following = [],
+    musicTrack,
+    showMusicPlayer,
+    children,
+  } = props;
+  const fallbackProfile = useMemo<EditableProfile>(() => ({
+    displayName, username, bio, avatarSrc,
+    avatarTransform: DEFAULT_AVATAR_TRANSFORM,
+    avatarTransforms: { [DEFAULT_THEME_ID]: DEFAULT_AVATAR_TRANSFORM },
+    soundtrack: musicTrack ? {
+      ...EMPTY_PROFILE_SOUNDTRACK,
+      tracks: [{
+        id: "default-profile-track",
+        title: musicTrack.title,
+        artist: musicTrack.artist ?? displayName,
+        sourceType: "upload",
+        source: musicTrack.audioSrc,
+      }],
+    } : EMPTY_PROFILE_SOUNDTRACK,
+    showMusicPlayer: Boolean(musicTrack) && showMusicPlayer,
+    themeId: DEFAULT_THEME_ID,
+    environment: DEFAULT_ENVIRONMENT_SETTINGS,
+    companions: DEFAULT_COMPANION_SETTINGS,
+    widgets: DEFAULT_WIDGET_SETTINGS,
+    playground: {
+      enabled: true,
+      objects: [
+        {
+          id: "profile-retro-folder",
+          objectId: "retro-folder",
+          lane: "music",
+          enabled: true,
+          position: { x: 84, y: 32 },
+          rotation: -3,
+          scale: 1,
+          zIndex: 1,
+          action: { type: "open-music" },
+        },
+      ],
+    },
+  }), [avatarSrc, bio, displayName, musicTrack, showMusicPlayer, username]);
+
+  const [profile, setProfile] = useState<EditableProfile>(() => readStoredProfile(fallbackProfile));
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [followDrawerMode, setFollowDrawerMode] =
+    useState<FollowDrawerMode | null>(null);
+  const [activeFollowRelationship, setActiveFollowRelationship] =
+    useState<FollowRelationship>(followRelationship);
+
+  useEffect(() => {
+    setActiveFollowRelationship(followRelationship);
+  }, [followRelationship]);
+
+  useEffect(() => {
+    let active = true;
+    const objectUrls: string[] = [];
+    void (async () => {
+      try {
+        const avatarMigrationKey = "worlds-avatar-hd-migration-v1";
+
+        if (!localStorage.getItem(avatarMigrationKey)) {
+          await deleteProfileMedia("profile-avatar");
+          localStorage.setItem(avatarMigrationKey, "complete");
+        }
+
+        const avatarBlob = await readProfileMedia("profile-avatar");
+        const currentSoundtrack = normalizeSoundtrack(profile.soundtrack ?? EMPTY_PROFILE_SOUNDTRACK);
+        const restoredTracks = await Promise.all(currentSoundtrack.tracks.map(async (track): Promise<SoundtrackTrack> => {
+          if (track.sourceType !== "upload") return track;
+          const blob = await readProfileMedia(`profile-track:${track.id}`);
+          if (!blob) return track;
+          const objectUrl = URL.createObjectURL(blob);
+          objectUrls.push(objectUrl);
+          return { ...track, source: objectUrl };
+        }));
+        if (!active) return;
+        let restoredAvatar: string | undefined;
+        if (avatarBlob) {
+          restoredAvatar = URL.createObjectURL(avatarBlob);
+          objectUrls.push(restoredAvatar);
+        }
+        setProfile((current) => ({
+          ...current,
+          avatarSrc: restoredAvatar ?? current.avatarSrc,
+          soundtrack: { ...currentSoundtrack, tracks: restoredTracks },
+        }));
+      } catch (error) {
+        console.error("Could not restore profile media:", error);
+      }
+    })();
+    return () => {
+      active = false;
+      objectUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, []);
+
+  const activeTheme = getTheme(profile.themeId || DEFAULT_THEME_ID);
+  const activeAvatarTransform = normalizeAvatarTransform(
+    profile.avatarTransform ?? DEFAULT_AVATAR_TRANSFORM,
+  );
+  const soundtrack = normalizeSoundtrack(profile.soundtrack ?? EMPTY_PROFILE_SOUNDTRACK);
+
+  const saveProfile = async (next: EditableProfile) => {
+    const mergedNext: EditableProfile = {
+      ...next,
+      avatarSrc: next.avatarSrc ?? profile.avatarSrc,
+      soundtrack: normalizeSoundtrack(next.soundtrack ?? profile.soundtrack),
+      playground: normalizePlayground(next.playground ?? profile.playground),
+      environment: normalizeEnvironmentSettings(next.environment ?? profile.environment),
+      companions: normalizeCompanionSettings(next.companions ?? profile.companions),
+      widgets: normalizeWidgetSettings(next.widgets ?? profile.widgets),
+    };
+    try {
+      if (mergedNext.avatarSrc?.startsWith("blob:")) {
+        await saveProfileMedia("profile-avatar", await blobFromSource(mergedNext.avatarSrc));
+      } else if (!mergedNext.avatarSrc) {
+        await deleteProfileMedia("profile-avatar");
+      }
+      for (const track of mergedNext.soundtrack?.tracks ?? []) {
+        if (track.sourceType === "upload" && track.source.startsWith("blob:")) {
+          await saveProfileMedia(`profile-track:${track.id}`, await blobFromSource(track.source));
+        }
+      }
+    } catch (error) {
+      console.error("Could not permanently save profile media:", error);
+    }
+    setProfile(mergedNext);
+    persistProfile(mergedNext);
+    setEditorOpen(false);
+  };
+
+  const handleFollowAction = () => {
+    setActiveFollowRelationship((current) => {
+      if (current === "following") {
+        return "none";
+      }
+
+      if (current === "requested") {
+        return "none";
+      }
+
+      return accountVisibility === "private"
+        ? "requested"
+        : "following";
+    });
+  };
+
+  const handleMessage = () => {
+    window.dispatchEvent(
+      new CustomEvent("playground:open-message", {
+        detail: {
+          username: profile.username,
+          displayName: profile.displayName,
+        },
+      }),
+    );
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: `${profile.displayName} on Playground`,
+      text: `Explore ${profile.displayName}'s Playground.`,
+      url: window.location.href,
+    };
+
+    try {
+      if (typeof navigator.share === "function") {
+        await navigator.share(shareData);
+        return;
+      }
+
+      await navigator.clipboard.writeText(window.location.href);
+    } catch (error) {
+      if (
+        error instanceof DOMException &&
+        error.name === "AbortError"
+      ) {
+        return;
+      }
+
+      console.error("Could not share this profile:", error);
+    }
+  };
+
+
+  const copyProfileLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+    } catch (error) {
+      console.error("Could not copy profile link:", error);
+    }
+  };
+
+  const hiddenAutoplay = soundtrack.tracks.length > 0 && !profile.showMusicPlayer && soundtrack.autoplay;
+
+  return (
+    <PresenceProvider>
+      <div className="your-playground-presence-shell">
+        <PresenceLayer />
+        {isOwner && <PresenceSettings />}
+    <ProfileActionBar
+      isOwner={isOwner}
+      accountVisibility={accountVisibility}
+      followRelationship={activeFollowRelationship}
+      onEdit={() => setEditorOpen(true)}
+      onFollowToggle={handleFollowAction}
+      onMessage={handleMessage}
+      onShare={handleShare}
+      onCopyLink={copyProfileLink}
+    />
+    <ExperienceRenderer
+      themeId={activeTheme.id}
+      className={activeTheme.className}
+      style={getThemeStyle(activeTheme)}
+      profile={{
+        displayName: profile.displayName,
+        username: profile.username,
+        bio: profile.bio,
+        avatarSrc: profile.avatarSrc,
+        avatarTransform: activeAvatarTransform,
+      }}
+      posts={children}
+      postCount={postCount}
+      followerCount={followerCount}
+      followingCount={followingCount}
+      isOwner={isOwner}
+      accountVisibility={accountVisibility}
+      followRelationship={activeFollowRelationship}
+      onFollowersClick={
+        isOwner
+          ? () => setFollowDrawerMode("followers")
+          : undefined
+      }
+      onFollowingClick={
+        isOwner
+          ? () => setFollowDrawerMode("following")
+          : undefined
+      }
+      soundtrack={soundtrack}
+      showMusicPlayer={profile.showMusicPlayer}
+      hiddenAutoplay={hiddenAutoplay}
+      playground={profile.playground ?? EMPTY_PLAYGROUND}
+      environment={profile.environment}
+      companions={profile.companions}
+      widgets={profile.widgets}
+      onEdit={() => setEditorOpen(true)}
+    />
+    {editorOpen && (
+      <EditProfile
+        profile={profile}
+        onCancel={() => setEditorOpen(false)}
+        onSave={saveProfile}
+      />
+    )}
+
+    <FollowDrawer
+      open={isOwner && followDrawerMode !== null}
+      mode={followDrawerMode ?? "followers"}
+      users={
+        followDrawerMode === "following"
+          ? following
+          : followers
+      }
+      onClose={() => setFollowDrawerMode(null)}
+    />
+      </div>
+    </PresenceProvider>
+  );
+}

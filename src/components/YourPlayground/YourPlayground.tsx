@@ -1,5 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
+import FollowDrawer from "../FollowDrawer";
+import ProfileActionBar from "../ProfileActionBar";
+import { PresenceProvider } from "../../presence/PresenceContext";
+import PresenceLayer from "../../presence/PresenceLayer";
+import PresenceSettings from "../../presence/PresenceSettings";
+import type {
+  FollowDrawerMode,
+  FollowUser,
+} from "../FollowDrawer";
 import type { ReactNode } from "react";
+import type {
+  AccountVisibility,
+  FollowRelationship,
+} from "../../profile-experiences/shared/ExperienceTypes";
 import EditProfile from "../EditProfile";
 import type { EditableProfile } from "../EditProfile";
 import type { ProfileTrack } from "../ProfileMusicPlayer";
@@ -24,9 +37,21 @@ import type { WidgetSettings } from "../../personalization/widgets";
 import "./YourPlayground.css";
 
 type Props = {
-  displayName: string; username: string; bio: string; avatarSrc?: string;
-  postCount: number; followerCount: number; followingCount: number;
-  musicTrack: ProfileTrack | null; showMusicPlayer: boolean; children?: ReactNode;
+  displayName: string;
+  username: string;
+  bio: string;
+  avatarSrc?: string;
+  postCount: number;
+  followerCount: number;
+  followingCount: number;
+  isOwner?: boolean;
+  accountVisibility?: AccountVisibility;
+  followRelationship?: FollowRelationship;
+  followers?: FollowUser[];
+  following?: FollowUser[];
+  musicTrack: ProfileTrack | null;
+  showMusicPlayer: boolean;
+  children?: ReactNode;
 };
 
 const PROFILE_STORAGE_KEY = "playground.profile.settings.v2";
@@ -120,7 +145,23 @@ function persistProfile(profile: EditableProfile): void {
 }
 
 export default function YourPlayground(props: Props) {
-  const { displayName, username, bio, avatarSrc, postCount, followerCount, followingCount, musicTrack, showMusicPlayer, children } = props;
+  const {
+    displayName,
+    username,
+    bio,
+    avatarSrc,
+    postCount,
+    followerCount,
+    followingCount,
+    isOwner = true,
+    accountVisibility = "public",
+    followRelationship = "none",
+    followers = [],
+    following = [],
+    musicTrack,
+    showMusicPlayer,
+    children,
+  } = props;
   const fallbackProfile = useMemo<EditableProfile>(() => ({
     displayName, username, bio, avatarSrc,
     avatarTransform: DEFAULT_AVATAR_TRANSFORM,
@@ -160,6 +201,14 @@ export default function YourPlayground(props: Props) {
 
   const [profile, setProfile] = useState<EditableProfile>(() => readStoredProfile(fallbackProfile));
   const [editorOpen, setEditorOpen] = useState(false);
+  const [followDrawerMode, setFollowDrawerMode] =
+    useState<FollowDrawerMode | null>(null);
+  const [activeFollowRelationship, setActiveFollowRelationship] =
+    useState<FollowRelationship>(followRelationship);
+
+  useEffect(() => {
+    setActiveFollowRelationship(followRelationship);
+  }, [followRelationship]);
 
   useEffect(() => {
     let active = true;
@@ -239,9 +288,85 @@ export default function YourPlayground(props: Props) {
     setEditorOpen(false);
   };
 
+  const handleFollowAction = () => {
+    setActiveFollowRelationship((current) => {
+      if (current === "following") {
+        return "none";
+      }
+
+      if (current === "requested") {
+        return "none";
+      }
+
+      return accountVisibility === "private"
+        ? "requested"
+        : "following";
+    });
+  };
+
+  const handleMessage = () => {
+    window.dispatchEvent(
+      new CustomEvent("playground:open-message", {
+        detail: {
+          username: profile.username,
+          displayName: profile.displayName,
+        },
+      }),
+    );
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: `${profile.displayName} on Playground`,
+      text: `Explore ${profile.displayName}'s Playground.`,
+      url: window.location.href,
+    };
+
+    try {
+      if (typeof navigator.share === "function") {
+        await navigator.share(shareData);
+        return;
+      }
+
+      await navigator.clipboard.writeText(window.location.href);
+    } catch (error) {
+      if (
+        error instanceof DOMException &&
+        error.name === "AbortError"
+      ) {
+        return;
+      }
+
+      console.error("Could not share this profile:", error);
+    }
+  };
+
+
+  const copyProfileLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+    } catch (error) {
+      console.error("Could not copy profile link:", error);
+    }
+  };
+
   const hiddenAutoplay = soundtrack.tracks.length > 0 && !profile.showMusicPlayer && soundtrack.autoplay;
 
-  return <>
+  return (
+    <PresenceProvider>
+      <div className="your-playground-presence-shell">
+        <PresenceLayer />
+        {isOwner && <PresenceSettings />}
+    <ProfileActionBar
+      isOwner={isOwner}
+      accountVisibility={accountVisibility}
+      followRelationship={activeFollowRelationship}
+      onEdit={() => setEditorOpen(true)}
+      onFollowToggle={handleFollowAction}
+      onMessage={handleMessage}
+      onShare={handleShare}
+      onCopyLink={copyProfileLink}
+    />
     <ExperienceRenderer
       themeId={activeTheme.id}
       className={activeTheme.className}
@@ -257,6 +382,19 @@ export default function YourPlayground(props: Props) {
       postCount={postCount}
       followerCount={followerCount}
       followingCount={followingCount}
+      isOwner={isOwner}
+      accountVisibility={accountVisibility}
+      followRelationship={activeFollowRelationship}
+      onFollowersClick={
+        isOwner
+          ? () => setFollowDrawerMode("followers")
+          : undefined
+      }
+      onFollowingClick={
+        isOwner
+          ? () => setFollowDrawerMode("following")
+          : undefined
+      }
       soundtrack={soundtrack}
       showMusicPlayer={profile.showMusicPlayer}
       hiddenAutoplay={hiddenAutoplay}
@@ -266,6 +404,25 @@ export default function YourPlayground(props: Props) {
       widgets={profile.widgets}
       onEdit={() => setEditorOpen(true)}
     />
-    {editorOpen && <EditProfile profile={profile} onCancel={() => setEditorOpen(false)} onSave={saveProfile} />}
-  </>;
+    {editorOpen && (
+      <EditProfile
+        profile={profile}
+        onCancel={() => setEditorOpen(false)}
+        onSave={saveProfile}
+      />
+    )}
+
+    <FollowDrawer
+      open={isOwner && followDrawerMode !== null}
+      mode={followDrawerMode ?? "followers"}
+      users={
+        followDrawerMode === "following"
+          ? following
+          : followers
+      }
+      onClose={() => setFollowDrawerMode(null)}
+    />
+      </div>
+    </PresenceProvider>
+  );
 }

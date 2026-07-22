@@ -38,10 +38,7 @@ export default function ExperienceRenderer(props: WorldExperienceProps) {
       <EnvironmentLayer settings={environment} />
       <CompanionLayer settings={companions} />
       <WidgetLayer settings={widgets} />
-      <button className="profile-experience-owner-edit" type="button" onClick={props.onEdit} aria-label="Edit profile">
-        <span aria-hidden="true">✦</span>
-        Edit profile
-      </button>
+
       <WorldCanvas
         playground={playground}
         onObjectAction={(event) => {

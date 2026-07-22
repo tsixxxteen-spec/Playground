@@ -1,0 +1,500 @@
+.theme-marketplace {
+  position: fixed;
+  z-index: 10000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #f4f4f1;
+}
+
+.theme-marketplace *,
+.theme-marketplace *::before,
+.theme-marketplace *::after {
+  box-sizing: border-box;
+}
+
+.theme-marketplace__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(0, 0, 0, 0.72);
+  cursor: default;
+  backdrop-filter: blur(18px);
+}
+
+.theme-marketplace__panel {
+  position: relative;
+  display: grid;
+  width: min(96vw, 1500px);
+  height: min(92vh, 980px);
+  grid-template-rows: auto auto minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 20px;
+  background: #111211;
+  box-shadow: 0 35px 120px rgba(0, 0, 0, 0.56);
+}
+
+.theme-marketplace__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  padding: 1.25rem 1.4rem;
+}
+
+.theme-marketplace__header p,
+.theme-marketplace__header h2 {
+  margin: 0;
+}
+
+.theme-marketplace__header p {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.theme-marketplace__header h2 {
+  margin-top: 0.25rem;
+  font-size: clamp(1.4rem, 3vw, 2.3rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+
+.theme-marketplace__close {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 1.35rem;
+}
+
+.theme-marketplace__toolbar {
+  display: grid;
+  grid-template-columns: minmax(240px, 1.5fr) repeat(3, minmax(130px, 0.5fr));
+  gap: 0.7rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  padding: 0.9rem 1.4rem;
+}
+
+.theme-marketplace__toolbar label {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.theme-marketplace__toolbar label > span {
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.theme-marketplace__toolbar input,
+.theme-marketplace__toolbar select {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  outline: none;
+  background: rgba(255, 255, 255, 0.045);
+  color: inherit;
+  padding: 0.7rem 0.75rem;
+  font: inherit;
+  font-size: 0.76rem;
+}
+
+.theme-marketplace__toolbar input:focus,
+.theme-marketplace__toolbar select:focus {
+  border-color: rgba(255, 255, 255, 0.38);
+}
+
+.theme-marketplace__body {
+  display: grid;
+  min-height: 0;
+  grid-template-columns: minmax(0, 1fr) minmax(290px, 360px);
+}
+
+.theme-marketplace__catalog {
+  min-width: 0;
+  overflow-y: auto;
+  padding: 1rem 1.4rem 2rem;
+}
+
+.theme-marketplace__summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.8rem;
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 0.61rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.theme-marketplace__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.theme-marketplace__card {
+  position: relative;
+  display: grid;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.035);
+  color: inherit;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.theme-marketplace__card:hover,
+.theme-marketplace__card.is-selected {
+  border-color: rgba(255, 255, 255, 0.36);
+  transform: translateY(-2px);
+}
+
+.theme-marketplace__card.is-active {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+.theme-marketplace__preview,
+.theme-marketplace__hero-preview {
+  position: relative;
+  display: grid;
+  overflow: hidden;
+  background: var(--market-bg);
+  color: var(--market-fg);
+}
+
+.theme-marketplace__preview {
+  min-height: 125px;
+  grid-template-columns: 36% 1fr;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem;
+}
+
+.theme-marketplace__preview > i {
+  height: 100%;
+  background: var(--market-surface);
+  border: 1px solid var(--market-border);
+}
+
+.theme-marketplace__preview > strong {
+  position: absolute;
+  top: 50%;
+  left: 18%;
+  transform: translate(-50%, -50%);
+  color: var(--market-accent);
+  font-size: 2rem;
+}
+
+.theme-marketplace__preview > span {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.theme-marketplace__preview > span i {
+  height: 5px;
+  background: var(--market-fg);
+  opacity: 0.7;
+}
+
+.theme-marketplace__preview > span i:nth-child(2) {
+  width: 70%;
+  background: var(--market-accent);
+}
+
+.theme-marketplace__preview > span i:nth-child(3) {
+  width: 48%;
+  opacity: 0.35;
+}
+
+.theme-marketplace__card-copy {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.7rem 0.75rem 0.8rem;
+}
+
+.theme-marketplace__card-copy > span {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.theme-marketplace__card-copy small {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.55rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.theme-marketplace__card-copy strong {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.theme-marketplace__card > em {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+  border-radius: 999px;
+  background: rgba(10, 10, 10, 0.7);
+  padding: 0.3rem 0.45rem;
+  font-size: 0.52rem;
+  font-style: normal;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+}
+
+.theme-marketplace__details {
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+  min-width: 0;
+  overflow-y: auto;
+  border-left: 1px solid rgba(255, 255, 255, 0.09);
+  padding: 1rem;
+}
+
+.theme-marketplace__hero-preview {
+  min-height: 220px;
+  place-items: center;
+  border: 1px solid var(--market-border);
+}
+
+.theme-marketplace__hero-preview > i {
+  position: absolute;
+  width: 64%;
+  aspect-ratio: 1;
+  border: 1px solid var(--market-border);
+  border-radius: 50%;
+}
+
+.theme-marketplace__hero-preview > strong {
+  position: relative;
+  z-index: 2;
+  color: var(--market-accent);
+  font-size: clamp(1.8rem, 4vw, 3.8rem);
+  font-weight: 500;
+  letter-spacing: -0.06em;
+  text-align: center;
+}
+
+.theme-marketplace__hero-preview > span {
+  position: absolute;
+  right: 8%;
+  bottom: 8%;
+  width: 38%;
+  height: 5px;
+  background: var(--market-fg);
+  opacity: 0.55;
+}
+
+.theme-marketplace__detail-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.theme-marketplace__detail-heading small {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.57rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.theme-marketplace__detail-heading h3 {
+  margin: 0.2rem 0 0;
+  font-size: 1.45rem;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+
+.theme-marketplace__detail-heading > span {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  padding: 0.38rem 0.55rem;
+  font-size: 0.58rem;
+}
+
+.theme-marketplace__details > p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.theme-marketplace__details dl {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.theme-marketplace__details dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.45rem;
+}
+
+.theme-marketplace__details dt {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.62rem;
+}
+
+.theme-marketplace__details dd {
+  margin: 0;
+  font-size: 0.65rem;
+}
+
+.theme-marketplace__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.theme-marketplace__tags span {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  padding: 0.35rem 0.5rem;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.56rem;
+}
+
+.theme-marketplace__apply {
+  border: 0;
+  border-radius: 10px;
+  background: #f2f2ed;
+  color: #121212;
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+.theme-marketplace__apply:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.theme-marketplace__foundation-note {
+  color: rgba(255, 255, 255, 0.34);
+  font-size: 0.58rem;
+  line-height: 1.45;
+}
+
+.theme-marketplace__empty {
+  display: grid;
+  min-height: 220px;
+  place-items: center;
+  align-content: center;
+  gap: 0.3rem;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  color: rgba(255, 255, 255, 0.48);
+}
+
+.theme-marketplace__empty strong {
+  color: #fff;
+}
+
+@media (max-width: 1120px) {
+  .theme-marketplace__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .theme-marketplace__toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .theme-marketplace {
+    place-items: stretch;
+  }
+
+  .theme-marketplace__panel {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .theme-marketplace__body {
+    grid-template-columns: 1fr;
+  }
+
+  .theme-marketplace__details {
+    display: none;
+  }
+
+  .theme-marketplace__toolbar {
+    grid-template-columns: 1fr 1fr;
+    padding-inline: 0.8rem;
+  }
+
+  .theme-marketplace__toolbar label:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .theme-marketplace__catalog,
+  .theme-marketplace__header {
+    padding-inline: 0.8rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .theme-marketplace__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .theme-marketplace__toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .theme-marketplace__toolbar label:first-child {
+    grid-column: auto;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .theme-marketplace__panel {
+    animation: marketplace-enter 190ms ease-out;
+  }
+
+  .theme-marketplace__card {
+    transition:
+      transform 160ms ease,
+      border-color 160ms ease;
+  }
+}
+
+@keyframes marketplace-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.99);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-marketplace__panel,
+  .theme-marketplace__card {
+    animation: none;
+    transition: none;
+  }
+}

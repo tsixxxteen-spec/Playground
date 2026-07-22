@@ -1,0 +1,349 @@
+/* ---------------------------------------------------------
+   Profile root and continuous creative canvas
+   --------------------------------------------------------- */
+
+.playground-polished-profile {
+  position: relative !important;
+  min-height: 100%;
+  overflow-x: clip;
+  isolation: isolate;
+}
+
+.playground-profile-header-removed {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+}
+
+.playground-profile-bio-canvas {
+  position: relative !important;
+  min-height:
+    max(
+      720px,
+      100vh
+    );
+  width: 100%;
+  overflow: hidden;
+  isolation: isolate;
+  contain:
+    layout paint;
+}
+
+/* ---------------------------------------------------------
+   Widgets and profile objects
+   --------------------------------------------------------- */
+
+.playground-polished-profile-object {
+  position: relative;
+  z-index: 5;
+  max-width: 100%;
+}
+
+.playground-profile-bio-canvas
+[data-profile-object],
+.playground-profile-bio-canvas
+[data-world-object],
+.playground-profile-bio-canvas
+[data-widget],
+.playground-profile-bio-canvas
+.profile-object,
+.playground-profile-bio-canvas
+.world-object,
+.playground-profile-bio-canvas
+.profile-widget,
+.playground-profile-bio-canvas
+.world-widget {
+  box-sizing:
+    border-box;
+}
+
+/* ---------------------------------------------------------
+   Companions
+   --------------------------------------------------------- */
+
+.playground-polished-companion {
+  z-index: 7;
+  overflow: visible !important;
+  border: 0 !important;
+  outline: 0 !important;
+  background:
+    transparent !important;
+  background-color:
+    transparent !important;
+  background-image:
+    none !important;
+  box-shadow:
+    none !important;
+  filter:
+    none !important;
+  backdrop-filter:
+    none !important;
+  mix-blend-mode:
+    normal;
+  isolation:
+    isolate;
+  transform:
+    translate3d(
+      var(
+        --playground-companion-correction-x,
+        0px
+      ),
+      var(
+        --playground-companion-correction-y,
+        0px
+      ),
+      0
+    );
+  transform-origin:
+    center center;
+  will-change:
+    transform;
+  backface-visibility:
+    hidden;
+  -webkit-backface-visibility:
+    hidden;
+  perspective:
+    1000px;
+  -webkit-perspective:
+    1000px;
+  image-rendering:
+    auto;
+}
+
+.playground-polished-companion::before,
+.playground-polished-companion::after {
+  background:
+    transparent !important;
+  box-shadow:
+    none !important;
+  filter:
+    none !important;
+  backdrop-filter:
+    none !important;
+}
+
+.playground-polished-companion-media {
+  display: block;
+  max-width: 100%;
+  border: 0 !important;
+  outline: 0 !important;
+  background:
+    transparent !important;
+  background-color:
+    transparent !important;
+  box-shadow:
+    none !important;
+  filter:
+    none !important;
+  backdrop-filter:
+    none !important;
+  opacity: 1;
+  transform:
+    translateZ(0);
+  will-change:
+    transform;
+  backface-visibility:
+    hidden;
+  -webkit-backface-visibility:
+    hidden;
+  object-fit:
+    contain;
+  pointer-events:
+    none;
+  user-select:
+    none;
+  -webkit-user-drag:
+    none;
+}
+
+/*
+  Prevent browser interpolation from creating faint matte rectangles
+  around animated transparent images.
+*/
+
+.playground-polished-companion img,
+.playground-polished-companion picture,
+.playground-polished-companion canvas,
+.playground-polished-companion video {
+  background:
+    transparent !important;
+  box-shadow:
+    none !important;
+  filter:
+    none !important;
+  transform:
+    translate3d(
+      0,
+      0,
+      0
+    );
+}
+
+/* ---------------------------------------------------------
+   Full-page environmental effects
+   --------------------------------------------------------- */
+
+.playground-full-page-effect {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  min-width: 100vw !important;
+  min-height: 100vh !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  transform: none !important;
+  z-index: 1 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+  user-select: none !important;
+  contain:
+    strict;
+}
+
+.playground-full-page-effect canvas,
+.playground-full-page-effect svg,
+.playground-full-page-effect video,
+.playground-full-page-effect img {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: cover !important;
+  pointer-events: none !important;
+}
+
+.playground-polished-profile
+> :not(
+  .playground-full-page-effect
+) {
+  position: relative;
+  z-index: 2;
+}
+
+/* ---------------------------------------------------------
+   Discreet workspace controls
+   --------------------------------------------------------- */
+
+.playground-discreet-workspace-control {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.playground-command-center-launcher--discreet {
+  right: 18px !important;
+  bottom: 18px !important;
+  top: auto !important;
+  left: auto !important;
+  z-index: 11000 !important;
+  min-width: 42px;
+  width: 42px;
+  height: 42px;
+  padding: 0 !important;
+  justify-content: center;
+  border-radius: 50% !important;
+  opacity: 0.72;
+}
+
+.playground-command-center-launcher--discreet:hover,
+.playground-command-center-launcher--discreet:focus-visible {
+  opacity: 1;
+}
+
+.playground-command-center-launcher--discreet
+.playground-command-center-launcher__label,
+.playground-command-center-launcher--discreet
+.playground-command-center-launcher__shortcut {
+  display: none !important;
+}
+
+.playground-command-center-launcher--discreet
+.playground-command-center-launcher__mark {
+  width: 26px;
+  height: 26px;
+  background:
+    transparent;
+}
+
+/* ---------------------------------------------------------
+   Active Explorers safe zone
+   --------------------------------------------------------- */
+
+.playground-active-explorers-safe-zone {
+  position: relative;
+  z-index: 11001;
+}
+
+/*
+  Reserve breathing room so the discreet Workspace button cannot overlap
+  Active Explorers when Active Explorers is bottom-right aligned.
+*/
+
+.playground-active-explorers-safe-zone {
+  margin-right:
+    54px;
+}
+
+/* ---------------------------------------------------------
+   Reduced motion
+   --------------------------------------------------------- */
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+  .playground-polished-companion,
+  .playground-polished-companion-media {
+    transition:
+      none !important;
+    animation-duration:
+      1ms !important;
+    animation-iteration-count:
+      1 !important;
+  }
+}
+
+/* ---------------------------------------------------------
+   Mobile layout
+   --------------------------------------------------------- */
+
+@media (
+  max-width:
+  700px
+) {
+  .playground-profile-bio-canvas {
+    min-height:
+      max(
+        640px,
+        100dvh
+      );
+  }
+
+  .playground-command-center-launcher--discreet {
+    right: 12px !important;
+    bottom:
+      calc(
+        12px +
+        env(
+          safe-area-inset-bottom,
+          0px
+        )
+      ) !important;
+  }
+
+  .playground-active-explorers-safe-zone {
+    margin-right:
+      48px;
+  }
+}

@@ -1,0 +1,39 @@
+.share-session-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.share-session-panel__label {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.share-session-panel__label span {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.share-session-panel__label small {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 9px;
+}
+
+.share-session-panel button {
+  min-height: 32px;
+  padding: 0 11px;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 10px;
+  background: transparent;
+  color: #ffffff;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
