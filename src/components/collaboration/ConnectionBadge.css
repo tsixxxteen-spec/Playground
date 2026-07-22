@@ -1,0 +1,69 @@
+.connection-badge {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  background:
+    rgba(255, 255, 255, 0.035);
+  color:
+    rgba(255, 255, 255, 0.5);
+  font: inherit;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.connection-badge:not(:disabled) {
+  cursor: pointer;
+}
+
+.connection-badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #77777c;
+}
+
+.connection-badge[data-state="connected"] {
+  color:
+    rgba(255, 255, 255, 0.82);
+}
+
+.connection-badge[data-state="connected"]
+.connection-badge__dot {
+  background: #6ddc8b;
+  box-shadow:
+    0 0 10px
+    rgba(109, 220, 139, 0.5);
+}
+
+.connection-badge[data-state="connecting"]
+.connection-badge__dot,
+.connection-badge[data-state="reconnecting"]
+.connection-badge__dot {
+  background: #e8c76e;
+  animation:
+    collaboration-pulse
+    1.1s infinite;
+}
+
+.connection-badge[data-state="error"]
+.connection-badge__dot {
+  background: #e57373;
+}
+
+@keyframes collaboration-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

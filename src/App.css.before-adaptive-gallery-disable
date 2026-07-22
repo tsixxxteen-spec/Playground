@@ -1,0 +1,6003 @@
+:root {
+  --background: #f4f3ef;
+  --foreground: #11110f;
+  --panel: rgba(244, 243, 239, 0.93);
+  --panel-muted: rgba(244, 243, 239, 0.78);
+  --line: rgba(17, 17, 15, 0.14);
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --background: #09090a;
+  --foreground: #f3f2ee;
+  --panel: rgba(13, 13, 14, 0.93);
+  --panel-muted: rgba(13, 13, 14, 0.76);
+  --line: rgba(255, 255, 255, 0.13);
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-width: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+html {
+  background: var(--background);
+}
+
+body {
+  overflow-x: hidden;
+  background: var(--background);
+  color: var(--foreground);
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Text",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  border: 0;
+  color: inherit;
+  font: inherit;
+}
+
+button:focus-visible,
+.post-tile:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -4px;
+}
+
+.app {
+  min-height: 100vh;
+  background: var(--background);
+}
+
+.utility-bar {
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: grid;
+  height: 58px;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 14px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--background) 82%, transparent),
+    transparent
+  );
+  pointer-events: none;
+}
+
+.utility-bar button,
+.utility-brand,
+.utility-actions {
+  pointer-events: auto;
+}
+
+.menu-button {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  justify-self: start;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--panel) 88%, transparent);
+  cursor: pointer;
+  backdrop-filter: blur(20px);
+}
+
+.menu-icon {
+  position: relative;
+  display: block;
+  width: 15px;
+  height: 12px;
+}
+
+.menu-icon i {
+  position: absolute;
+  left: 0;
+  display: block;
+  width: 15px;
+  height: 1px;
+  background: currentColor;
+  transition:
+    top 220ms ease,
+    transform 220ms ease;
+}
+
+.menu-icon i:first-child {
+  top: 3px;
+}
+
+.menu-icon i:last-child {
+  top: 9px;
+}
+
+.menu-icon--open i:first-child {
+  top: 6px;
+  transform: rotate(45deg);
+}
+
+.menu-icon--open i:last-child {
+  top: 6px;
+  transform: rotate(-45deg);
+}
+
+.utility-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-self: center;
+  color: white;
+  mix-blend-mode: difference;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+
+.brand-mark {
+  position: relative;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+}
+
+.brand-mark i {
+  position: absolute;
+  display: block;
+  width: 9px;
+  height: 9px;
+  border: 1.2px solid currentColor;
+  border-radius: 50%;
+}
+
+.brand-mark i:first-child {
+  top: 0;
+  left: 0;
+}
+
+.brand-mark i:last-child {
+  right: 0;
+  bottom: 0;
+}
+
+.utility-actions {
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  gap: 8px;
+}
+
+.theme-control {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--panel) 86%, transparent);
+  backdrop-filter: blur(20px);
+}
+
+.theme-control button {
+  display: grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  font-size: 11px;
+  opacity: 0.48;
+}
+
+.theme-control button.active {
+  background: var(--foreground);
+  color: var(--background);
+  opacity: 1;
+}
+
+.user-button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--panel) 88%, transparent);
+  cursor: pointer;
+  font-size: 8px;
+  font-weight: 700;
+  backdrop-filter: blur(20px);
+}
+
+.weighted-wall {
+  display: grid;
+  width: 100%;
+  min-height: 100vh;
+  grid-auto-flow: dense;
+  grid-auto-rows: 8vw;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0;
+  background: #0a0a0a;
+}
+
+.post-tile {
+  --image-position: center;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: #111;
+  cursor: pointer;
+}
+
+.post-tile--standard {
+  grid-column: span 1;
+  grid-row: span 2;
+}
+
+.post-tile--wide {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.post-tile--tall {
+  grid-column: span 2;
+  grid-row: span 4;
+}
+
+.post-tile--hero {
+  grid-column: span 3;
+  grid-row: span 4;
+}
+
+.post-tile--panorama {
+  grid-column: span 3;
+  grid-row: span 2;
+}
+
+.post-tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--image-position);
+  transform: scale(1.001);
+  transition:
+    transform 900ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 400ms ease;
+  user-select: none;
+}
+
+.post-reveal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  padding: clamp(15px, 2vw, 30px);
+  background: linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.86) 0%,
+    rgba(0, 0, 0, 0.36) 44%,
+    rgba(0, 0, 0, 0) 76%
+  );
+  color: white;
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 220ms ease,
+    transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.post-reveal strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(12px, 1vw, 17px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.post-reveal p {
+  max-width: 440px;
+  margin: 7px 0 0;
+  font-size: clamp(9px, 0.8vw, 13px);
+  line-height: 1.45;
+}
+
+.post-reveal span {
+  margin-top: 9px;
+  color: rgba(255, 255, 255, 0.62);
+  font-family: "Courier New", monospace;
+  font-size: clamp(7px, 0.58vw, 10px);
+}
+
+.post-tile:hover .post-reveal,
+.post-tile:focus .post-reveal,
+.post-tile:focus-within .post-reveal,
+.post-tile--revealed .post-reveal {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.post-tile:hover img,
+.post-tile:focus img,
+.post-tile--revealed img {
+  filter: brightness(0.72);
+  transform: scale(1.025);
+}
+
+.menu-scrim {
+  position: fixed;
+  z-index: 109;
+  inset: 0;
+  visibility: hidden;
+  background: rgba(0, 0, 0, 0.18);
+  opacity: 0;
+  cursor: default;
+  transition:
+    visibility 300ms ease,
+    opacity 300ms ease;
+}
+
+.menu-scrim--visible {
+  visibility: visible;
+  opacity: 1;
+}
+
+.navigation-panel {
+  position: fixed;
+  z-index: 110;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  width: min(330px, 82vw);
+  flex-direction: column;
+  padding: 84px 25px 26px;
+  background: var(--panel);
+  color: var(--foreground);
+  box-shadow: 25px 0 80px rgba(0, 0, 0, 0.14);
+  backdrop-filter: blur(35px) saturate(125%);
+  transform: translateX(-102%);
+  transition: transform 520ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.navigation-panel--open {
+  transform: translateX(0);
+}
+
+.navigation-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.045em;
+}
+
+.navigation-panel nav {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 2px;
+  margin-top: 54px;
+}
+
+.navigation-panel nav button {
+  padding: 8px 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  text-align: left;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.navigation-panel nav button:hover {
+  transform: translateX(4px);
+}
+
+.create-action {
+  width: 100%;
+  height: 42px;
+  margin-top: 30px;
+  border: 1px solid var(--foreground);
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.create-action:hover {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.navigation-note {
+  margin-top: auto;
+  max-width: 220px;
+}
+
+.navigation-note span {
+  font-family: "Courier New", monospace;
+  font-size: 7px;
+  letter-spacing: 0.15em;
+}
+
+.navigation-note p {
+  margin: 10px 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+/* Preserve a desktop visual canvas on mobile */
+@media (max-width: 760px) {
+  html,
+  body {
+    overflow-x: auto;
+  }
+
+  .app {
+    min-width: 1120px;
+  }
+
+  .utility-bar {
+    width: 100vw;
+    min-width: 320px;
+  }
+
+  .weighted-wall {
+    min-width: 1120px;
+    grid-auto-rows: 90px;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .navigation-panel {
+    position: fixed;
+    width: min(330px, 84vw);
+  }
+}
+
+@media (min-width: 1700px) {
+  .weighted-wall {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-auto-rows: 6.5vw;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .startup-title,
+  .startup-title::before,
+  .startup-title span {
+    animation-duration: 1ms !important;
+  }
+}
+
+
+
+
+/* =========================================================
+   PLAYGROUND PARTICLE FUSION INTRO — 2.9 SECONDS
+   ========================================================= */
+
+.startup-title {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+  animation: startup-container 4400ms linear forwards;
+}
+
+.startup-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(0, 0, 0, 0.08) 0%,
+      rgba(0, 0, 0, 0.28) 56%,
+      rgba(0, 0, 0, 0.48) 100%
+    );
+  backdrop-filter: brightness(0.67) saturate(0.88);
+  animation: startup-vignette 4400ms ease-in-out forwards;
+}
+
+.startup-word,
+.startup-monogram {
+  position: absolute;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  color: #fff200;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+  font-size: clamp(52px, 8.2vw, 142px);
+  font-weight: 600;
+  line-height: 0.86;
+  white-space: nowrap;
+  text-shadow:
+    0 0 10px rgba(255, 242, 0, 0.72),
+    0 0 28px rgba(255, 214, 0, 0.42),
+    0 0 76px rgba(255, 190, 0, 0.24);
+}
+
+.startup-word {
+  letter-spacing: -0.075em;
+  animation: word-arrival 4400ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.startup-letter {
+  display: inline-block;
+  transform-origin: center;
+  will-change: opacity, filter, transform;
+}
+
+.startup-letter--fade {
+  animation:
+    letter-dissolve 4400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.startup-letter--1 { --letter-x: 28px;  --letter-y: -22px; --letter-rotate: -5deg; }
+.startup-letter--2 { --letter-x: 43px;  --letter-y: -42px; --letter-rotate: 7deg; }
+.startup-letter--3 { --letter-x: 56px;  --letter-y: -27px; --letter-rotate: -8deg; }
+.startup-letter--4 { --letter-x: 72px;  --letter-y: -50px; --letter-rotate: 10deg; }
+.startup-letter--5 { --letter-x: 88px;  --letter-y: -31px; --letter-rotate: -12deg; }
+.startup-letter--6 { --letter-x: 106px; --letter-y: -62px; --letter-rotate: 13deg; }
+.startup-letter--7 { --letter-x: 124px; --letter-y: -38px; --letter-rotate: -9deg; }
+.startup-letter--8 { --letter-x: 145px; --letter-y: -70px; --letter-rotate: 15deg; }
+
+.startup-letter--p {
+  animation:
+    preserve-p 4400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.startup-letter--g {
+  animation:
+    preserve-g 4400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.startup-letter--dot {
+  animation:
+    preserve-dot 4400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.particle-field {
+  position: absolute;
+  width: min(76vw, 980px);
+  height: 260px;
+  transform: translateY(-2px);
+  pointer-events: none;
+}
+
+.particle-field i {
+  position: absolute;
+  top: 50%;
+  left: 56%;
+  width: var(--particle-size);
+  height: var(--particle-size);
+  border-radius: 50%;
+  background: #fff200;
+  box-shadow:
+    0 0 5px rgba(255, 242, 0, 0.95),
+    0 0 13px rgba(255, 190, 0, 0.66);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0);
+  animation:
+    golden-particle 1650ms cubic-bezier(0.14, 0.73, 0.23, 1) calc(1900ms + var(--particle-delay)) forwards;
+}
+
+.startup-monogram {
+  gap: 0;
+  letter-spacing: -0.085em;
+  opacity: 0;
+  filter: blur(18px);
+  transform: scale(0.78);
+  animation:
+    monogram-fusion 4400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.startup-monogram span {
+  display: inline-block;
+}
+
+
+
+
+
+
+
+
+
+
+
+@keyframes golden-particle {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+  }
+
+  12% {
+    opacity: 0.96;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  48% {
+    opacity: 0.82;
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translate(
+        calc(
+          -50% +
+          cos(var(--particle-angle)) * var(--particle-distance)
+        ),
+        calc(
+          -50% +
+          sin(var(--particle-angle)) * var(--particle-distance) +
+          var(--particle-lift)
+        )
+      )
+      scale(0.15);
+  }
+}
+
+
+
+
+
+
+
+@media (prefers-reduced-motion: reduce) {
+  .startup-title,
+  .startup-vignette,
+  .startup-word,
+  .startup-monogram,
+  .startup-letter,
+  .particle-field i {
+    animation-duration: 1ms !important;
+  }
+}
+
+
+@keyframes word-arrival {
+  0% {
+    opacity: 0;
+    filter: blur(20px);
+    transform: translateY(10px) scale(0.92);
+  }
+
+  8% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+  }
+
+  /* Playground. stays intact until 1.9 seconds */
+  43.2% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+  }
+
+  57% {
+    opacity: 0.72;
+  }
+
+  70%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes letter-dissolve {
+  0%,
+  43.2% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate(0, 0) rotate(0) scale(1);
+  }
+
+  49% {
+    opacity: 0.92;
+    filter: blur(2px);
+  }
+
+  58% {
+    opacity: 0.52;
+    filter: blur(8px);
+    transform:
+      translate(
+        calc(var(--letter-x) * 0.38),
+        calc(var(--letter-y) * 0.38)
+      )
+      rotate(calc(var(--letter-rotate) * 0.45))
+      scale(1.05);
+  }
+
+  68% {
+    opacity: 0.1;
+    filter: blur(21px);
+    transform:
+      translate(
+        calc(var(--letter-x) * 0.82),
+        calc(var(--letter-y) * 0.82)
+      )
+      rotate(calc(var(--letter-rotate) * 0.84))
+      scale(1.16);
+  }
+
+  76%,
+  100% {
+    opacity: 0;
+    filter: blur(36px);
+    transform:
+      translate(var(--letter-x), var(--letter-y))
+      rotate(var(--letter-rotate))
+      scale(1.28);
+  }
+}
+
+@keyframes preserve-p {
+  0%,
+  43.2% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0) scale(1);
+  }
+
+  54% {
+    opacity: 1;
+    transform: translateX(34px) scale(1.02);
+  }
+
+  64% {
+    opacity: 0.88;
+    filter: blur(3px);
+    transform: translateX(76px) scale(1.06);
+  }
+
+  72%,
+  100% {
+    opacity: 0;
+    filter: blur(15px);
+    transform: translateX(96px) scale(1.12);
+  }
+}
+
+@keyframes preserve-g {
+  0%,
+  43.2% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0) scale(1);
+  }
+
+  54% {
+    opacity: 1;
+    transform: translateX(-40px) scale(1.03);
+  }
+
+  64% {
+    opacity: 0.88;
+    filter: blur(3px);
+    transform: translateX(-88px) scale(1.08);
+  }
+
+  72%,
+  100% {
+    opacity: 0;
+    filter: blur(15px);
+    transform: translateX(-108px) scale(1.14);
+  }
+}
+
+@keyframes preserve-dot {
+  0%,
+  43.2% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0) scale(1);
+  }
+
+  56% {
+    opacity: 1;
+    transform: translateX(-76px) scale(1.08);
+  }
+
+  66% {
+    opacity: 0.84;
+    filter: blur(3px);
+    transform: translateX(-124px) scale(1.14);
+  }
+
+  73%,
+  100% {
+    opacity: 0;
+    filter: blur(13px);
+    transform: translateX(-142px) scale(1.22);
+  }
+}
+
+@keyframes monogram-fusion {
+  0%,
+  43.2% {
+    opacity: 0;
+    filter: blur(22px);
+    transform: scale(0.72);
+  }
+
+  48% {
+    opacity: 0.18;
+    filter: blur(14px);
+    transform: scale(0.84);
+  }
+
+  55% {
+    opacity: 0.72;
+    filter: blur(5px);
+    transform: scale(0.96);
+  }
+
+  61% {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+    text-shadow:
+      0 0 18px rgba(255, 242, 0, 0.9),
+      0 0 60px rgba(255, 190, 0, 0.52);
+  }
+
+  /* PG. receives the longer hold */
+  92% {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1.015);
+  }
+
+  100% {
+    opacity: 0;
+    filter: blur(12px);
+    transform: translateY(-5px) scale(1.07);
+  }
+}
+
+@keyframes startup-vignette {
+  0% {
+    opacity: 0;
+  }
+
+  7% {
+    opacity: 1;
+  }
+
+  94% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes startup-container {
+  0%,
+  99% {
+    visibility: visible;
+  }
+
+  100% {
+    visibility: hidden;
+  }
+}
+
+
+/* =========================================================
+   PLAYGROUND INTRO — 3.6 SECOND PG. DOCK TRANSITION
+   ========================================================= */
+
+/*
+  Timing:
+  0.0–0.3s  Playground. appears
+  0.3–1.4s  Playground. holds
+  1.4–2.4s  Middle letters evaporate
+  2.4–3.2s  PG. forms
+  3.2–3.6s  PG. docks into the interface
+*/
+
+.startup-title {
+  animation: startup-container-final 3600ms linear forwards !important;
+}
+
+.startup-vignette {
+  animation: startup-vignette-final 3600ms ease forwards !important;
+}
+
+.startup-word {
+  animation: word-arrival-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.startup-letter--fade {
+  animation: letter-dissolve-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.startup-letter--p {
+  animation: preserve-p-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.startup-letter--g {
+  animation: preserve-g-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.startup-letter--dot {
+  animation: preserve-dot-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.startup-monogram {
+  animation: monogram-dock-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+/* Particles begin during the evaporation phase. */
+.particle-field i {
+  animation:
+    golden-particle 1050ms
+    cubic-bezier(0.14, 0.73, 0.23, 1)
+    calc(1450ms + var(--particle-delay))
+    forwards !important;
+}
+
+/* Move the persistent interface brand beside the menu button. */
+.utility-bar {
+  grid-template-columns: auto auto 1fr !important;
+  column-gap: 10px;
+}
+
+.utility-brand {
+  justify-self: start !important;
+  opacity: 0;
+  transform: translateX(-5px) scale(0.92);
+  animation: utility-brand-arrival 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.utility-actions {
+  justify-self: end;
+}
+
+/* The menu remains on the far left. */
+.menu-button {
+  grid-column: 1;
+}
+
+.utility-brand {
+  grid-column: 2;
+}
+
+.utility-actions {
+  grid-column: 3;
+}
+
+@keyframes word-arrival-final {
+  0% {
+    opacity: 0;
+    filter: blur(18px);
+    transform: translateY(10px) scale(0.92);
+  }
+
+  8.3% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+  }
+
+  /* Hold Playground. until roughly 1.4 seconds. */
+  38.9% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+  }
+
+  58% {
+    opacity: 0.5;
+  }
+
+  69%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes letter-dissolve-final {
+  0%,
+  38.9% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+
+  47% {
+    opacity: 0.9;
+    filter: blur(2px);
+  }
+
+  57% {
+    opacity: 0.52;
+    filter: blur(8px);
+    transform:
+      translate(
+        calc(var(--letter-x) * 0.38),
+        calc(var(--letter-y) * 0.38)
+      )
+      rotate(calc(var(--letter-rotate) * 0.45))
+      scale(1.05);
+  }
+
+  67% {
+    opacity: 0.11;
+    filter: blur(21px);
+    transform:
+      translate(
+        calc(var(--letter-x) * 0.82),
+        calc(var(--letter-y) * 0.82)
+      )
+      rotate(calc(var(--letter-rotate) * 0.84))
+      scale(1.16);
+  }
+
+  72%,
+  100% {
+    opacity: 0;
+    filter: blur(36px);
+    transform:
+      translate(var(--letter-x), var(--letter-y))
+      rotate(var(--letter-rotate))
+      scale(1.28);
+  }
+}
+
+@keyframes preserve-p-final {
+  0%,
+  39% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0) scale(1);
+  }
+
+  52% {
+    opacity: 1;
+    transform: translateX(36px) scale(1.02);
+  }
+
+  63% {
+    opacity: 0.75;
+    filter: blur(4px);
+    transform: translateX(84px) scale(1.07);
+  }
+
+  70%,
+  100% {
+    opacity: 0;
+    filter: blur(15px);
+    transform: translateX(104px) scale(1.12);
+  }
+}
+
+@keyframes preserve-g-final {
+  0%,
+  39% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0) scale(1);
+  }
+
+  52% {
+    opacity: 1;
+    transform: translateX(-42px) scale(1.03);
+  }
+
+  63% {
+    opacity: 0.75;
+    filter: blur(4px);
+    transform: translateX(-92px) scale(1.08);
+  }
+
+  70%,
+  100% {
+    opacity: 0;
+    filter: blur(15px);
+    transform: translateX(-112px) scale(1.14);
+  }
+}
+
+@keyframes preserve-dot-final {
+  0%,
+  41% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0) scale(1);
+  }
+
+  54% {
+    opacity: 1;
+    transform: translateX(-80px) scale(1.08);
+  }
+
+  65% {
+    opacity: 0.7;
+    filter: blur(4px);
+    transform: translateX(-128px) scale(1.15);
+  }
+
+  71%,
+  100% {
+    opacity: 0;
+    filter: blur(14px);
+    transform: translateX(-146px) scale(1.22);
+  }
+}
+
+@keyframes monogram-dock-final {
+  0%,
+  61% {
+    opacity: 0;
+    filter: blur(20px);
+    transform: translate(0, 0) scale(0.74);
+  }
+
+  /* PG. begins forming around 2.4 seconds. */
+  67% {
+    opacity: 0.25;
+    filter: blur(12px);
+    transform: translate(0, 0) scale(0.86);
+  }
+
+  76% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate(0, 0) scale(1);
+    text-shadow:
+      0 0 18px rgba(255, 242, 0, 0.9),
+      0 0 62px rgba(255, 190, 0, 0.55);
+  }
+
+  88.8% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate(0, 0) scale(1.02);
+  }
+
+  /* PG. flies into the upper-left interface position. */
+  100% {
+    opacity: 0;
+    filter: blur(0);
+    transform:
+      translate(
+        calc(-50vw + 94px),
+        calc(-50vh + 29px)
+      )
+      scale(0.18);
+    text-shadow:
+      0 0 6px rgba(255, 242, 0, 0.28);
+  }
+}
+
+@keyframes utility-brand-arrival {
+  0%,
+  91% {
+    opacity: 0;
+    transform: translateX(-5px) scale(0.92);
+  }
+
+  96% {
+    opacity: 0.35;
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes startup-vignette-final {
+  0% {
+    opacity: 0;
+  }
+
+  8% {
+    opacity: 1;
+  }
+
+  88% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes startup-container-final {
+  0%,
+  99.8% {
+    visibility: visible;
+  }
+
+  100% {
+    visibility: hidden;
+  }
+}
+
+@media (max-width: 760px) {
+  .utility-bar {
+    grid-template-columns: auto auto 1fr !important;
+  }
+
+  @keyframes monogram-dock-final {
+    0%,
+    61% {
+      opacity: 0;
+      filter: blur(20px);
+      transform: translate(0, 0) scale(0.74);
+    }
+
+    67% {
+      opacity: 0.25;
+      filter: blur(12px);
+      transform: translate(0, 0) scale(0.86);
+    }
+
+    76% {
+      opacity: 1;
+      filter: blur(0);
+      transform: translate(0, 0) scale(1);
+    }
+
+    88.8% {
+      opacity: 1;
+      filter: blur(0);
+      transform: translate(0, 0) scale(1.02);
+    }
+
+    100% {
+      opacity: 0;
+      filter: blur(0);
+      transform:
+        translate(
+          calc(-50vw + 94px),
+          calc(-50vh + 29px)
+        )
+        scale(0.18);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .startup-title,
+  .startup-vignette,
+  .startup-word,
+  .startup-monogram,
+  .startup-letter,
+  .particle-field i,
+  .utility-brand {
+    animation-duration: 1ms !important;
+  }
+}
+
+
+/* =========================================================
+   PLAYGROUND INTRO — 3.6 SECOND PG. DOCK TRANSITION
+   ========================================================= */
+
+/*
+  Timing:
+  0.0–0.3s  Playground. appears
+  0.3–1.4s  Playground. holds
+  1.4–2.4s  Middle letters evaporate
+  2.4–3.2s  PG. forms
+  3.2–3.6s  PG. docks into the interface
+*/
+
+.startup-title {
+  animation: startup-container-final 3600ms linear forwards !important;
+}
+
+.startup-vignette {
+  animation: startup-vignette-final 3600ms ease forwards !important;
+}
+
+.startup-word {
+  animation: word-arrival-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.startup-letter--fade {
+  animation: letter-dissolve-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.startup-letter--p {
+  animation: preserve-p-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.startup-letter--g {
+  animation: preserve-g-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.startup-letter--dot {
+  animation: preserve-dot-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.startup-monogram {
+  animation: monogram-dock-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+/* Particles begin during the evaporation phase. */
+.particle-field i {
+  animation:
+    golden-particle 1050ms
+    cubic-bezier(0.14, 0.73, 0.23, 1)
+    calc(1450ms + var(--particle-delay))
+    forwards !important;
+}
+
+/* Move the persistent interface brand beside the menu button. */
+.utility-bar {
+  grid-template-columns: auto auto 1fr !important;
+  column-gap: 10px;
+}
+
+.utility-brand {
+  justify-self: start !important;
+  opacity: 0;
+  transform: translateX(-5px) scale(0.92);
+  animation: utility-brand-arrival 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.utility-actions {
+  justify-self: end;
+}
+
+/* The menu remains on the far left. */
+.menu-button {
+  grid-column: 1;
+}
+
+.utility-brand {
+  grid-column: 2;
+}
+
+.utility-actions {
+  grid-column: 3;
+}
+
+@keyframes word-arrival-final {
+  0% {
+    opacity: 0;
+    filter: blur(18px);
+    transform: translateY(10px) scale(0.92);
+  }
+
+  8.3% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+  }
+
+  /* Hold Playground. until roughly 1.4 seconds. */
+  38.9% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+  }
+
+  58% {
+    opacity: 0.5;
+  }
+
+  69%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes letter-dissolve-final {
+  0%,
+  38.9% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+
+  47% {
+    opacity: 0.9;
+    filter: blur(2px);
+  }
+
+  57% {
+    opacity: 0.52;
+    filter: blur(8px);
+    transform:
+      translate(
+        calc(var(--letter-x) * 0.38),
+        calc(var(--letter-y) * 0.38)
+      )
+      rotate(calc(var(--letter-rotate) * 0.45))
+      scale(1.05);
+  }
+
+  67% {
+    opacity: 0.11;
+    filter: blur(21px);
+    transform:
+      translate(
+        calc(var(--letter-x) * 0.82),
+        calc(var(--letter-y) * 0.82)
+      )
+      rotate(calc(var(--letter-rotate) * 0.84))
+      scale(1.16);
+  }
+
+  72%,
+  100% {
+    opacity: 0;
+    filter: blur(36px);
+    transform:
+      translate(var(--letter-x), var(--letter-y))
+      rotate(var(--letter-rotate))
+      scale(1.28);
+  }
+}
+
+@keyframes preserve-p-final {
+  0%,
+  39% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0) scale(1);
+  }
+
+  52% {
+    opacity: 1;
+    transform: translateX(36px) scale(1.02);
+  }
+
+  63% {
+    opacity: 0.75;
+    filter: blur(4px);
+    transform: translateX(84px) scale(1.07);
+  }
+
+  70%,
+  100% {
+    opacity: 0;
+    filter: blur(15px);
+    transform: translateX(104px) scale(1.12);
+  }
+}
+
+@keyframes preserve-g-final {
+  0%,
+  39% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0) scale(1);
+  }
+
+  52% {
+    opacity: 1;
+    transform: translateX(-42px) scale(1.03);
+  }
+
+  63% {
+    opacity: 0.75;
+    filter: blur(4px);
+    transform: translateX(-92px) scale(1.08);
+  }
+
+  70%,
+  100% {
+    opacity: 0;
+    filter: blur(15px);
+    transform: translateX(-112px) scale(1.14);
+  }
+}
+
+@keyframes preserve-dot-final {
+  0%,
+  41% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0) scale(1);
+  }
+
+  54% {
+    opacity: 1;
+    transform: translateX(-80px) scale(1.08);
+  }
+
+  65% {
+    opacity: 0.7;
+    filter: blur(4px);
+    transform: translateX(-128px) scale(1.15);
+  }
+
+  71%,
+  100% {
+    opacity: 0;
+    filter: blur(14px);
+    transform: translateX(-146px) scale(1.22);
+  }
+}
+
+@keyframes monogram-dock-final {
+  0%,
+  61% {
+    opacity: 0;
+    filter: blur(20px);
+    transform: translate(0, 0) scale(0.74);
+  }
+
+  /* PG. begins forming around 2.4 seconds. */
+  67% {
+    opacity: 0.25;
+    filter: blur(12px);
+    transform: translate(0, 0) scale(0.86);
+  }
+
+  76% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate(0, 0) scale(1);
+    text-shadow:
+      0 0 18px rgba(255, 242, 0, 0.9),
+      0 0 62px rgba(255, 190, 0, 0.55);
+  }
+
+  88.8% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate(0, 0) scale(1.02);
+  }
+
+  /* PG. flies into the upper-left interface position. */
+  100% {
+    opacity: 0;
+    filter: blur(0);
+    transform:
+      translate(
+        calc(-50vw + 94px),
+        calc(-50vh + 29px)
+      )
+      scale(0.18);
+    text-shadow:
+      0 0 6px rgba(255, 242, 0, 0.28);
+  }
+}
+
+@keyframes utility-brand-arrival {
+  0%,
+  91% {
+    opacity: 0;
+    transform: translateX(-5px) scale(0.92);
+  }
+
+  96% {
+    opacity: 0.35;
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes startup-vignette-final {
+  0% {
+    opacity: 0;
+  }
+
+  8% {
+    opacity: 1;
+  }
+
+  88% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes startup-container-final {
+  0%,
+  99.8% {
+    visibility: visible;
+  }
+
+  100% {
+    visibility: hidden;
+  }
+}
+
+@media (max-width: 760px) {
+  .utility-bar {
+    grid-template-columns: auto auto 1fr !important;
+  }
+
+  @keyframes monogram-dock-final {
+    0%,
+    61% {
+      opacity: 0;
+      filter: blur(20px);
+      transform: translate(0, 0) scale(0.74);
+    }
+
+    67% {
+      opacity: 0.25;
+      filter: blur(12px);
+      transform: translate(0, 0) scale(0.86);
+    }
+
+    76% {
+      opacity: 1;
+      filter: blur(0);
+      transform: translate(0, 0) scale(1);
+    }
+
+    88.8% {
+      opacity: 1;
+      filter: blur(0);
+      transform: translate(0, 0) scale(1.02);
+    }
+
+    100% {
+      opacity: 0;
+      filter: blur(0);
+      transform:
+        translate(
+          calc(-50vw + 94px),
+          calc(-50vh + 29px)
+        )
+        scale(0.18);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .startup-title,
+  .startup-vignette,
+  .startup-word,
+  .startup-monogram,
+  .startup-letter,
+  .particle-field i,
+  .utility-brand {
+    animation-duration: 1ms !important;
+  }
+}
+
+
+/* =========================================================
+   CENTERED PG. ENDING — REMOVE CORNER DOCK
+   ========================================================= */
+
+/* Return the utility bar to its original centered structure. */
+.utility-bar {
+  grid-template-columns: 1fr auto 1fr !important;
+  column-gap: 0 !important;
+}
+
+.menu-button {
+  grid-column: auto !important;
+}
+
+.utility-brand {
+  grid-column: auto !important;
+  justify-self: center !important;
+  opacity: 0;
+  transform: scale(0.96);
+  animation: utility-brand-after-intro 3600ms ease forwards !important;
+}
+
+.utility-actions {
+  grid-column: auto !important;
+  justify-self: end !important;
+}
+
+/* PG. stays centered, holds briefly, then evaporates in place. */
+.startup-monogram {
+  animation: monogram-centered-final 3600ms
+    cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+@keyframes monogram-centered-final {
+  0%,
+  61% {
+    opacity: 0;
+    filter: blur(20px);
+    transform: scale(0.74);
+  }
+
+  67% {
+    opacity: 0.24;
+    filter: blur(12px);
+    transform: scale(0.86);
+  }
+
+  76% {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+    text-shadow:
+      0 0 18px rgba(255, 242, 0, 0.9),
+      0 0 62px rgba(255, 190, 0, 0.55);
+  }
+
+  /* Hold PG. centered. */
+  91% {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1.02);
+  }
+
+  /* Evaporate without moving toward the corner. */
+  100% {
+    opacity: 0;
+    filter: blur(18px);
+    letter-spacing: 0.02em;
+    transform: translateY(-10px) scale(1.12);
+    text-shadow:
+      0 0 90px rgba(255, 242, 0, 0);
+  }
+}
+
+/* Reveal the regular centered utility brand once the intro is ending. */
+@keyframes utility-brand-after-intro {
+  0%,
+  94% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 760px) {
+  .utility-bar {
+    grid-template-columns: 1fr auto 1fr !important;
+  }
+
+  .utility-brand {
+    justify-self: center !important;
+  }
+}
+
+/* =========================================================
+   IMMERSIVE POST VIEWER
+   ========================================================= */
+
+body.viewer-open {
+  overflow: hidden;
+}
+
+.immersive-viewer {
+  position: fixed;
+  z-index: 2000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 30px 78px;
+  animation: viewer-enter 360ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.viewer-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 5, 6, 0.94);
+  cursor: default;
+  backdrop-filter: blur(22px) saturate(0.72);
+}
+
+.viewer-stage {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  width: min(88vw, 1480px);
+  height: min(88vh, 960px);
+  place-items: center;
+  margin: 0;
+}
+
+.viewer-stage img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  animation: viewer-image-enter 560ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.viewer-caption {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 100px 24px 23px;
+  background: linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.82),
+    rgba(0, 0, 0, 0)
+  );
+  color: #fff;
+  pointer-events: none;
+}
+
+.viewer-caption strong {
+  display: block;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(14px, 1.3vw, 20px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.viewer-caption p {
+  max-width: 600px;
+  margin: 8px 0 0;
+  font-size: clamp(10px, 0.9vw, 14px);
+  line-height: 1.5;
+}
+
+.viewer-caption span {
+  display: block;
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: "Courier New", monospace;
+  font-size: clamp(7px, 0.65vw, 10px);
+}
+
+.viewer-close {
+  position: fixed;
+  z-index: 4;
+  top: 20px;
+  left: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(20, 20, 22, 0.72);
+  cursor: pointer;
+  backdrop-filter: blur(20px);
+}
+
+.viewer-close span {
+  position: absolute;
+  top: 19px;
+  left: 12px;
+  width: 16px;
+  height: 1px;
+  background: #fff;
+}
+
+.viewer-close span:first-child {
+  transform: rotate(45deg);
+}
+
+.viewer-close span:last-child {
+  transform: rotate(-45deg);
+}
+
+.viewer-arrow {
+  position: fixed;
+  z-index: 4;
+  top: 50%;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(20, 20, 22, 0.56);
+  color: #fff;
+  cursor: pointer;
+  font-size: 18px;
+  backdrop-filter: blur(18px);
+  transform: translateY(-50%);
+  transition:
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.viewer-arrow:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.viewer-arrow--previous {
+  left: 20px;
+}
+
+.viewer-arrow--next {
+  right: 20px;
+}
+
+@keyframes viewer-enter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes viewer-image-enter {
+  from {
+    opacity: 0;
+    filter: blur(10px);
+    transform: scale(0.965);
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 760px) {
+  .immersive-viewer {
+    width: 100vw;
+    min-width: 320px;
+    padding: 58px 14px 80px;
+  }
+
+  .viewer-stage {
+    width: 100%;
+    height: calc(100vh - 138px);
+  }
+
+  .viewer-arrow {
+    top: auto;
+    bottom: 20px;
+    transform: none;
+  }
+
+  .viewer-arrow--previous {
+    left: calc(50% - 54px);
+  }
+
+  .viewer-arrow--next {
+    right: calc(50% - 54px);
+  }
+}
+
+/* =========================================================
+   FUNCTIONAL PUSH ENDORSEMENT
+   ========================================================= */
+
+.viewer-caption {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+.viewer-caption-copy {
+  min-width: 0;
+}
+
+.viewer-caption-copy > span {
+  display: block;
+}
+
+.viewer-push {
+  display: inline-flex;
+  min-width: 94px;
+  height: 38px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 999px;
+  background: rgba(12, 12, 14, 0.28);
+  color: rgba(255, 255, 255, 0.78);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 600;
+  backdrop-filter: blur(18px);
+  transition:
+    color 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 180ms ease;
+  pointer-events: auto;
+}
+
+.viewer-push:hover {
+  border-color: rgba(255, 242, 0, 0.7);
+  color: #fff200;
+  transform: translateY(-1px);
+}
+
+.viewer-push:active {
+  transform: translateX(5px) scale(0.98);
+}
+
+.viewer-push--active {
+  border-color: rgba(255, 242, 0, 0.7);
+  background: rgba(255, 242, 0, 0.1);
+  color: #fff200;
+  animation: push-swing-momentum 680ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.viewer-push-arrow {
+  display: inline-block;
+  font-size: 14px;
+  transition: transform 360ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.viewer-push--active .viewer-push-arrow {
+  transform: translate(2px, -2px);
+}
+
+.viewer-stage:has(.viewer-push--active) > img {
+  animation: pushed-image-momentum 680ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes push-swing-momentum {
+  0% {
+    transform: translateX(0) rotate(0deg);
+  }
+
+  28% {
+    transform: translateX(7px) rotate(0.6deg);
+  }
+
+  58% {
+    transform: translateX(-2px) rotate(-0.2deg);
+  }
+
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+}
+
+@keyframes pushed-image-momentum {
+  0% {
+    transform: translateX(0) scale(1);
+    filter: brightness(1);
+  }
+
+  28% {
+    transform: translateX(8px) scale(1.002);
+    filter: brightness(1.035);
+  }
+
+  62% {
+    transform: translateX(-1px) scale(1);
+    filter: brightness(1.01);
+  }
+
+  100% {
+    transform: translateX(0) scale(1);
+    filter: brightness(1);
+  }
+}
+
+@media (max-width: 760px) {
+  .viewer-caption {
+    align-items: start;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .viewer-push {
+    align-self: flex-start;
+  }
+}
+
+/* =========================================================
+   HOVER PUSH CONTROL
+   ========================================================= */
+
+.post-reveal {
+  justify-content: flex-end;
+  gap: 18px;
+  pointer-events: none;
+}
+
+.post-reveal-copy {
+  min-width: 0;
+}
+
+.tile-push {
+  display: inline-flex;
+  width: fit-content;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(8, 8, 9, 0.26);
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 620;
+  opacity: 0;
+  transform: translateY(8px);
+  backdrop-filter: blur(18px);
+  pointer-events: auto;
+  transition:
+    opacity 220ms ease,
+    transform 360ms cubic-bezier(0.16, 1, 0.3, 1),
+    color 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+.post-tile:hover .tile-push,
+.post-tile:focus-within .tile-push,
+.post-tile--revealed .tile-push {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tile-push:hover {
+  border-color: rgba(255, 242, 0, 0.72);
+  color: #fff200;
+}
+
+.tile-push--active {
+  border-color: rgba(255, 242, 0, 0.75);
+  background: rgba(255, 242, 0, 0.1);
+  color: #fff200;
+}
+
+.tile-push-arrow {
+  display: inline-block;
+  font-size: 13px;
+  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tile-push--active .tile-push-arrow {
+  transform: translate(2px, -2px);
+}
+
+/* Gentle swing-like support response. */
+.post-tile--push-animating {
+  z-index: 2;
+  animation: tile-push-momentum 680ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.post-tile--push-animating::after {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 26%,
+    rgba(255, 242, 0, 0.12) 50%,
+    transparent 74%
+  );
+  pointer-events: none;
+  content: "";
+  animation: tile-push-light 680ms ease-out;
+}
+
+@keyframes tile-push-momentum {
+  0% {
+    transform: translateX(0) scale(1);
+  }
+
+  28% {
+    transform: translateX(7px) scale(1.002);
+  }
+
+  62% {
+    transform: translateX(-1px) scale(1);
+  }
+
+  100% {
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes tile-push-light {
+  from {
+    opacity: 0;
+    transform: translateX(-48%);
+  }
+
+  28% {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(48%);
+  }
+}
+
+/* Keep the reveal concise on smaller tiles. */
+.post-tile--standard .post-reveal {
+  gap: 10px;
+  padding: 14px;
+}
+
+.post-tile--standard .tile-push {
+  height: 30px;
+  padding-inline: 10px;
+}
+
+@media (max-width: 760px) {
+  .tile-push {
+    opacity: 1;
+  }
+}
+
+/* =========================================================
+   RELIABLE TILE PUSH + DOUBLE CLICK/TAP
+   ========================================================= */
+
+.post-tile {
+  touch-action: manipulation;
+}
+
+/* Metadata remains limited to username, caption and Push source. */
+.post-reveal {
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Small Push control fixed to the bottom-right of every tile. */
+.tile-push {
+  position: absolute !important;
+  z-index: 12 !important;
+  right: 12px !important;
+  bottom: 12px !important;
+
+  display: grid !important;
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  padding: 0 !important;
+  place-items: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.42) !important;
+  border-radius: 50% !important;
+  background: rgba(6, 6, 7, 0.34) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(7px) scale(0.92);
+  backdrop-filter: blur(18px) saturate(125%);
+  pointer-events: auto !important;
+
+  transition:
+    opacity 180ms ease,
+    visibility 180ms ease,
+    transform 300ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 180ms ease,
+    background 180ms ease,
+    color 180ms ease;
+}
+
+.tile-push > span {
+  display: block;
+  font-size: 15px;
+  line-height: 1;
+  transform: translate(-1px, 1px);
+  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Make the control visible whenever the tile is being explored. */
+.post-tile:hover .tile-push,
+.post-tile:focus .tile-push,
+.post-tile:focus-within .tile-push,
+.post-tile--revealed .tile-push {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.tile-push:hover {
+  border-color: #fff200 !important;
+  background: rgba(255, 242, 0, 0.13) !important;
+  color: #fff200 !important;
+  transform: scale(1.06) !important;
+}
+
+.tile-push:active {
+  transform: translate(3px, -2px) scale(0.94) !important;
+}
+
+.tile-push--active {
+  visibility: visible;
+  border-color: rgba(255, 242, 0, 0.86) !important;
+  background: rgba(255, 242, 0, 0.14) !important;
+  color: #fff200 !important;
+}
+
+.tile-push--active > span {
+  transform: translate(1px, -1px);
+}
+
+/* Keep a very subtle indication after the user has Pushed it. */
+.post-tile--pushed:not(:hover):not(:focus-within) .tile-push {
+  visibility: visible;
+  opacity: 0.52;
+  transform: scale(0.88);
+}
+
+/* Swing-like momentum from button, double-click or double-tap. */
+.post-tile--push-animating {
+  z-index: 15;
+  animation: tile-direct-push 680ms
+    cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.post-tile--push-animating::after {
+  position: absolute;
+  z-index: 10;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 22%,
+    rgba(255, 242, 0, 0.15) 50%,
+    transparent 78%
+  );
+  pointer-events: none;
+  content: "";
+  animation: tile-direct-push-light 680ms ease-out;
+}
+
+@keyframes tile-direct-push {
+  0% {
+    transform: translateX(0) scale(1);
+  }
+
+  26% {
+    transform: translateX(8px) scale(1.003);
+  }
+
+  58% {
+    transform: translateX(-2px) scale(1);
+  }
+
+  100% {
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes tile-direct-push-light {
+  0% {
+    opacity: 0;
+    transform: translateX(-52%);
+  }
+
+  28% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(52%);
+  }
+}
+
+/* Touchscreens have no hover, so keep the small control available. */
+@media (hover: none), (pointer: coarse) {
+  .tile-push {
+    visibility: visible;
+    opacity: 0.72;
+    transform: scale(0.92);
+  }
+
+  .post-tile:focus-within .tile-push,
+  .tile-push:active,
+  .tile-push--active {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* =========================================================
+   CORRECTED HOVER PUSH INTERACTION
+   ========================================================= */
+
+.post-tile {
+  touch-action: manipulation;
+  transform-origin: center;
+}
+
+/* Image remains the bottom visual layer. */
+.post-tile > img {
+  position: relative;
+  z-index: 1;
+}
+
+/* Metadata overlay sits above the image. */
+.post-reveal {
+  z-index: 5 !important;
+  pointer-events: none !important;
+}
+
+/* Push stays above both image and metadata. */
+.tile-push {
+  position: absolute !important;
+  z-index: 30 !important;
+  right: 12px !important;
+  bottom: 12px !important;
+
+  display: inline-flex !important;
+  width: auto !important;
+  min-width: 58px !important;
+  height: 26px !important;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  margin: 0 !important;
+  padding: 0 9px !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.48) !important;
+  border-radius: 999px !important;
+
+  background: rgba(7, 7, 8, 0.46) !important;
+  color: rgba(255, 255, 255, 0.94) !important;
+
+  font-size: 8px !important;
+  font-weight: 650 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.01em;
+
+  cursor: pointer;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(7px) scale(0.94);
+
+  pointer-events: auto !important;
+  backdrop-filter: blur(18px) saturate(130%);
+
+  transition:
+    visibility 180ms ease,
+    opacity 180ms ease,
+    transform 300ms cubic-bezier(0.16, 1, 0.3, 1),
+    color 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+.tile-push-arrow {
+  display: inline-block;
+  font-size: 12px;
+  line-height: 1;
+  transform: translateY(1px);
+  transition:
+    transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Reliably reveal Push during hover and keyboard focus. */
+.post-tile:hover > .tile-push,
+.post-tile:focus > .tile-push,
+.post-tile:focus-within > .tile-push {
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: translateY(0) scale(1) !important;
+}
+
+.tile-push:hover {
+  border-color: rgba(255, 242, 0, 0.9) !important;
+  background: rgba(255, 242, 0, 0.13) !important;
+  color: #fff200 !important;
+  transform: translateY(-1px) scale(1.04) !important;
+}
+
+.tile-push:active {
+  transform: translate(3px, -1px) scale(0.96) !important;
+}
+
+.tile-push--active {
+  visibility: visible !important;
+  border-color: rgba(255, 242, 0, 0.82) !important;
+  background: rgba(255, 242, 0, 0.12) !important;
+  color: #fff200 !important;
+}
+
+.tile-push--active .tile-push-arrow {
+  transform: translate(2px, -1px);
+}
+
+/* Once Pushed, keep only a faint indication while idle. */
+.post-tile--pushed:not(:hover):not(:focus-within) > .tile-push {
+  visibility: visible !important;
+  opacity: 0.42 !important;
+  transform: scale(0.9) !important;
+}
+
+/* Printed-photo nudge: no resizing or repositioning after completion. */
+.post-tile--push-animating {
+  z-index: 20;
+  animation: playground-push-nudge 520ms
+    cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Brief traveling light confirms the Push. */
+.post-tile--push-animating::after {
+  position: absolute;
+  z-index: 24;
+  inset: 0;
+  background: linear-gradient(
+    108deg,
+    transparent 22%,
+    rgba(255, 242, 0, 0.15) 50%,
+    transparent 78%
+  );
+  content: "";
+  pointer-events: none;
+  animation: playground-push-flash 520ms ease-out;
+}
+
+@keyframes playground-push-nudge {
+  0% {
+    transform: translateX(0) rotate(0deg) scale(1);
+  }
+
+  18% {
+    transform: translateX(10px) rotate(0.35deg) scale(1);
+  }
+
+  46% {
+    transform: translateX(-3px) rotate(-0.12deg) scale(1);
+  }
+
+  72% {
+    transform: translateX(1px) rotate(0.04deg) scale(1);
+  }
+
+  100% {
+    transform: translateX(0) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes playground-push-flash {
+  0% {
+    opacity: 0;
+    transform: translateX(-55%);
+  }
+
+  24% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(55%);
+  }
+}
+
+/* Touchscreens do not have hover, so the button remains available. */
+@media (hover: none), (pointer: coarse) {
+  .tile-push {
+    visibility: visible !important;
+    opacity: 0.72 !important;
+    transform: scale(0.94) !important;
+  }
+
+  .tile-push:active,
+  .tile-push--active {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+  }
+}
+
+/* Small tiles use an even more discreet capsule. */
+.post-tile--standard > .tile-push {
+  right: 8px !important;
+  bottom: 8px !important;
+  min-width: 50px !important;
+  height: 23px !important;
+  padding-inline: 7px !important;
+  font-size: 7px !important;
+}
+
+/* =========================================================
+   VERIFIED PUSH + NATIVE-RESOLUTION VIEWER REPAIR
+   ========================================================= */
+
+/*
+  These rules intentionally come last so they override the
+  conflicting experimental Push rules already in App.css.
+*/
+
+.post-tile {
+  position: relative;
+  touch-action: manipulation;
+  transform-origin: center;
+}
+
+.post-tile > img {
+  position: relative;
+  z-index: 1;
+}
+
+.post-reveal {
+  z-index: 5 !important;
+  pointer-events: none !important;
+}
+
+.post-reveal-copy {
+  min-width: 0;
+}
+
+/* The visible Push capsule */
+.post-tile > .tile-push {
+  position: absolute !important;
+  z-index: 100 !important;
+  right: 12px !important;
+  bottom: 12px !important;
+
+  display: inline-flex !important;
+  width: auto !important;
+  min-width: 57px !important;
+  height: 26px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+
+  margin: 0 !important;
+  padding: 0 9px !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.64) !important;
+  border-radius: 999px !important;
+  background: rgba(5, 5, 6, 0.58) !important;
+  color: #ffffff !important;
+
+  font-size: 8px !important;
+  font-weight: 650 !important;
+  line-height: 1 !important;
+
+  cursor: pointer !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  transform: translateY(6px) scale(0.96) !important;
+
+  pointer-events: auto !important;
+  backdrop-filter: blur(16px) saturate(130%);
+
+  transition:
+    visibility 180ms ease,
+    opacity 180ms ease,
+    transform 280ms cubic-bezier(0.16, 1, 0.3, 1),
+    color 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease !important;
+}
+
+.post-tile > .tile-push span:first-child {
+  display: inline-block;
+  font-size: 12px;
+  transform: translateY(1px);
+}
+
+/* Explicit child selector keeps the button above the reveal layer. */
+.post-tile:hover > .tile-push,
+.post-tile:focus > .tile-push,
+.post-tile:focus-within > .tile-push {
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: translateY(0) scale(1) !important;
+}
+
+.post-tile > .tile-push:hover {
+  border-color: #fff200 !important;
+  background: rgba(255, 242, 0, 0.15) !important;
+  color: #fff200 !important;
+  transform: translateY(-1px) scale(1.04) !important;
+}
+
+.post-tile > .tile-push:active {
+  transform: translate(3px, -1px) scale(0.96) !important;
+}
+
+.post-tile > .tile-push--active {
+  visibility: visible !important;
+  border-color: rgba(255, 242, 0, 0.9) !important;
+  background: rgba(255, 242, 0, 0.15) !important;
+  color: #fff200 !important;
+}
+
+/* Keep pushed work quietly marked without presenting a count. */
+.post-tile--pushed:not(:hover):not(:focus-within) > .tile-push {
+  visibility: visible !important;
+  opacity: 0.38 !important;
+  transform: scale(0.9) !important;
+}
+
+/*
+  Nudge the tile temporarily, then return it to its exact
+  original size and grid placement.
+*/
+.post-tile--push-animating {
+  z-index: 20;
+  animation: verified-push-nudge 520ms
+    cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.post-tile--push-animating::after {
+  position: absolute;
+  z-index: 90;
+  inset: 0;
+  background: linear-gradient(
+    108deg,
+    transparent 24%,
+    rgba(255, 242, 0, 0.16) 50%,
+    transparent 76%
+  );
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  animation: verified-push-light 520ms ease-out;
+}
+
+@keyframes verified-push-nudge {
+  0% {
+    transform: translateX(0) rotate(0deg) scale(1);
+  }
+
+  18% {
+    transform: translateX(10px) rotate(0.35deg) scale(1);
+  }
+
+  46% {
+    transform: translateX(-3px) rotate(-0.12deg) scale(1);
+  }
+
+  72% {
+    transform: translateX(1px) rotate(0.04deg) scale(1);
+  }
+
+  100% {
+    transform: translateX(0) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes verified-push-light {
+  0% {
+    opacity: 0;
+    transform: translateX(-55%);
+  }
+
+  24% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(55%);
+  }
+}
+
+/* Touchscreens have no hover, so keep the Push capsule available. */
+@media (hover: none), (pointer: coarse) {
+  .post-tile > .tile-push {
+    visibility: visible !important;
+    opacity: 0.72 !important;
+    transform: scale(0.94) !important;
+  }
+
+  .post-tile > .tile-push:active,
+  .post-tile > .tile-push--active {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+  }
+}
+
+/* =========================================================
+   PRESERVE ORIGINAL IMAGE QUALITY IN THE VIEWER
+   ========================================================= */
+
+.viewer-stage {
+  display: flex !important;
+  width: calc(100vw - 150px) !important;
+  height: calc(100vh - 60px) !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/*
+  Width/height auto prevents the browser from forcing every
+  source image to fill the entire viewer and becoming blurry.
+*/
+.viewer-stage > img {
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+
+  object-fit: contain !important;
+  image-rendering: auto !important;
+
+  filter: none !important;
+  transform: none !important;
+  animation: verified-viewer-image-in 260ms ease-out !important;
+
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+@keyframes verified-viewer-image-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 760px) {
+  .viewer-stage {
+    width: calc(100vw - 24px) !important;
+    height: calc(100vh - 130px) !important;
+  }
+
+  .viewer-stage > img {
+    width: auto !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+  }
+}
+
+/* =========================================================
+   VIEWER DISMISS INTERACTIONS
+   ========================================================= */
+
+.immersive-viewer {
+  cursor: zoom-out;
+  touch-action: pan-y;
+}
+
+.viewer-stage,
+.viewer-stage * {
+  cursor: default;
+}
+
+.viewer-stage {
+  pointer-events: auto;
+}
+
+.viewer-close,
+.viewer-arrow,
+.viewer-push {
+  cursor: pointer;
+}
+
+/* =========================================================
+   VIEWER DISMISS INTERACTIONS
+   ========================================================= */
+
+.immersive-viewer {
+  cursor: zoom-out;
+  touch-action: pan-y;
+}
+
+.viewer-stage,
+.viewer-stage * {
+  cursor: default;
+}
+
+.viewer-stage {
+  pointer-events: auto;
+}
+
+.viewer-close,
+.viewer-arrow,
+.viewer-push {
+  cursor: pointer;
+}
+
+/* =========================================================
+   VERIFIED OPAQUE VIEWER + DISMISS GESTURES
+   These rules intentionally override all older viewer rules.
+   ========================================================= */
+
+html:has(body.viewer-open),
+body.viewer-open {
+  overflow: hidden !important;
+}
+
+.immersive-viewer--repaired {
+  position: fixed !important;
+  z-index: 10000 !important;
+  inset: 0 !important;
+
+  display: flex !important;
+  width: 100vw !important;
+  height: 100vh !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 44px 76px !important;
+
+  /* Completely conceal the collage. */
+  background: #050506 !important;
+  opacity: 1 !important;
+
+  overflow: hidden !important;
+  cursor: zoom-out !important;
+  isolation: isolate !important;
+  touch-action: pan-y !important;
+
+  animation: repaired-viewer-enter 220ms ease-out !important;
+}
+
+.immersive-viewer--repaired::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background:
+    radial-gradient(
+      circle at center,
+      #171719 0%,
+      #09090a 52%,
+      #050506 100%
+    );
+  content: "";
+}
+
+/*
+  The frame now wraps the actual rendered image instead of
+  occupying almost the entire screen.
+*/
+.immersive-viewer--repaired .viewer-frame {
+  position: relative !important;
+  z-index: 2 !important;
+
+  display: inline-flex !important;
+  width: fit-content !important;
+  height: fit-content !important;
+
+  max-width: calc(100vw - 152px) !important;
+  max-height: calc(100vh - 88px) !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  overflow: hidden !important;
+  background: #080809 !important;
+
+  cursor: default !important;
+  pointer-events: auto !important;
+}
+
+/* Preserve native aspect ratio and avoid forced enlargement. */
+.immersive-viewer--repaired .viewer-frame > img {
+  position: relative !important;
+  z-index: 1 !important;
+
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+
+  max-width: calc(100vw - 152px) !important;
+  max-height: calc(100vh - 88px) !important;
+
+  object-fit: contain !important;
+  image-rendering: auto !important;
+
+  filter: none !important;
+  transform: none !important;
+
+  user-select: none !important;
+  -webkit-user-drag: none !important;
+
+  animation: repaired-image-enter 260ms ease-out !important;
+}
+
+/* Caption stays attached to the actual image frame. */
+.immersive-viewer--repaired .viewer-caption {
+  position: absolute !important;
+  z-index: 3 !important;
+
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: space-between !important;
+  gap: 24px !important;
+
+  padding: 92px 22px 20px !important;
+
+  background:
+    linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.88),
+      rgba(0, 0, 0, 0)
+    ) !important;
+
+  color: #fff !important;
+  pointer-events: none !important;
+}
+
+.immersive-viewer--repaired .viewer-caption-copy {
+  min-width: 0 !important;
+}
+
+.immersive-viewer--repaired .viewer-push {
+  pointer-events: auto !important;
+}
+
+/* Controls stay outside the image frame. */
+.immersive-viewer--repaired .viewer-close {
+  position: fixed !important;
+  z-index: 6 !important;
+  top: 18px !important;
+  left: 18px !important;
+}
+
+.immersive-viewer--repaired .viewer-arrow {
+  position: fixed !important;
+  z-index: 6 !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+.immersive-viewer--repaired .viewer-arrow--previous {
+  left: 18px !important;
+}
+
+.immersive-viewer--repaired .viewer-arrow--next {
+  right: 18px !important;
+}
+
+@keyframes repaired-viewer-enter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes repaired-image-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 760px) {
+  .immersive-viewer--repaired {
+    min-width: 0 !important;
+    width: 100vw !important;
+    padding: 54px 12px 76px !important;
+  }
+
+  .immersive-viewer--repaired .viewer-frame {
+    max-width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 130px) !important;
+  }
+
+  .immersive-viewer--repaired .viewer-frame > img {
+    max-width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 130px) !important;
+  }
+
+  .immersive-viewer--repaired .viewer-caption {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+    gap: 14px !important;
+    padding: 74px 16px 15px !important;
+  }
+
+  .immersive-viewer--repaired .viewer-arrow {
+    top: auto !important;
+    bottom: 18px !important;
+    transform: none !important;
+  }
+
+  .immersive-viewer--repaired .viewer-arrow--previous {
+    left: calc(50% - 54px) !important;
+  }
+
+  .immersive-viewer--repaired .viewer-arrow--next {
+    right: calc(50% - 54px) !important;
+  }
+}
+
+/* =========================================================
+   CREATE COMPOSER
+   ========================================================= */
+
+body.composer-open {
+  overflow: hidden !important;
+}
+
+.create-composer {
+  position: fixed;
+  z-index: 12000;
+  inset: 0;
+
+  display: grid;
+  place-items: center;
+
+  padding: 26px;
+
+  background: rgba(4, 4, 5, 0.94);
+  backdrop-filter: blur(28px) saturate(0.75);
+
+  animation: composer-background-in 240ms ease-out;
+}
+
+.composer-panel {
+  display: flex;
+  width: min(1120px, calc(100vw - 52px));
+  max-height: calc(100vh - 52px);
+  flex-direction: column;
+
+  overflow: hidden;
+
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 26px;
+
+  background: rgba(18, 18, 20, 0.97);
+  color: #f4f3ef;
+
+  box-shadow:
+    0 32px 100px rgba(0, 0, 0, 0.5);
+
+  animation: composer-panel-in 460ms
+    cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.composer-header {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  padding: 24px 26px 18px;
+}
+
+.composer-header span {
+  color: rgba(255, 255, 255, 0.46);
+  font-family: "Courier New", monospace;
+  font-size: 7px;
+  letter-spacing: 0.16em;
+}
+
+.composer-header h2 {
+  margin: 5px 0 0;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(32px, 4vw, 58px);
+  font-weight: 500;
+  letter-spacing: -0.06em;
+  line-height: 0.92;
+}
+
+.composer-close {
+  position: relative;
+
+  width: 38px;
+  height: 38px;
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+}
+
+.composer-close i {
+  position: absolute;
+  top: 18px;
+  left: 11px;
+
+  display: block;
+  width: 15px;
+  height: 1px;
+
+  background: currentColor;
+}
+
+.composer-close i:first-child {
+  transform: rotate(45deg);
+}
+
+.composer-close i:last-child {
+  transform: rotate(-45deg);
+}
+
+.composer-body {
+  display: grid;
+  min-height: 0;
+  flex: 1 1 auto;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+  gap: 22px;
+
+  padding: 0 26px 24px;
+  overflow: auto;
+}
+
+.composer-dropzone {
+  position: relative;
+
+  display: grid;
+  min-height: 500px;
+  place-items: center;
+
+  overflow: hidden;
+
+  border: 1px dashed rgba(255, 255, 255, 0.22);
+  border-radius: 18px;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 0.055),
+      rgba(255, 255, 255, 0.018)
+    );
+
+  color: inherit;
+  cursor: pointer;
+
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.composer-dropzone:hover,
+.composer-dropzone--dragging {
+  border-color: rgba(255, 242, 0, 0.68);
+  background: rgba(255, 242, 0, 0.035);
+}
+
+.composer-dropzone--dragging {
+  transform: scale(0.992);
+}
+
+.composer-dropzone--filled {
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 0.1);
+  background: #09090a;
+}
+
+.composer-dropzone img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 68vh;
+
+  object-fit: contain;
+  image-rendering: auto;
+}
+
+.composer-empty {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.composer-empty strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 21px;
+  font-weight: 500;
+  letter-spacing: -0.035em;
+}
+
+.composer-empty span {
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 10px;
+}
+
+.composer-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.composer-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+
+  padding: 8px 2px;
+}
+
+.composer-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.composer-field > span,
+.composer-weight legend {
+  margin-bottom: 9px;
+
+  color: rgba(255, 255, 255, 0.48);
+  font-family: "Courier New", monospace;
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.composer-field textarea {
+  width: 100%;
+  min-height: 150px;
+  resize: vertical;
+
+  padding: 15px 0;
+
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0;
+
+  outline: none;
+  background: transparent;
+  color: #fff;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.composer-field textarea::placeholder {
+  color: rgba(255, 255, 255, 0.28);
+}
+
+.composer-field small {
+  align-self: flex-end;
+  margin-top: 7px;
+
+  color: rgba(255, 255, 255, 0.32);
+  font-family: "Courier New", monospace;
+  font-size: 7px;
+}
+
+.composer-weight {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.composer-weight > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.composer-weight button {
+  height: 32px;
+  padding: 0 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+
+  cursor: pointer;
+  font-size: 8px;
+
+  transition:
+    border-color 180ms ease,
+    color 180ms ease,
+    background 180ms ease;
+}
+
+.composer-weight button:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #fff;
+}
+
+.composer-weight button.active {
+  border-color: #fff200;
+  background: rgba(255, 242, 0, 0.1);
+  color: #fff200;
+}
+
+.composer-footer {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 17px 26px 20px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.composer-footer > span {
+  color: rgba(255, 255, 255, 0.38);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 11px;
+}
+
+.composer-publish {
+  min-width: 120px;
+  height: 39px;
+
+  border-radius: 999px;
+
+  background: #fff200;
+  color: #11110f;
+
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 750;
+
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.composer-publish:hover {
+  box-shadow:
+    0 0 28px rgba(255, 242, 0, 0.2);
+  transform: translateY(-1px);
+}
+
+.composer-publish:active {
+  transform: scale(0.98);
+}
+
+@keyframes composer-background-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes composer-panel-in {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(18px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 760px) {
+  .create-composer {
+    width: 100vw;
+    min-width: 0;
+    padding: 0;
+  }
+
+  .composer-panel {
+    width: 100vw;
+    height: 100vh;
+    max-height: none;
+
+    border: 0;
+    border-radius: 0;
+  }
+
+  .composer-body {
+    display: flex;
+    flex-direction: column;
+
+    padding: 0 16px 20px;
+  }
+
+  .composer-dropzone {
+    min-height: 46vh;
+  }
+
+  .composer-dropzone img {
+    max-height: 54vh;
+  }
+
+  .composer-footer {
+    align-items: stretch;
+    flex-direction: column;
+
+    padding: 14px 16px 18px;
+  }
+
+  .composer-publish {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   PLAYGROUND MULTIMEDIA FOUNDATION
+   ========================================================= */
+
+.feed-media {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #09090a;
+}
+
+.feed-media > img,
+.feed-media > video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--image-position, center);
+}
+
+.feed-media-badge {
+  position: absolute;
+  z-index: 3;
+  top: 10px;
+  right: 10px;
+
+  padding: 5px 7px;
+
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 999px;
+
+  background: rgba(5, 5, 6, 0.34);
+  color: rgba(255, 255, 255, 0.86);
+
+  pointer-events: none;
+}
+
+.feed-media--audio::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.8),
+      rgba(0, 0, 0, 0.05) 70%
+    );
+  content: "";
+  pointer-events: none;
+}
+
+.audio-default-art {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+
+  background:
+    radial-gradient(
+      circle at 38% 32%,
+      rgba(255, 242, 0, 0.18),
+      transparent 32%
+    ),
+    linear-gradient(145deg, #282313, #080808 65%);
+}
+
+.audio-default-art span {
+  color: #fff200;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(44px, 8vw, 130px);
+  letter-spacing: -0.09em;
+  text-shadow: 0 0 40px rgba(255, 242, 0, 0.25);
+}
+
+.audio-feed-treatment {
+  position: absolute;
+  z-index: 2;
+  right: 16px;
+  bottom: 17px;
+  left: 16px;
+
+  display: flex;
+  align-items: flex-end;
+  gap: 15px;
+
+  color: #fff;
+}
+
+.audio-feed-treatment > div:last-child {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.audio-feed-treatment span {
+  color: rgba(255, 255, 255, 0.56);
+  font-family: "Courier New", monospace;
+  font-size: 6px;
+  letter-spacing: 0.14em;
+}
+
+.audio-feed-treatment strong {
+  overflow: hidden;
+  margin-top: 4px;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(14px, 1.5vw, 24px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.audio-feed-treatment small {
+  margin-top: 2px;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 8px;
+}
+
+.audio-wave {
+  display: flex;
+  width: 88px;
+  height: 34px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 2px;
+}
+
+.audio-wave i {
+  width: 2px;
+  height: var(--wave-height);
+  border-radius: 999px;
+  background: #fff200;
+  opacity: 0.76;
+}
+
+/* Viewer video */
+.viewer-frame .viewer-primary-video {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: calc(100vw - 152px);
+  max-height: calc(100vh - 88px);
+
+  background: #000;
+  object-fit: contain;
+}
+
+/* Viewer audio */
+.viewer-audio {
+  display: flex;
+  width: min(980px, calc(100vw - 152px));
+  max-height: calc(100vh - 88px);
+  flex-direction: column;
+
+  overflow: hidden;
+
+  background: #0a0a0b;
+}
+
+.viewer-audio-visual {
+  position: relative;
+  min-height: min(68vh, 680px);
+  overflow: hidden;
+}
+
+.viewer-audio-visual > img,
+.viewer-audio-visual > video,
+.viewer-audio-visual > .audio-default-art {
+  display: block;
+  width: 100%;
+  height: min(68vh, 680px);
+  object-fit: cover;
+}
+
+.viewer-audio-visual::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.86),
+      transparent 70%
+    );
+  content: "";
+}
+
+.viewer-audio-copy {
+  position: absolute;
+  z-index: 2;
+  right: 24px;
+  bottom: 24px;
+  left: 24px;
+
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+}
+
+.viewer-audio-copy > span {
+  color: #fff200;
+  font-family: "Courier New", monospace;
+  font-size: 7px;
+  letter-spacing: 0.16em;
+}
+
+.viewer-audio-copy strong {
+  margin-top: 7px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(28px, 5vw, 70px);
+  font-weight: 500;
+  letter-spacing: -0.06em;
+}
+
+.viewer-audio-copy small {
+  margin-top: 5px;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 12px;
+}
+
+.viewer-audio > audio {
+  width: calc(100% - 32px);
+  margin: 16px;
+}
+
+/* =========================================================
+   MULTIMEDIA CREATE COMPOSER
+   ========================================================= */
+
+body.composer-open {
+  overflow: hidden !important;
+}
+
+.create-composer {
+  position: fixed;
+  z-index: 12000;
+  inset: 0;
+
+  display: grid;
+  place-items: center;
+  padding: 26px;
+
+  background: rgba(4, 4, 5, 0.95);
+  backdrop-filter: blur(28px) saturate(0.75);
+}
+
+.composer-panel--multimedia {
+  display: flex;
+  width: min(1160px, calc(100vw - 52px));
+  max-height: calc(100vh - 52px);
+  flex-direction: column;
+
+  overflow: hidden;
+
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 26px;
+
+  background: rgba(18, 18, 20, 0.98);
+  color: #f4f3ef;
+}
+
+.composer-header {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 24px 26px 18px;
+}
+
+.composer-header > div > span {
+  color: rgba(255, 255, 255, 0.46);
+  font-family: "Courier New", monospace;
+  font-size: 7px;
+  letter-spacing: 0.16em;
+}
+
+.composer-header h2 {
+  margin: 5px 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(32px, 4vw, 58px);
+  font-weight: 500;
+  letter-spacing: -0.06em;
+  line-height: 0.92;
+}
+
+.composer-close {
+  position: relative;
+  width: 38px;
+  height: 38px;
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  cursor: pointer;
+}
+
+.composer-close i {
+  position: absolute;
+  top: 18px;
+  left: 11px;
+
+  width: 15px;
+  height: 1px;
+  background: currentColor;
+}
+
+.composer-close i:first-child {
+  transform: rotate(45deg);
+}
+
+.composer-close i:last-child {
+  transform: rotate(-45deg);
+}
+
+.composer-body {
+  display: grid;
+  min-height: 0;
+  flex: 1;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+  gap: 22px;
+
+  padding: 0 26px 24px;
+  overflow: auto;
+}
+
+.composer-media-column {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.composer-dropzone {
+  display: grid;
+  min-height: 480px;
+  place-items: center;
+
+  overflow: hidden;
+
+  border: 1px dashed rgba(255, 255, 255, 0.22);
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.025);
+  color: inherit;
+  cursor: pointer;
+}
+
+.composer-dropzone--dragging {
+  border-color: #fff200;
+  background: rgba(255, 242, 0, 0.035);
+}
+
+.composer-dropzone--filled {
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 0.1);
+  background: #09090a;
+}
+
+.composer-dropzone > img,
+.composer-dropzone > video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 65vh;
+  object-fit: contain;
+}
+
+.composer-empty {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.composer-empty strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 21px;
+  font-weight: 500;
+}
+
+.composer-empty span {
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 10px;
+}
+
+.composer-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.composer-audio-preview {
+  display: flex;
+  width: min(440px, 86%);
+  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.composer-audio-orb {
+  display: grid;
+  width: 170px;
+  height: 170px;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle at 35% 30%,
+      rgba(255, 242, 0, 0.48),
+      rgba(255, 242, 0, 0.04) 43%,
+      rgba(0, 0, 0, 0.9)
+    );
+
+  box-shadow:
+    0 0 65px rgba(255, 242, 0, 0.08);
+}
+
+.composer-audio-orb span {
+  color: #fff200;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 48px;
+  letter-spacing: -0.08em;
+}
+
+.composer-audio-preview > strong {
+  margin-top: 10px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+}
+
+.composer-audio-preview > span {
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 10px;
+}
+
+.composer-audio-preview audio {
+  width: 100%;
+  margin-top: 14px;
+}
+
+.companion-uploader {
+  display: grid;
+  gap: 12px;
+
+  padding: 15px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.companion-uploader > div:first-child > span {
+  color: #fff200;
+  font-family: "Courier New", monospace;
+  font-size: 7px;
+  letter-spacing: 0.14em;
+}
+
+.companion-uploader p {
+  margin: 5px 0 0;
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 9px;
+}
+
+.companion-uploader > button {
+  width: fit-content;
+  height: 31px;
+  padding: 0 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  font-size: 8px;
+}
+
+.companion-preview {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.companion-preview > img,
+.companion-preview > video {
+  display: block;
+  width: 100%;
+  max-height: 230px;
+  object-fit: cover;
+}
+
+.companion-preview > button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+
+  height: 26px;
+  padding: 0 9px;
+
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.68);
+  color: #fff;
+  cursor: pointer;
+  font-size: 7px;
+}
+
+.composer-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 8px 2px;
+}
+
+.composer-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.composer-field > span,
+.composer-weight legend {
+  margin-bottom: 9px;
+  color: rgba(255, 255, 255, 0.48);
+  font-family: "Courier New", monospace;
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.composer-field input,
+.composer-field textarea {
+  width: 100%;
+  padding: 13px 0;
+
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0;
+
+  outline: none;
+  background: transparent;
+  color: #fff;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 19px;
+}
+
+.composer-field textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.composer-field small {
+  align-self: flex-end;
+  margin-top: 7px;
+  color: rgba(255, 255, 255, 0.32);
+  font-size: 7px;
+}
+
+.composer-weight {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.composer-weight > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.composer-weight button {
+  height: 32px;
+  padding: 0 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  font-size: 8px;
+}
+
+.composer-weight button.active {
+  border-color: #fff200;
+  background: rgba(255, 242, 0, 0.1);
+  color: #fff200;
+}
+
+.composer-footer {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 17px 26px 20px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.composer-footer > span {
+  color: rgba(255, 255, 255, 0.38);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 11px;
+}
+
+.composer-publish {
+  min-width: 120px;
+  height: 39px;
+
+  border-radius: 999px;
+
+  background: #fff200;
+  color: #11110f;
+
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+@media (max-width: 760px) {
+  .create-composer {
+    width: 100vw;
+    min-width: 0;
+    padding: 0;
+  }
+
+  .composer-panel--multimedia {
+    width: 100vw;
+    height: 100vh;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .composer-body {
+    display: flex;
+    flex-direction: column;
+    padding: 0 16px 20px;
+  }
+
+  .composer-dropzone {
+    min-height: 43vh;
+  }
+
+  .composer-footer {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 14px 16px 18px;
+  }
+
+  .composer-publish {
+    width: 100%;
+  }
+
+  .viewer-frame .viewer-primary-video,
+  .viewer-audio {
+    max-width: calc(100vw - 24px);
+    max-height: calc(100vh - 130px);
+  }
+
+  .viewer-audio-visual,
+  .viewer-audio-visual > img,
+  .viewer-audio-visual > video,
+  .viewer-audio-visual > .audio-default-art {
+    height: 58vh;
+    min-height: 0;
+  }
+}
+
+/* =========================================================
+   PLAYGROUND MULTIMEDIA FOUNDATION
+   ========================================================= */
+
+.feed-media {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #09090a;
+}
+
+.feed-media > img,
+.feed-media > video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--image-position, center);
+}
+
+.feed-media-badge {
+  position: absolute;
+  z-index: 3;
+  top: 10px;
+  right: 10px;
+
+  padding: 5px 7px;
+
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 999px;
+
+  background: rgba(5, 5, 6, 0.34);
+  color: rgba(255, 255, 255, 0.86);
+  pointer-events: none;
+}
+
+.audio-default-art {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+
+  background:
+    radial-gradient(
+      circle at 38% 32%,
+      rgba(255, 242, 0, 0.18),
+      transparent 32%
+    ),
+    linear-gradient(145deg, #282313, #080808 65%);
+}
+
+.audio-default-art span {
+  color: #fff200;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(44px, 8vw, 130px);
+  letter-spacing: -0.09em;
+  text-shadow: 0 0 40px rgba(255, 242, 0, 0.25);
+}
+
+.audio-feed-treatment {
+  position: absolute;
+  z-index: 2;
+  right: 16px;
+  bottom: 17px;
+  left: 16px;
+
+  display: flex;
+  align-items: flex-end;
+  gap: 15px;
+
+  color: #fff;
+}
+
+.audio-feed-treatment > div:last-child {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.audio-feed-treatment span {
+  color: rgba(255, 255, 255, 0.56);
+  font-family: "Courier New", monospace;
+  font-size: 6px;
+  letter-spacing: 0.14em;
+}
+
+.audio-feed-treatment strong {
+  overflow: hidden;
+  margin-top: 4px;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(14px, 1.5vw, 24px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.audio-feed-treatment small {
+  margin-top: 2px;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 8px;
+}
+
+.audio-wave {
+  display: flex;
+  width: 88px;
+  height: 34px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 2px;
+}
+
+.audio-wave i {
+  width: 2px;
+  height: var(--wave-height);
+  border-radius: 999px;
+  background: #fff200;
+  opacity: 0.76;
+}
+
+/* Viewer video */
+.viewer-frame .viewer-primary-video {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: calc(100vw - 152px);
+  max-height: calc(100vh - 88px);
+
+  background: #000;
+  object-fit: contain;
+}
+
+/* Viewer audio */
+.viewer-audio {
+  display: flex;
+  width: min(980px, calc(100vw - 152px));
+  max-height: calc(100vh - 88px);
+  flex-direction: column;
+
+  overflow: hidden;
+
+  background: #0a0a0b;
+}
+
+.viewer-audio-visual {
+  position: relative;
+  min-height: min(68vh, 680px);
+  overflow: hidden;
+}
+
+.viewer-audio-visual > img,
+.viewer-audio-visual > video,
+.viewer-audio-visual > .audio-default-art {
+  display: block;
+  width: 100%;
+  height: min(68vh, 680px);
+  object-fit: cover;
+}
+
+.viewer-audio-visual::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.86),
+      transparent 70%
+    );
+  content: "";
+}
+
+.viewer-audio-copy {
+  position: absolute;
+  z-index: 2;
+  right: 24px;
+  bottom: 24px;
+  left: 24px;
+
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+}
+
+.viewer-audio-copy > span {
+  color: #fff200;
+  font-family: "Courier New", monospace;
+  font-size: 7px;
+  letter-spacing: 0.16em;
+}
+
+.viewer-audio-copy strong {
+  margin-top: 7px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(28px, 5vw, 70px);
+  font-weight: 500;
+  letter-spacing: -0.06em;
+}
+
+.viewer-audio-copy small {
+  margin-top: 5px;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 12px;
+}
+
+.viewer-audio > audio {
+  width: calc(100% - 32px);
+  margin: 16px;
+}
+
+/* =========================================================
+   MULTIMEDIA CREATE COMPOSER
+   ========================================================= */
+
+body.composer-open {
+  overflow: hidden !important;
+}
+
+.create-composer {
+  position: fixed;
+  z-index: 12000;
+  inset: 0;
+
+  display: grid;
+  place-items: center;
+  padding: 26px;
+
+  background: rgba(4, 4, 5, 0.95);
+  backdrop-filter: blur(28px) saturate(0.75);
+}
+
+.composer-panel--multimedia {
+  display: flex;
+  width: min(1160px, calc(100vw - 52px));
+  max-height: calc(100vh - 52px);
+  flex-direction: column;
+
+  overflow: hidden;
+
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 26px;
+
+  background: rgba(18, 18, 20, 0.98);
+  color: #f4f3ef;
+}
+
+.composer-header {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 24px 26px 18px;
+}
+
+.composer-header > div > span {
+  color: rgba(255, 255, 255, 0.46);
+  font-family: "Courier New", monospace;
+  font-size: 7px;
+  letter-spacing: 0.16em;
+}
+
+.composer-header h2 {
+  margin: 5px 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(32px, 4vw, 58px);
+  font-weight: 500;
+  letter-spacing: -0.06em;
+  line-height: 0.92;
+}
+
+.composer-close {
+  position: relative;
+  width: 38px;
+  height: 38px;
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  cursor: pointer;
+}
+
+.composer-close i {
+  position: absolute;
+  top: 18px;
+  left: 11px;
+
+  width: 15px;
+  height: 1px;
+  background: currentColor;
+}
+
+.composer-close i:first-child {
+  transform: rotate(45deg);
+}
+
+.composer-close i:last-child {
+  transform: rotate(-45deg);
+}
+
+.composer-body {
+  display: grid;
+  min-height: 0;
+  flex: 1;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+  gap: 22px;
+
+  padding: 0 26px 24px;
+  overflow: auto;
+}
+
+.composer-media-column {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.composer-dropzone {
+  display: grid;
+  min-height: 480px;
+  place-items: center;
+
+  overflow: hidden;
+
+  border: 1px dashed rgba(255, 255, 255, 0.22);
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.025);
+  color: inherit;
+  cursor: pointer;
+}
+
+.composer-dropzone--dragging {
+  border-color: #fff200;
+  background: rgba(255, 242, 0, 0.035);
+}
+
+.composer-dropzone--filled {
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 0.1);
+  background: #09090a;
+}
+
+.composer-dropzone > img,
+.composer-dropzone > video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 65vh;
+  object-fit: contain;
+}
+
+.composer-empty {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.composer-empty strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 21px;
+  font-weight: 500;
+}
+
+.composer-empty span {
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 10px;
+}
+
+.composer-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.composer-audio-preview {
+  display: flex;
+  width: min(440px, 86%);
+  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.composer-audio-orb {
+  display: grid;
+  width: 170px;
+  height: 170px;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle at 35% 30%,
+      rgba(255, 242, 0, 0.48),
+      rgba(255, 242, 0, 0.04) 43%,
+      rgba(0, 0, 0, 0.9)
+    );
+
+  box-shadow:
+    0 0 65px rgba(255, 242, 0, 0.08);
+}
+
+.composer-audio-orb span {
+  color: #fff200;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 48px;
+  letter-spacing: -0.08em;
+}
+
+.composer-audio-preview > strong {
+  margin-top: 10px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+}
+
+.composer-audio-preview > span {
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 10px;
+}
+
+.composer-audio-preview audio {
+  width: 100%;
+  margin-top: 14px;
+}
+
+.companion-uploader {
+  display: grid;
+  gap: 12px;
+
+  padding: 15px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.companion-uploader > div:first-child > span {
+  color: #fff200;
+  font-family: "Courier New", monospace;
+  font-size: 7px;
+  letter-spacing: 0.14em;
+}
+
+.companion-uploader p {
+  margin: 5px 0 0;
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 9px;
+}
+
+.companion-uploader > button {
+  width: fit-content;
+  height: 31px;
+  padding: 0 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  font-size: 8px;
+}
+
+.companion-preview {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.companion-preview > img,
+.companion-preview > video {
+  display: block;
+  width: 100%;
+  max-height: 230px;
+  object-fit: cover;
+}
+
+.companion-preview > button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+
+  height: 26px;
+  padding: 0 9px;
+
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.68);
+  color: #fff;
+  cursor: pointer;
+  font-size: 7px;
+}
+
+.composer-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 8px 2px;
+}
+
+.composer-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.composer-field > span,
+.composer-weight legend {
+  margin-bottom: 9px;
+  color: rgba(255, 255, 255, 0.48);
+  font-family: "Courier New", monospace;
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.composer-field input,
+.composer-field textarea {
+  width: 100%;
+  padding: 13px 0;
+
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0;
+
+  outline: none;
+  background: transparent;
+  color: #fff;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 19px;
+}
+
+.composer-field textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.composer-field small {
+  align-self: flex-end;
+  margin-top: 7px;
+  color: rgba(255, 255, 255, 0.32);
+  font-size: 7px;
+}
+
+.composer-weight {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.composer-weight > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.composer-weight button {
+  height: 32px;
+  padding: 0 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  font-size: 8px;
+}
+
+.composer-weight button.active {
+  border-color: #fff200;
+  background: rgba(255, 242, 0, 0.1);
+  color: #fff200;
+}
+
+.composer-footer {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 17px 26px 20px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.composer-footer > span {
+  color: rgba(255, 255, 255, 0.38);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 11px;
+}
+
+.composer-publish {
+  min-width: 120px;
+  height: 39px;
+
+  border-radius: 999px;
+
+  background: #fff200;
+  color: #11110f;
+
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+@media (max-width: 760px) {
+  .create-composer {
+    width: 100vw;
+    min-width: 0;
+    padding: 0;
+  }
+
+  .composer-panel--multimedia {
+    width: 100vw;
+    height: 100vh;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .composer-body {
+    display: flex;
+    flex-direction: column;
+    padding: 0 16px 20px;
+  }
+
+  .composer-dropzone {
+    min-height: 43vh;
+  }
+
+  .composer-footer {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 14px 16px 18px;
+  }
+
+  .composer-publish {
+    width: 100%;
+  }
+
+  .viewer-frame .viewer-primary-video,
+  .viewer-audio {
+    max-width: calc(100vw - 24px);
+    max-height: calc(100vh - 130px);
+  }
+
+  .viewer-audio-visual,
+  .viewer-audio-visual > img,
+  .viewer-audio-visual > video,
+  .viewer-audio-visual > .audio-default-art {
+    height: 58vh;
+    min-height: 0;
+  }
+}
+
+/* =========================================================
+   VERIFIED MULTIMEDIA DOM REPAIR
+   ========================================================= */
+
+.post-tile > .feed-media {
+  position: absolute !important;
+  z-index: 1 !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.post-tile > .feed-media > img,
+.post-tile > .feed-media > video,
+.post-tile > .feed-media > .audio-default-art {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+.post-tile:hover > .feed-media > img,
+.post-tile:hover > .feed-media > video {
+  filter: brightness(0.72);
+  transform: scale(1.025);
+}
+
+.viewer-frame > .viewer-primary-video {
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: calc(100vw - 152px) !important;
+  max-height: calc(100vh - 88px) !important;
+  object-fit: contain !important;
+  background: #000 !important;
+}
+
+.viewer-frame > .viewer-audio {
+  width: min(980px, calc(100vw - 152px)) !important;
+  max-height: calc(100vh - 88px) !important;
+}
+
+.composer-dropzone {
+  cursor: pointer;
+}
+
+.composer-dropzone video,
+.composer-dropzone audio {
+  pointer-events: auto;
+}
+
+@media (max-width: 760px) {
+  .viewer-frame > .viewer-primary-video,
+  .viewer-frame > .viewer-audio {
+    max-width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 130px) !important;
+  }
+}
+
+/* =========================================================
+   FULL COMPOSER DRAG AND DROP
+   ========================================================= */
+
+.composer-panel--multimedia {
+  position: relative;
+}
+
+.composer-panel--multimedia::after {
+  position: absolute;
+  z-index: 100;
+  inset: 12px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px dashed rgba(255, 242, 0, 0.78);
+  border-radius: 19px;
+
+  background: rgba(7, 7, 8, 0.82);
+  color: #fff200;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(22px, 3vw, 42px);
+  letter-spacing: -0.045em;
+
+  content: "Drop into Playground";
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.985);
+
+  pointer-events: none;
+  backdrop-filter: blur(20px);
+
+  transition:
+    opacity 160ms ease,
+    visibility 160ms ease,
+    transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.composer-panel--dragging::after {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+}
+
+.composer-dropzone--dragging {
+  border-color: #fff200 !important;
+}
+
+/* =========================================================
+   PRESERVE ORIGINAL PHOTO AND VIDEO PROPORTIONS
+   ========================================================= */
+
+/*
+  Newly uploaded media is fitted without stretching or cropping.
+  The weighted tile remains part of the collage, while the actual
+  media keeps its original width-to-height relationship.
+*/
+
+.post-tile--native-media {
+  background: #050506 !important;
+}
+
+.post-tile--native-media > img,
+.post-tile--native-media > .feed-media > img,
+.post-tile--native-media > .feed-media > video {
+  width: 100% !important;
+  height: 100% !important;
+
+  object-fit: contain !important;
+  object-position: center !important;
+
+  background: #050506 !important;
+
+  transform: none !important;
+  filter: none;
+}
+
+/* Hover may darken the work but must not crop or enlarge it. */
+.post-tile--native-media:hover > img,
+.post-tile--native-media:hover > .feed-media > img,
+.post-tile--native-media:hover > .feed-media > video {
+  object-fit: contain !important;
+  transform: none !important;
+  filter: brightness(0.72) !important;
+}
+
+/* Composer preview also preserves original proportions. */
+.composer-dropzone--filled > img,
+.composer-dropzone--filled > video {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: 65vh !important;
+
+  object-fit: contain !important;
+  background: #050506;
+}
+
+/* Immersive media never stretches or crops. */
+.viewer-frame > img,
+.viewer-frame > .viewer-primary-video {
+  width: auto !important;
+  height: auto !important;
+
+  max-width: calc(100vw - 152px) !important;
+  max-height: calc(100vh - 88px) !important;
+
+  object-fit: contain !important;
+  object-position: center !important;
+
+  image-rendering: auto !important;
+}
+
+@media (max-width: 760px) {
+  .viewer-frame > img,
+  .viewer-frame > .viewer-primary-video {
+    max-width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 130px) !important;
+  }
+}
+
+
+/* =========================================================
+   ADAPTIVE HOME GALLERY — VERIFIED FINAL OVERRIDES
+   ========================================================= */
+
+/*
+  Home is an adaptive museum/gallery collage.
+  Slide will remain a separate reel-style experience.
+*/
+
+.weighted-wall {
+  display: grid !important;
+  grid-auto-flow: dense !important;
+  grid-auto-rows: 8px !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  gap: 0 !important;
+  align-items: start !important;
+}
+
+/*
+  Uploaded visual media overrides the old preset weight dimensions.
+  Its real aspect ratio determines its grid height.
+*/
+.post-tile--native-media {
+  grid-column: span var(--tile-columns, 2) !important;
+  grid-row: span var(--tile-rows, 24) !important;
+
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+
+  overflow: hidden !important;
+  background: #080809 !important;
+}
+
+/*
+  Because the tile itself now matches the upload's aspect ratio,
+  cover no longer distorts or meaningfully crops the media.
+*/
+.post-tile--native-media > .feed-media {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.post-tile--native-media > .feed-media > img,
+.post-tile--native-media > .feed-media > video {
+  display: block !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  object-fit: cover !important;
+  object-position: center !important;
+
+  background: #080809 !important;
+  transform: scale(1.001) !important;
+}
+
+.post-tile--native-media:hover > .feed-media > img,
+.post-tile--native-media:hover > .feed-media > video {
+  filter: brightness(0.72) !important;
+  transform: scale(1.018) !important;
+}
+
+/*
+  Audio posts continue using a designed weighted tile because
+  the audio file itself has no visual dimensions.
+*/
+.post-tile--native-media:has(.feed-media--audio) {
+  grid-column: span 2 !important;
+  grid-row: span 40 !important;
+}
+
+/* =========================================================
+   RELIABLE FULL-WINDOW DRAG AND DROP
+   ========================================================= */
+
+.create-composer {
+  position: fixed !important;
+}
+
+.create-composer::after {
+  position: fixed;
+  z-index: 13000;
+  inset: 18px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px dashed rgba(255, 242, 0, 0.88);
+  border-radius: 24px;
+
+  background: rgba(5, 5, 6, 0.88);
+  color: #fff200;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(26px, 4vw, 58px);
+  letter-spacing: -0.055em;
+
+  content: "Drop into Playground";
+
+  visibility: hidden;
+  opacity: 0;
+  transform: scale(0.985);
+
+  pointer-events: none;
+  backdrop-filter: blur(26px);
+
+  transition:
+    visibility 150ms ease,
+    opacity 150ms ease,
+    transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.create-composer--dragging::after {
+  visibility: visible;
+  opacity: 1;
+  transform: scale(1);
+}
+
+/*
+  The inner dropzone remains clickable, but the root composer
+  now owns drag events so nested controls cannot block dropping.
+*/
+.composer-dropzone {
+  position: relative !important;
+}
+
+.composer-dropzone--filled > img,
+.composer-dropzone--filled > video {
+  display: block !important;
+
+  width: auto !important;
+  height: auto !important;
+
+  max-width: 100% !important;
+  max-height: 65vh !important;
+
+  margin: auto !important;
+
+  object-fit: contain !important;
+  object-position: center !important;
+
+  background: #080809 !important;
+}
+
+@media (max-width: 1100px) {
+  .weighted-wall {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 760px) {
+  /*
+    Preserve the desktop gallery composition on mobile.
+    The canvas remains broad and horizontally explorable.
+  */
+  .weighted-wall {
+    min-width: 1120px !important;
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    grid-auto-rows: 8px !important;
+  }
+}
+
+/* =========================================================
+   AUDIO VIEWER LAYOUT REPAIR
+   Keeps playback, caption and Push controls separated.
+   ========================================================= */
+
+/* Audio viewer becomes a structured card rather than overlapping layers. */
+.viewer-frame:has(.viewer-audio) {
+  display: block !important;
+  width: min(920px, calc(100vw - 152px)) !important;
+  height: auto !important;
+  max-height: calc(100vh - 88px) !important;
+  overflow: hidden !important;
+  background: #080809 !important;
+}
+
+/* The audio component fills the frame cleanly. */
+.viewer-frame:has(.viewer-audio) .viewer-audio {
+  display: flex !important;
+  width: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  background: #080809 !important;
+}
+
+/* Reserve enough room beneath the artwork for metadata and playback. */
+.viewer-frame:has(.viewer-audio) .viewer-audio-visual {
+  position: relative !important;
+  width: 100% !important;
+  height: min(64vh, 620px) !important;
+  min-height: 360px !important;
+  flex: 0 1 auto !important;
+}
+
+/* Preserve the uploaded visual companion without distortion. */
+.viewer-frame:has(.viewer-audio) .viewer-audio-visual > img,
+.viewer-frame:has(.viewer-audio) .viewer-audio-visual > video,
+.viewer-frame:has(.viewer-audio) .viewer-audio-visual > .audio-default-art {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  background: #080809 !important;
+}
+
+/* Keep the track title safely above the lower controls. */
+.viewer-frame:has(.viewer-audio) .viewer-audio-copy {
+  right: 22px !important;
+  bottom: 26px !important;
+  left: 22px !important;
+  padding-right: 150px !important;
+}
+
+/* Native audio playback receives its own dock. */
+.viewer-frame:has(.viewer-audio) .viewer-audio > audio {
+  position: relative !important;
+  z-index: 5 !important;
+
+  display: block !important;
+  width: calc(100% - 28px) !important;
+  height: 54px !important;
+
+  margin: 14px !important;
+
+  border-radius: 12px !important;
+  background: #111113 !important;
+
+  flex: 0 0 auto !important;
+}
+
+/*
+  The normal viewer caption becomes a separate metadata strip
+  above the playback dock instead of covering it.
+*/
+.viewer-frame:has(.viewer-audio) > .viewer-caption {
+  position: relative !important;
+  z-index: 6 !important;
+
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+
+  display: flex !important;
+  width: 100% !important;
+  min-height: 68px !important;
+
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 20px !important;
+
+  padding: 12px 16px !important;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+
+  background: #0b0b0d !important;
+  pointer-events: auto !important;
+}
+
+/* Prevent long captions from pushing into the Push button. */
+.viewer-frame:has(.viewer-audio) .viewer-caption-copy {
+  min-width: 0 !important;
+  max-width: calc(100% - 112px) !important;
+}
+
+.viewer-frame:has(.viewer-audio) .viewer-caption-copy strong,
+.viewer-frame:has(.viewer-audio) .viewer-caption-copy p,
+.viewer-frame:has(.viewer-audio) .viewer-caption-copy span {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.viewer-frame:has(.viewer-audio) .viewer-caption-copy p {
+  margin-top: 4px !important;
+}
+
+/* Push stays isolated from the playback timeline. */
+.viewer-frame:has(.viewer-audio) .viewer-push {
+  position: relative !important;
+  right: auto !important;
+  bottom: auto !important;
+
+  min-width: 92px !important;
+  height: 34px !important;
+
+  flex: 0 0 auto !important;
+  pointer-events: auto !important;
+}
+
+/* Mobile audio viewer */
+@media (max-width: 760px) {
+  .viewer-frame:has(.viewer-audio) {
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 110px) !important;
+  }
+
+  .viewer-frame:has(.viewer-audio) .viewer-audio-visual {
+    height: 52vh !important;
+    min-height: 280px !important;
+  }
+
+  .viewer-frame:has(.viewer-audio) .viewer-audio-copy {
+    right: 16px !important;
+    bottom: 18px !important;
+    left: 16px !important;
+    padding-right: 0 !important;
+  }
+
+  .viewer-frame:has(.viewer-audio) > .viewer-caption {
+    align-items: stretch !important;
+    flex-direction: row !important;
+    padding: 10px 12px !important;
+  }
+
+  .viewer-frame:has(.viewer-audio) .viewer-caption-copy {
+    max-width: calc(100% - 96px) !important;
+  }
+
+  .viewer-frame:has(.viewer-audio) .viewer-push {
+    min-width: 82px !important;
+  }
+
+  .viewer-frame:has(.viewer-audio) .viewer-audio > audio {
+    width: calc(100% - 20px) !important;
+    margin: 10px !important;
+  }
+}
+
+/* =========================================================
+   AUDIO VIEWER LAYOUT REPAIR
+   Keeps playback, caption and Push controls separated.
+   ========================================================= */
+
+/* Audio viewer becomes a structured card rather than overlapping layers. */
+.viewer-frame:has(.viewer-audio) {
+  display: block !important;
+  width: min(920px, calc(100vw - 152px)) !important;
+  height: auto !important;
+  max-height: calc(100vh - 88px) !important;
+  overflow: hidden !important;
+  background: #080809 !important;
+}
+
+/* The audio component fills the frame cleanly. */
+.viewer-frame:has(.viewer-audio) .viewer-audio {
+  display: flex !important;
+  width: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  background: #080809 !important;
+}
+
+/* Reserve enough room beneath the artwork for metadata and playback. */
+.viewer-frame:has(.viewer-audio) .viewer-audio-visual {
+  position: relative !important;
+  width: 100% !important;
+  height: min(64vh, 620px) !important;
+  min-height: 360px !important;
+  flex: 0 1 auto !important;
+}
+
+/* Preserve the uploaded visual companion without distortion. */
+.viewer-frame:has(.viewer-audio) .viewer-audio-visual > img,
+.viewer-frame:has(.viewer-audio) .viewer-audio-visual > video,
+.viewer-frame:has(.viewer-audio) .viewer-audio-visual > .audio-default-art {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  background: #080809 !important;
+}
+
+/* Keep the track title safely above the lower controls. */
+.viewer-frame:has(.viewer-audio) .viewer-audio-copy {
+  right: 22px !important;
+  bottom: 26px !important;
+  left: 22px !important;
+  padding-right: 150px !important;
+}
+
+/* Native audio playback receives its own dock. */
+.viewer-frame:has(.viewer-audio) .viewer-audio > audio {
+  position: relative !important;
+  z-index: 5 !important;
+
+  display: block !important;
+  width: calc(100% - 28px) !important;
+  height: 54px !important;
+
+  margin: 14px !important;
+
+  border-radius: 12px !important;
+  background: #111113 !important;
+
+  flex: 0 0 auto !important;
+}
+
+/*
+  The normal viewer caption becomes a separate metadata strip
+  above the playback dock instead of covering it.
+*/
+.viewer-frame:has(.viewer-audio) > .viewer-caption {
+  position: relative !important;
+  z-index: 6 !important;
+
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+
+  display: flex !important;
+  width: 100% !important;
+  min-height: 68px !important;
+
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 20px !important;
+
+  padding: 12px 16px !important;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+
+  background: #0b0b0d !important;
+  pointer-events: auto !important;
+}
+
+/* Prevent long captions from pushing into the Push button. */
+.viewer-frame:has(.viewer-audio) .viewer-caption-copy {
+  min-width: 0 !important;
+  max-width: calc(100% - 112px) !important;
+}
+
+.viewer-frame:has(.viewer-audio) .viewer-caption-copy strong,
+.viewer-frame:has(.viewer-audio) .viewer-caption-copy p,
+.viewer-frame:has(.viewer-audio) .viewer-caption-copy span {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.viewer-frame:has(.viewer-audio) .viewer-caption-copy p {
+  margin-top: 4px !important;
+}
+
+/* Push stays isolated from the playback timeline. */
+.viewer-frame:has(.viewer-audio) .viewer-push {
+  position: relative !important;
+  right: auto !important;
+  bottom: auto !important;
+
+  min-width: 92px !important;
+  height: 34px !important;
+
+  flex: 0 0 auto !important;
+  pointer-events: auto !important;
+}
+
+/* Mobile audio viewer */
+@media (max-width: 760px) {
+  .viewer-frame:has(.viewer-audio) {
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 110px) !important;
+  }
+
+  .viewer-frame:has(.viewer-audio) .viewer-audio-visual {
+    height: 52vh !important;
+    min-height: 280px !important;
+  }
+
+  .viewer-frame:has(.viewer-audio) .viewer-audio-copy {
+    right: 16px !important;
+    bottom: 18px !important;
+    left: 16px !important;
+    padding-right: 0 !important;
+  }
+
+  .viewer-frame:has(.viewer-audio) > .viewer-caption {
+    align-items: stretch !important;
+    flex-direction: row !important;
+    padding: 10px 12px !important;
+  }
+
+  .viewer-frame:has(.viewer-audio) .viewer-caption-copy {
+    max-width: calc(100% - 96px) !important;
+  }
+
+  .viewer-frame:has(.viewer-audio) .viewer-push {
+    min-width: 82px !important;
+  }
+
+  .viewer-frame:has(.viewer-audio) .viewer-audio > audio {
+    width: calc(100% - 20px) !important;
+    margin: 10px !important;
+  }
+}
+
+/* ==========================================================
+   AUDIO PLAYER SHELL REPAIR
+   ========================================================== */
+
+.viewer-audio-player-shell{
+  position:absolute;
+  z-index:8;
+  left:50%;
+  transform:translateX(-50%);
+  width:min(470px,calc(100% - 48px));
+  pointer-events:auto;
+}
+
+.viewer-audio--image-visual .viewer-audio-player-shell{
+  top:50%;
+  transform:translate(-50%,-50%);
+}
+
+.viewer-audio--video-visual .viewer-audio-player-shell{
+  bottom:18px;
+  top:auto;
+  transform:translateX(-50%);
+  width:min(620px,calc(100% - 36px));
+}
+
+.viewer-audio-player-shell audio{
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+
+  width:100% !important;
+  height:54px !important;
+
+  margin:0 !important;
+}
+
+.viewer-audio--video-visual .viewer-audio-player-shell audio{
+  height:38px !important;
+}
+
+/* Disable the obsolete rule that targets the old markup */
+.viewer-audio > audio{
+  width:auto !important;
+  margin:0 !important;
+}
+
+/* =========================================================
+   ISOLATED PLAYGROUND AUDIO VIEWER
+   This block uses unique pg-audio-* classes so old viewer
+   experiments cannot hide or reposition the controls.
+   ========================================================= */
+
+.viewer-frame:has(.pg-audio-viewer) {
+  display: flex !important;
+  width: min(920px, calc(100vw - 156px)) !important;
+  max-width: min(920px, calc(100vw - 156px)) !important;
+  max-height: calc(100vh - 70px) !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  background: #080809 !important;
+}
+
+.pg-audio-viewer {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  background: #080809 !important;
+}
+
+.pg-audio-viewer__canvas {
+  position: relative !important;
+  width: 100% !important;
+  height: min(68vh, 650px) !important;
+  min-height: 380px !important;
+  overflow: hidden !important;
+  background: #080809 !important;
+}
+
+.pg-audio-viewer__visual,
+.pg-audio-viewer__fallback {
+  position: absolute !important;
+  z-index: 1 !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  background: #080809 !important;
+}
+
+.pg-audio-viewer__fallback {
+  display: grid !important;
+  place-items: center !important;
+  color: #fff200 !important;
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-size: clamp(52px, 10vw, 130px) !important;
+}
+
+.pg-audio-viewer__shade {
+  position: absolute !important;
+  z-index: 2 !important;
+  inset: 0 !important;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.03),
+      rgba(0, 0, 0, 0.08) 48%,
+      rgba(0, 0, 0, 0.74) 100%
+    ) !important;
+  pointer-events: none !important;
+}
+
+.pg-audio-viewer__track {
+  position: absolute !important;
+  z-index: 4 !important;
+  right: 24px !important;
+  bottom: 22px !important;
+  left: 24px !important;
+  display: flex !important;
+  min-width: 0 !important;
+  flex-direction: column !important;
+  color: #fff !important;
+  pointer-events: none !important;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.92) !important;
+}
+
+.pg-audio-viewer__track > span {
+  color: #fff200 !important;
+  font-family: "Courier New", monospace !important;
+  font-size: 7px !important;
+  letter-spacing: 0.18em !important;
+}
+
+.pg-audio-viewer__track > strong {
+  display: block !important;
+  max-width: 100% !important;
+  margin-top: 8px !important;
+  overflow: hidden !important;
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-size: clamp(28px, 4.2vw, 58px) !important;
+  font-weight: 500 !important;
+  line-height: 0.98 !important;
+  letter-spacing: -0.055em !important;
+  text-overflow: ellipsis !important;
+}
+
+.pg-audio-viewer__track > small {
+  margin-top: 8px !important;
+  color: rgba(255, 255, 255, 0.72) !important;
+  font-size: 11px !important;
+}
+
+.pg-audio-player {
+  position: absolute !important;
+  z-index: 20 !important;
+  display: grid !important;
+  grid-template-columns: 46px 34px minmax(80px, 1fr) 34px !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: min(500px, calc(100% - 56px)) !important;
+  min-height: 64px !important;
+  padding: 9px 14px !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  border-radius: 20px !important;
+  background: rgba(7, 7, 9, 0.7) !important;
+  color: #fff !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.38) !important;
+  backdrop-filter: blur(24px) saturate(135%) !important;
+  pointer-events: auto !important;
+}
+
+/* Image artwork: centered player */
+.pg-audio-viewer--image .pg-audio-player {
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+/* Video visual: compact lower strip */
+.pg-audio-viewer--video .pg-audio-player {
+  right: 18px !important;
+  bottom: 18px !important;
+  left: 18px !important;
+  width: auto !important;
+  min-height: 48px !important;
+  padding: 6px 10px !important;
+  border-radius: 14px !important;
+  transform: none !important;
+}
+
+.pg-audio-viewer--video .pg-audio-viewer__track {
+  bottom: 82px !important;
+}
+
+.pg-audio-player__button {
+  display: grid !important;
+  width: 46px !important;
+  height: 46px !important;
+  min-width: 46px !important;
+  padding: 0 !important;
+  place-items: center !important;
+  border: 1px solid rgba(255, 242, 0, 0.82) !important;
+  border-radius: 50% !important;
+  background: #fff200 !important;
+  color: #11110f !important;
+  cursor: pointer !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+.pg-audio-player__button > span {
+  display: block !important;
+  font-size: 17px !important;
+  line-height: 1 !important;
+  transform: translateX(1px) !important;
+}
+
+.pg-audio-player__button:hover {
+  transform: scale(1.05) !important;
+}
+
+.pg-audio-player__button:active {
+  transform: scale(0.94) !important;
+}
+
+.pg-audio-player__time {
+  display: block !important;
+  color: rgba(255, 255, 255, 0.74) !important;
+  font-family: "Courier New", monospace !important;
+  font-size: 8px !important;
+  text-align: center !important;
+}
+
+.pg-audio-player__timeline {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 18px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  accent-color: #fff200 !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+.pg-audio-player__engine {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Keep post metadata below the audio canvas. */
+.viewer-frame:has(.pg-audio-viewer) > .viewer-caption {
+  position: relative !important;
+  z-index: 30 !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  display: flex !important;
+  width: 100% !important;
+  min-height: 68px !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+  padding: 11px 15px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.09) !important;
+  background: #0b0b0d !important;
+  pointer-events: auto !important;
+}
+
+.viewer-frame:has(.pg-audio-viewer) .viewer-caption-copy {
+  min-width: 0 !important;
+  max-width: calc(100% - 112px) !important;
+}
+
+.viewer-frame:has(.pg-audio-viewer) .viewer-caption-copy strong,
+.viewer-frame:has(.pg-audio-viewer) .viewer-caption-copy p,
+.viewer-frame:has(.pg-audio-viewer) .viewer-caption-copy span {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.viewer-frame:has(.pg-audio-viewer) .viewer-push {
+  position: static !important;
+  min-width: 92px !important;
+  height: 34px !important;
+  flex: 0 0 auto !important;
+}
+
+@media (max-width: 760px) {
+  .viewer-frame:has(.pg-audio-viewer) {
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 112px) !important;
+  }
+
+  .pg-audio-viewer__canvas {
+    height: 57vh !important;
+    min-height: 300px !important;
+  }
+
+  .pg-audio-player {
+    grid-template-columns: 42px 31px minmax(60px, 1fr) 31px !important;
+    gap: 7px !important;
+    width: calc(100% - 28px) !important;
+    min-height: 56px !important;
+    padding: 7px 9px !important;
+    border-radius: 16px !important;
+  }
+
+  .pg-audio-player__button {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+  }
+
+  .pg-audio-viewer--video .pg-audio-player {
+    right: 10px !important;
+    bottom: 10px !important;
+    left: 10px !important;
+    width: auto !important;
+  }
+
+  .pg-audio-viewer--video .pg-audio-viewer__track {
+    bottom: 70px !important;
+  }
+
+  .pg-audio-viewer__track {
+    right: 15px !important;
+    bottom: 15px !important;
+    left: 15px !important;
+  }
+
+  .pg-audio-viewer__track > strong {
+    font-size: clamp(23px, 8vw, 42px) !important;
+  }
+}
+
+/* =========================================================
+   YOUR PLAYGROUND — APP INTEGRATION
+   ========================================================= */
+
+.navigation-panel nav button.active,
+.navigation-panel nav button[aria-current="page"] {
+  opacity: 1;
+  transform: translateX(4px);
+}
+
+.navigation-panel nav button.active::before,
+.navigation-panel nav button[aria-current="page"]::before {
+  margin-right: 8px;
+  color: #fff200;
+  content: "•";
+}
+
+.user-button[aria-current="page"] {
+  border-color: #fff200;
+  box-shadow:
+    0 0 0 3px rgba(255, 242, 0, 0.08);
+}
+
+.weighted-wall--profile {
+  min-height: 320px;
+  background: transparent;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+@media (max-width: 760px) {
+  .your-playground .weighted-wall--profile {
+    min-width: 100%;
+  }
+}

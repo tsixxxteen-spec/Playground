@@ -1,0 +1,29 @@
+.session-badge {
+  display: inline-flex;
+  min-height: 27px;
+  align-items: center;
+  gap: 7px;
+  padding: 0 9px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.045);
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.session-badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #77777c;
+}
+
+.session-badge--shared {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.session-badge--shared .session-badge__dot {
+  background: #6ddc8b;
+}

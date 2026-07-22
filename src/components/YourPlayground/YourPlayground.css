@@ -1,2 +1,23 @@
 /* Profile presentation now lives in src/profile-experiences/ExperienceRenderer.css */
 .profile-experience-root{position:relative}
+
+/* Sprint 20A.2 — Live Presence */
+.your-playground-presence-shell {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  isolation: isolate;
+}
+
+.your-playground-presence-shell > .presence-layer {
+  z-index: 30;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .presence-orb {
+    transition:
+      opacity 0.2s ease,
+      left 0s linear,
+      top 0s linear;
+  }
+}

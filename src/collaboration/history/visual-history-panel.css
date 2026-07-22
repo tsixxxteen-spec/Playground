@@ -1,0 +1,566 @@
+.playground-history-launcher {
+  position: fixed;
+  right: 18px;
+  bottom: 124px;
+  z-index: 9998;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 13px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.13);
+  border-radius: 12px;
+  background:
+    rgba(18, 18, 20, 0.94);
+  color:
+    rgba(255, 255, 255, 0.9);
+  font:
+    650 12px/1
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  cursor: pointer;
+  box-shadow:
+    0 12px 36px
+    rgba(0, 0, 0, 0.32);
+  backdrop-filter:
+    blur(18px);
+}
+
+.playground-history-launcher:hover {
+  background:
+    rgba(28, 28, 31, 0.98);
+  transform:
+    translateY(-1px);
+}
+
+.playground-history-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 12100;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  background:
+    rgba(0, 0, 0, 0.54);
+  backdrop-filter:
+    blur(16px);
+  animation:
+    playground-history-fade
+    160ms ease-out;
+}
+
+.playground-history-panel {
+  width:
+    min(940px, 96vw);
+  height:
+    min(700px, 88vh);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid
+    rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+  background:
+    rgba(14, 14, 16, 0.98);
+  color: #fff;
+  box-shadow:
+    0 36px 100px
+    rgba(0, 0, 0, 0.58);
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  animation:
+    playground-history-rise
+    210ms
+    cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    );
+}
+
+.playground-history-panel__header {
+  min-height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px 24px;
+  border-bottom: 1px solid
+    rgba(255, 255, 255, 0.08);
+}
+
+.playground-history-panel__eyebrow {
+  margin: 0 0 4px;
+  color:
+    rgba(255, 255, 255, 0.4);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.playground-history-panel__header h2 {
+  margin: 0;
+  font-size: 25px;
+  font-weight: 680;
+  letter-spacing: -0.035em;
+}
+
+.playground-history-panel__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.playground-history-panel__status {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 11px;
+  border-radius: 999px;
+  background:
+    rgba(255, 255, 255, 0.055);
+  color:
+    rgba(255, 255, 255, 0.5);
+  font-size: 11px;
+}
+
+.playground-history-panel__status--saved,
+.playground-history-panel__status--restored {
+  color: #a8efbb;
+  background:
+    rgba(62, 180, 95, 0.12);
+}
+
+.playground-history-panel__status--error {
+  color: #ffb4b4;
+  background:
+    rgba(221, 70, 70, 0.13);
+}
+
+.playground-history-panel__close {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background:
+    rgba(255, 255, 255, 0.07);
+  color:
+    rgba(255, 255, 255, 0.72);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.playground-history-panel__toolbar {
+  min-height: 55px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  border-bottom: 1px solid
+    rgba(255, 255, 255, 0.07);
+}
+
+.playground-history-panel__toolbar button,
+.playground-history-panel__snapshot-bar button {
+  min-height: 34px;
+  padding: 0 13px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.1);
+  border-radius: 9px;
+  background:
+    rgba(255, 255, 255, 0.055);
+  color:
+    rgba(255, 255, 255, 0.82);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.playground-history-panel__toolbar button:hover {
+  background:
+    rgba(255, 255, 255, 0.1);
+}
+
+.playground-history-panel__toolbar-spacer {
+  flex: 1;
+}
+
+.playground-history-panel__shortcut {
+  color:
+    rgba(255, 255, 255, 0.34);
+  font-size: 11px;
+}
+
+.playground-history-panel__snapshot-bar {
+  display: flex;
+  gap: 8px;
+  padding: 12px 24px;
+  border-bottom: 1px solid
+    rgba(255, 255, 255, 0.07);
+}
+
+.playground-history-panel__snapshot-bar input {
+  min-width: 0;
+  flex: 1;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.1);
+  border-radius: 9px;
+  outline: none;
+  background:
+    rgba(255, 255, 255, 0.04);
+  color: #fff;
+  font: inherit;
+  font-size: 11px;
+}
+
+.playground-history-panel__snapshot-bar input:focus {
+  border-color:
+    rgba(255, 255, 255, 0.25);
+}
+
+.playground-history-panel__snapshot-bar button {
+  background: #f4f4f4;
+  color: #111;
+}
+
+.playground-history-panel__body {
+  min-height: 0;
+  flex: 1;
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    280px;
+}
+
+.playground-history-panel__timeline {
+  overflow-y: auto;
+  padding: 14px;
+}
+
+.playground-history-entry {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto;
+  align-items: center;
+  margin-bottom: 7px;
+  padding: 7px;
+  border: 1px solid
+    transparent;
+  border-radius: 13px;
+  background:
+    rgba(255, 255, 255, 0.025);
+}
+
+.playground-history-entry:hover {
+  background:
+    rgba(255, 255, 255, 0.05);
+}
+
+.playground-history-entry--selected {
+  border-color:
+    rgba(255, 255, 255, 0.15);
+  background:
+    rgba(255, 255, 255, 0.075);
+}
+
+.playground-history-entry__main {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.playground-history-entry__icon {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background:
+    rgba(255, 255, 255, 0.06);
+  color:
+    rgba(255, 255, 255, 0.63);
+  font-size: 17px;
+}
+
+.playground-history-entry__icon--snapshot {
+  color: #c8c8ff;
+}
+
+.playground-history-entry__icon--undo,
+.playground-history-entry__icon--redo {
+  color: #b9e5ff;
+}
+
+.playground-history-entry__icon--recovery,
+.playground-history-entry__icon--restore {
+  color: #b8f0c5;
+}
+
+.playground-history-entry__content {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.playground-history-entry__content strong {
+  overflow: hidden;
+  color:
+    rgba(255, 255, 255, 0.9);
+  font-size: 12px;
+  font-weight: 630;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playground-history-entry__content small {
+  color:
+    rgba(255, 255, 255, 0.38);
+  font-size: 9px;
+}
+
+.playground-history-entry__delete {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color:
+    rgba(255, 255, 255, 0.32);
+  cursor: pointer;
+}
+
+.playground-history-entry__delete:hover {
+  background:
+    rgba(218, 70, 70, 0.12);
+  color: #ff9c9c;
+}
+
+.playground-history-panel__details {
+  position: relative;
+  min-width: 0;
+  padding: 22px;
+  border-left: 1px solid
+    rgba(255, 255, 255, 0.07);
+  background:
+    rgba(255, 255, 255, 0.016);
+}
+
+.playground-history-panel__preview {
+  height: 130px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 18px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  background:
+    radial-gradient(
+      circle at 34% 24%,
+      rgba(255, 255, 255, 0.12),
+      transparent 43%
+    ),
+    rgba(255, 255, 255, 0.025);
+  color:
+    rgba(255, 255, 255, 0.32);
+  font-size: 34px;
+}
+
+.playground-history-panel__detail-label {
+  margin: 0 0 5px;
+  color:
+    rgba(255, 255, 255, 0.35);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.playground-history-panel__details h3 {
+  margin: 0 0 18px;
+  font-size: 16px;
+  font-weight: 650;
+}
+
+.playground-history-panel__details dl {
+  margin: 0 0 20px;
+}
+
+.playground-history-panel__details dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 9px 0;
+  border-bottom: 1px solid
+    rgba(255, 255, 255, 0.055);
+}
+
+.playground-history-panel__details dt {
+  color:
+    rgba(255, 255, 255, 0.38);
+  font-size: 10px;
+}
+
+.playground-history-panel__details dd {
+  margin: 0;
+  color:
+    rgba(255, 255, 255, 0.73);
+  font-size: 10px;
+  text-align: right;
+}
+
+.playground-history-panel__restore {
+  width: 100%;
+  min-height: 36px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.18);
+  border-radius: 9px;
+  background: #f4f4f4;
+  color: #111;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.playground-history-panel__clear {
+  position: absolute;
+  right: 22px;
+  bottom: 20px;
+  left: 22px;
+  min-height: 32px;
+  border: 0;
+  background: transparent;
+  color:
+    rgba(255, 140, 140, 0.64);
+  font: inherit;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.playground-history-panel__clear:hover {
+  color: #ffaaaa;
+}
+
+.playground-history-panel__empty,
+.playground-history-panel__details-empty {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  color:
+    rgba(255, 255, 255, 0.36);
+  text-align: center;
+}
+
+.playground-history-panel__empty span {
+  margin-bottom: 12px;
+  font-size: 30px;
+}
+
+.playground-history-panel__empty h3 {
+  margin: 0 0 7px;
+  color:
+    rgba(255, 255, 255, 0.72);
+  font-size: 14px;
+}
+
+.playground-history-panel__empty p {
+  max-width: 290px;
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+@keyframes playground-history-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes playground-history-rise {
+  from {
+    opacity: 0;
+    transform:
+      translateY(16px)
+      scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@media (max-width: 800px) {
+  .playground-history-panel__body {
+    grid-template-columns: 1fr;
+  }
+
+  .playground-history-panel__details {
+    display: none;
+  }
+}
+
+@media (max-width: 620px) {
+  .playground-history-overlay {
+    padding: 10px;
+  }
+
+  .playground-history-panel {
+    width: 100%;
+    height: 94vh;
+    border-radius: 18px;
+  }
+
+  .playground-history-panel__header {
+    padding: 16px;
+  }
+
+  .playground-history-panel__status {
+    display: none;
+  }
+
+  .playground-history-panel__toolbar,
+  .playground-history-panel__snapshot-bar {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .playground-history-launcher {
+    right: 10px;
+    bottom: 116px;
+  }
+}

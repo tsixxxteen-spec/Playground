@@ -1,0 +1,468 @@
+.playground-session-launcher,
+.playground-history-launcher,
+.playground-collaboration-launcher,
+.playground-inspector-launcher {
+  display: none !important;
+}
+
+.playground-command-center-launcher {
+  position: fixed;
+  right: 18px;
+  bottom: 20px;
+  z-index: 9998;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 10px 0 12px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.14);
+  border-radius: 13px;
+  background:
+    rgba(17, 17, 19, 0.95);
+  color:
+    rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 14px 42px
+    rgba(0, 0, 0, 0.36);
+  backdrop-filter:
+    blur(20px);
+  font:
+    650 12px/1
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  cursor: pointer;
+  transition:
+    transform 150ms ease,
+    background 150ms ease,
+    border-color 150ms ease;
+}
+
+.playground-command-center-launcher:hover {
+  transform:
+    translateY(-2px);
+  background:
+    rgba(27, 27, 30, 0.98);
+  border-color:
+    rgba(255, 255, 255, 0.2);
+}
+
+.playground-command-center-launcher__mark {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background:
+    rgba(255, 255, 255, 0.075);
+  color:
+    rgba(255, 255, 255, 0.72);
+  font-size: 14px;
+}
+
+.playground-command-center-launcher__shortcut {
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 7px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.075);
+  border-radius: 7px;
+  background:
+    rgba(255, 255, 255, 0.045);
+  color:
+    rgba(255, 255, 255, 0.38);
+  font-size: 9px;
+}
+
+.playground-command-center-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 13000;
+  display: grid;
+  place-items: start center;
+  padding: 12vh 24px 24px;
+  background:
+    rgba(0, 0, 0, 0.49);
+  backdrop-filter:
+    blur(17px);
+  animation:
+    playground-command-center-fade
+    150ms ease-out;
+}
+
+.playground-command-center {
+  width:
+    min(650px, 96vw);
+  max-height:
+    min(670px, 78vh);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid
+    rgba(255, 255, 255, 0.13);
+  border-radius: 22px;
+  background:
+    rgba(14, 14, 16, 0.985);
+  color: #fff;
+  box-shadow:
+    0 36px 110px
+    rgba(0, 0, 0, 0.62);
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  animation:
+    playground-command-center-rise
+    190ms
+    cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    );
+}
+
+.playground-command-center__header {
+  min-height: 78px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 18px;
+  border-bottom: 1px solid
+    rgba(255, 255, 255, 0.075);
+}
+
+.playground-command-center__identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.playground-command-center__identity > span {
+  width: 39px;
+  height: 39px;
+  display: grid;
+  place-items: center;
+  border: 1px solid
+    rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.11),
+      rgba(255, 255, 255, 0.035)
+    );
+  color:
+    rgba(255, 255, 255, 0.62);
+  font-size: 18px;
+}
+
+.playground-command-center__identity p {
+  margin: 0 0 3px;
+  color:
+    rgba(255, 255, 255, 0.34);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.playground-command-center__identity h2 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 680;
+  letter-spacing: -0.025em;
+}
+
+.playground-command-center__close {
+  width: 33px;
+  height: 33px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background:
+    rgba(255, 255, 255, 0.065);
+  color:
+    rgba(255, 255, 255, 0.65);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.playground-command-center__close:hover {
+  background:
+    rgba(255, 255, 255, 0.11);
+  color: #fff;
+}
+
+.playground-command-center__search {
+  height: 58px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  border-bottom: 1px solid
+    rgba(255, 255, 255, 0.07);
+}
+
+.playground-command-center__search > span {
+  color:
+    rgba(255, 255, 255, 0.34);
+  font-size: 16px;
+}
+
+.playground-command-center__search input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color:
+    rgba(255, 255, 255, 0.94);
+  font: inherit;
+  font-size: 13px;
+}
+
+.playground-command-center__search input::placeholder {
+  color:
+    rgba(255, 255, 255, 0.28);
+}
+
+.playground-command-center kbd {
+  min-width: 32px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  background:
+    rgba(255, 255, 255, 0.045);
+  color:
+    rgba(255, 255, 255, 0.36);
+  font-family: inherit;
+  font-size: 8px;
+  box-shadow:
+    inset 0 -1px 0
+    rgba(255, 255, 255, 0.04);
+}
+
+.playground-command-center__body {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.playground-command-center__section-label {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 7px 10px;
+  color:
+    rgba(255, 255, 255, 0.3);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.playground-command-center__commands {
+  display: grid;
+  gap: 5px;
+}
+
+.playground-command-center__command {
+  width: 100%;
+  min-height: 74px;
+  display: grid;
+  grid-template-columns:
+    auto
+    minmax(0, 1fr)
+    auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid
+    transparent;
+  border-radius: 14px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 100ms ease,
+    border-color 100ms ease;
+}
+
+.playground-command-center__command:hover,
+.playground-command-center__command--active {
+  border-color:
+    rgba(255, 255, 255, 0.1);
+  background:
+    rgba(255, 255, 255, 0.065);
+}
+
+.playground-command-center__command-icon {
+  width: 43px;
+  height: 43px;
+  display: grid;
+  place-items: center;
+  border: 1px solid
+    rgba(255, 255, 255, 0.065);
+  border-radius: 12px;
+  background:
+    rgba(255, 255, 255, 0.045);
+  color:
+    rgba(255, 255, 255, 0.56);
+  font-size: 18px;
+}
+
+.playground-command-center__command-copy {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.playground-command-center__command-copy strong {
+  color:
+    rgba(255, 255, 255, 0.9);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.playground-command-center__command-copy small {
+  overflow: hidden;
+  color:
+    rgba(255, 255, 255, 0.38);
+  font-size: 9px;
+  line-height: 1.45;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playground-command-center__empty {
+  min-height: 270px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  color:
+    rgba(255, 255, 255, 0.34);
+  text-align: center;
+}
+
+.playground-command-center__empty > span {
+  margin-bottom: 13px;
+  font-size: 29px;
+}
+
+.playground-command-center__empty h3 {
+  margin: 0 0 7px;
+  color:
+    rgba(255, 255, 255, 0.72);
+  font-size: 13px;
+}
+
+.playground-command-center__empty p {
+  max-width: 330px;
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.playground-command-center__footer {
+  min-height: 45px;
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  padding: 0 18px;
+  border-top: 1px solid
+    rgba(255, 255, 255, 0.07);
+  color:
+    rgba(255, 255, 255, 0.3);
+  font-size: 8px;
+}
+
+.playground-command-center__footer div {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.playground-command-center__footer div span {
+  color:
+    rgba(255, 255, 255, 0.48);
+}
+
+.playground-command-center__footer p {
+  margin: 0 0 0 auto;
+  color:
+    rgba(255, 255, 255, 0.23);
+}
+
+@keyframes playground-command-center-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes playground-command-center-rise {
+  from {
+    opacity: 0;
+    transform:
+      translateY(-9px)
+      scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@media (max-width: 620px) {
+  .playground-command-center-overlay {
+    padding:
+      8vh 10px 10px;
+  }
+
+  .playground-command-center {
+    width: 100%;
+    max-height: 84vh;
+    border-radius: 18px;
+  }
+
+  .playground-command-center__command-copy small {
+    white-space: normal;
+  }
+
+  .playground-command-center__footer p {
+    display: none;
+  }
+
+  .playground-command-center-launcher {
+    right: 10px;
+    bottom: 12px;
+  }
+
+  .playground-command-center-launcher__label {
+    display: none;
+  }
+}

@@ -1,0 +1,6 @@
+src/personalization/appearance/types.ts
+src/personalization/appearance/AppearanceEditor.tsx
+src/components/EditProfile/EditProfile.tsx
+src/components/YourPlayground/YourPlayground.tsx
+src/profile-experiences/ExperienceRenderer.tsx
+src/personalization/index.ts

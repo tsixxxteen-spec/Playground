@@ -20,6 +20,19 @@ type AvatarProps = {
 };
 
 export default function Avatar({ profile }: AvatarProps) {
+  if (profile.avatarSrc) {
+    const img = new Image();
+    img.onload = () => {
+      console.log("===== AVATAR DEBUG =====");
+      console.log("src:", profile.avatarSrc);
+      console.log(
+        "natural:",
+        img.naturalWidth + "x" + img.naturalHeight,
+      );
+    };
+    img.src = profile.avatarSrc;
+  }
+
   return (
     <div className="xp-avatar">
       {profile.avatarSrc ? (
@@ -28,7 +41,8 @@ export default function Avatar({ profile }: AvatarProps) {
           alt={`${profile.displayName} profile`}
           draggable={false}
           style={getAvatarImageStyle(
-            profile.avatarTransform ?? DEFAULT_AVATAR_TRANSFORM,
+            profile.avatarTransform ??
+              DEFAULT_AVATAR_TRANSFORM,
           )}
         />
       ) : (

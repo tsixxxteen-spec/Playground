@@ -1,0 +1,13 @@
+
+> worlds@0.1.0 build
+> tsc && vite build
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 163 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.47 kB │ gzip:   0.30 kB
+dist/assets/index-Co6qShrs.css  179.85 kB │ gzip:  29.59 kB
+dist/assets/index-CuUGzWZX.js   342.66 kB │ gzip: 100.24 kB
+✓ built in 617ms

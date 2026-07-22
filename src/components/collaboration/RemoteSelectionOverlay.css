@@ -1,0 +1,54 @@
+.remote-selection-overlay {
+  position: fixed;
+  z-index: 9998;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.remote-selection-outline {
+  position: fixed;
+  border:
+    2px solid
+    rgba(255, 255, 255, 0.82);
+  border-radius: 6px;
+  box-shadow:
+    0 0 0 1px
+    rgba(0, 0, 0, 0.38);
+  pointer-events: none;
+}
+
+.remote-selection-outline[data-locked="true"] {
+  border-style: solid;
+  box-shadow:
+    0 0 0 1px
+    rgba(0, 0, 0, 0.38),
+    0 0 16px
+    rgba(255, 255, 255, 0.12);
+}
+
+.remote-selection-outline__label {
+  position: absolute;
+  top: -27px;
+  left: -2px;
+  display: inline-flex;
+  min-height: 23px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  border-radius: 7px 7px 7px 0;
+  background:
+    rgba(18, 18, 20, 0.94);
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 650;
+  white-space: nowrap;
+  backdrop-filter: blur(12px);
+}
+
+.remote-selection-outline__label small {
+  color:
+    rgba(255, 255, 255, 0.48);
+  font-size: 8px;
+  font-weight: 500;
+}

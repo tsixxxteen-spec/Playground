@@ -1,0 +1,637 @@
+import { useEffect, useMemo, useState } from "react";
+import type { ReactNode } from "react";
+
+import EditProfile from "../EditProfile";
+import type { EditableProfile } from "../EditProfile";
+
+import type { ProfileTrack } from "../ProfileMusicPlayer";
+
+import {
+  DEFAULT_AVATAR_TRANSFORM,
+  normalizeAvatarTransform,
+} from "../AvatarStudio";
+import type { AvatarTransform } from "../AvatarStudio";
+
+import {
+  blobFromSource,
+  deleteProfileMedia,
+  readProfileMedia,
+  saveProfileMedia,
+} from "../../lib/profileMediaStore";
+
+import {
+  ProfileAssetStore,
+} from "../../lib/profileAssetStore";
+import type {
+  ProfileAsset,
+} from "../../lib/profileAssetStore";
+
+import {
+  DEFAULT_THEME_ID,
+  getTheme,
+  getThemeStyle,
+} from "../../themes";
+
+import {
+  EMPTY_PROFILE_SOUNDTRACK,
+  normalizeSoundtrack,
+} from "../../lib/profileSoundtrack";
+import type {
+  ProfileSoundtrack,
+  SoundtrackTrack,
+} from "../../lib/profileSoundtrack";
+
+import { ExperienceRenderer } from "../../profile-experiences";
+
+import "./YourPlayground.css";
+
+type Props = {
+  displayName: string;
+  username: string;
+  bio: string;
+  avatarSrc?: string;
+  postCount: number;
+  followerCount: number;
+  followingCount: number;
+  musicTrack: ProfileTrack | null;
+  showMusicPlayer: boolean;
+  children?: ReactNode;
+};
+
+const PROFILE_STORAGE_KEY = "playground.profile.settings.v2";
+
+type StoredProfile = {
+  displayName: string;
+  username: string;
+  bio: string;
+  avatarSrc?: string | null;
+  avatarTransform?: AvatarTransform;
+  soundtrack?: ProfileSoundtrack;
+  showMusicPlayer: boolean;
+  themeId: string;
+};
+
+function canPersistSource(source?: string): boolean {
+  return Boolean(source && !source.startsWith("blob:"));
+}
+
+function createAssetId(): string {
+  if (
+    typeof crypto !== "undefined" &&
+    typeof crypto.randomUUID === "function"
+  ) {
+    return crypto.randomUUID();
+  }
+
+  return `avatar-${Date.now()}-${Math.random()
+    .toString(36)
+    .slice(2)}`;
+}
+
+function soundtrackForStorage(
+  soundtrack: ProfileSoundtrack,
+): ProfileSoundtrack {
+  return {
+    ...soundtrack,
+    tracks: soundtrack.tracks.map((track) => ({
+      ...track,
+      source:
+        track.sourceType === "upload" &&
+        track.source.startsWith("blob:")
+          ? ""
+          : track.source,
+    })),
+  };
+}
+
+function readStoredProfile(
+  fallback: EditableProfile,
+): EditableProfile {
+  try {
+    const raw =
+      window.localStorage.getItem(PROFILE_STORAGE_KEY) ??
+      window.localStorage.getItem(
+        "playground.profile.settings.v1",
+      );
+
+    if (!raw) {
+      return fallback;
+    }
+
+    const parsed = JSON.parse(raw) as Partial<StoredProfile> & {
+      musicTitle?: string;
+      musicArtist?: string;
+      musicSrc?: string | null;
+    };
+
+    const migratedSoundtrack =
+      parsed.soundtrack ??
+      (parsed.musicSrc && parsed.musicTitle
+        ? {
+            ...EMPTY_PROFILE_SOUNDTRACK,
+            tracks: [
+              {
+                id: "migrated-profile-track",
+                title: parsed.musicTitle,
+                artist:
+                  parsed.musicArtist ??
+                  fallback.displayName,
+                sourceType: "upload" as const,
+                source: parsed.musicSrc,
+              },
+            ],
+          }
+        : fallback.soundtrack);
+
+    return {
+      displayName:
+        typeof parsed.displayName === "string"
+          ? parsed.displayName
+          : fallback.displayName,
+
+      username:
+        typeof parsed.username === "string"
+          ? parsed.username
+          : fallback.username,
+
+      bio:
+        typeof parsed.bio === "string"
+          ? parsed.bio
+          : fallback.bio,
+
+      avatarSrc: Object.prototype.hasOwnProperty.call(
+        parsed,
+        "avatarSrc",
+      )
+        ? typeof parsed.avatarSrc === "string"
+          ? parsed.avatarSrc
+          : undefined
+        : fallback.avatarSrc,
+
+      avatarTransform: normalizeAvatarTransform(
+        parsed.avatarTransform &&
+          typeof parsed.avatarTransform === "object"
+          ? parsed.avatarTransform
+          : fallback.avatarTransform ??
+              DEFAULT_AVATAR_TRANSFORM,
+      ),
+
+      soundtrack: normalizeSoundtrack(
+        migratedSoundtrack ??
+          EMPTY_PROFILE_SOUNDTRACK,
+      ),
+
+      showMusicPlayer:
+        typeof parsed.showMusicPlayer === "boolean"
+          ? parsed.showMusicPlayer
+          : fallback.showMusicPlayer,
+
+      themeId:
+        typeof parsed.themeId === "string"
+          ? parsed.themeId
+          : fallback.themeId || DEFAULT_THEME_ID,
+    };
+  } catch (error) {
+    console.error(
+      "Could not read saved profile settings:",
+      error,
+    );
+
+    return fallback;
+  }
+}
+
+function persistProfile(profile: EditableProfile): void {
+  const soundtrack = normalizeSoundtrack(
+    profile.soundtrack ?? EMPTY_PROFILE_SOUNDTRACK,
+  );
+
+  const stored: StoredProfile = {
+    displayName: profile.displayName,
+    username: profile.username,
+    bio: profile.bio,
+
+    avatarSrc: canPersistSource(profile.avatarSrc)
+      ? profile.avatarSrc
+      : null,
+
+    avatarTransform: normalizeAvatarTransform(
+      profile.avatarTransform ??
+        DEFAULT_AVATAR_TRANSFORM,
+    ),
+
+    soundtrack: soundtrackForStorage(soundtrack),
+
+    showMusicPlayer:
+      soundtrack.tracks.length > 0 &&
+      profile.showMusicPlayer,
+
+    themeId:
+      profile.themeId || DEFAULT_THEME_ID,
+  };
+
+  window.localStorage.setItem(
+    PROFILE_STORAGE_KEY,
+    JSON.stringify(stored),
+  );
+}
+
+async function saveAvatarAsset(
+  blob: Blob,
+  transform: AvatarTransform,
+): Promise<void> {
+  const existing =
+    await ProfileAssetStore.get("avatar");
+
+  const now = Date.now();
+
+  const asset: ProfileAsset = {
+    id: existing?.id ?? createAssetId(),
+    type: "avatar",
+    file: blob,
+
+    // Object URLs are recreated when the app loads.
+    // The original Blob is the persistent source.
+    previewUrl: "",
+
+    width: existing?.width,
+    height: existing?.height,
+
+    createdAt: existing?.createdAt ?? now,
+    updatedAt: now,
+
+    transform: normalizeAvatarTransform(transform),
+  };
+
+  await ProfileAssetStore.save(asset);
+}
+
+async function updateStoredAvatarTransform(
+  transform: AvatarTransform,
+): Promise<void> {
+  const existing =
+    await ProfileAssetStore.get("avatar");
+
+  if (!existing) {
+    return;
+  }
+
+  await ProfileAssetStore.save({
+    ...existing,
+    transform: normalizeAvatarTransform(transform),
+    updatedAt: Date.now(),
+  });
+}
+
+export default function YourPlayground(
+  props: Props,
+) {
+  const {
+    displayName,
+    username,
+    bio,
+    avatarSrc,
+    postCount,
+    followerCount,
+    followingCount,
+    musicTrack,
+    showMusicPlayer,
+    children,
+  } = props;
+
+  const fallbackProfile =
+    useMemo<EditableProfile>(
+      () => ({
+        displayName,
+        username,
+        bio,
+        avatarSrc,
+
+        avatarTransform:
+          DEFAULT_AVATAR_TRANSFORM,
+
+        soundtrack: musicTrack
+          ? {
+              ...EMPTY_PROFILE_SOUNDTRACK,
+              tracks: [
+                {
+                  id: "default-profile-track",
+                  title: musicTrack.title,
+                  artist:
+                    musicTrack.artist ??
+                    displayName,
+                  sourceType: "upload",
+                  source: musicTrack.audioSrc,
+                },
+              ],
+            }
+          : EMPTY_PROFILE_SOUNDTRACK,
+
+        showMusicPlayer:
+          Boolean(musicTrack) &&
+          showMusicPlayer,
+
+        themeId: DEFAULT_THEME_ID,
+      }),
+      [
+        avatarSrc,
+        bio,
+        displayName,
+        musicTrack,
+        showMusicPlayer,
+        username,
+      ],
+    );
+
+  const [profile, setProfile] =
+    useState<EditableProfile>(() =>
+      readStoredProfile(fallbackProfile),
+    );
+
+  const [editorOpen, setEditorOpen] =
+    useState(false);
+
+  useEffect(() => {
+    let active = true;
+    const objectUrls: string[] = [];
+
+    void (async () => {
+      try {
+        /*
+         * Prefer the new global asset store.
+         * Fall back to the legacy media store and migrate
+         * automatically when necessary.
+         */
+        let avatarAsset =
+          await ProfileAssetStore.get("avatar");
+
+        if (!avatarAsset) {
+          const legacyAvatarBlob =
+            await readProfileMedia(
+              "profile-avatar",
+            );
+
+          if (legacyAvatarBlob) {
+            await saveAvatarAsset(
+              legacyAvatarBlob,
+              profile.avatarTransform ??
+                DEFAULT_AVATAR_TRANSFORM,
+            );
+
+            avatarAsset =
+              await ProfileAssetStore.get(
+                "avatar",
+              );
+          }
+        }
+
+        const currentSoundtrack =
+          normalizeSoundtrack(
+            profile.soundtrack ??
+              EMPTY_PROFILE_SOUNDTRACK,
+          );
+
+        const restoredTracks =
+          await Promise.all(
+            currentSoundtrack.tracks.map(
+              async (
+                track,
+              ): Promise<SoundtrackTrack> => {
+                if (
+                  track.sourceType !== "upload"
+                ) {
+                  return track;
+                }
+
+                const blob =
+                  await readProfileMedia(
+                    `profile-track:${track.id}`,
+                  );
+
+                if (!blob) {
+                  return track;
+                }
+
+                const objectUrl =
+                  URL.createObjectURL(blob);
+
+                objectUrls.push(objectUrl);
+
+                return {
+                  ...track,
+                  source: objectUrl,
+                };
+              },
+            ),
+          );
+
+        if (!active) {
+          return;
+        }
+
+        let restoredAvatar:
+          | string
+          | undefined;
+
+        if (avatarAsset?.file) {
+          restoredAvatar =
+            URL.createObjectURL(
+              avatarAsset.file,
+            );
+
+          objectUrls.push(restoredAvatar);
+        }
+
+        setProfile((current) => ({
+          ...current,
+
+          avatarSrc:
+            restoredAvatar ??
+            current.avatarSrc,
+
+          avatarTransform:
+            avatarAsset?.transform
+              ? normalizeAvatarTransform(
+                  avatarAsset.transform,
+                )
+              : current.avatarTransform,
+
+          soundtrack: {
+            ...currentSoundtrack,
+            tracks: restoredTracks,
+          },
+        }));
+      } catch (error) {
+        console.error(
+          "Could not restore profile media:",
+          error,
+        );
+      }
+    })();
+
+    return () => {
+      active = false;
+
+      objectUrls.forEach((url) => {
+        URL.revokeObjectURL(url);
+      });
+    };
+  }, []);
+
+  const activeTheme = getTheme(
+    profile.themeId || DEFAULT_THEME_ID,
+  );
+
+  const activeAvatarTransform =
+    normalizeAvatarTransform(
+      profile.avatarTransform ??
+        DEFAULT_AVATAR_TRANSFORM,
+    );
+
+  const soundtrack = normalizeSoundtrack(
+    profile.soundtrack ??
+      EMPTY_PROFILE_SOUNDTRACK,
+  );
+
+  const saveProfile = async (
+    next: EditableProfile,
+  ) => {
+    const mergedNext: EditableProfile = {
+      ...next,
+
+      avatarSrc:
+        next.avatarSrc ??
+        profile.avatarSrc,
+
+      avatarTransform:
+        normalizeAvatarTransform(
+          next.avatarTransform ??
+            profile.avatarTransform ??
+            DEFAULT_AVATAR_TRANSFORM,
+        ),
+
+      soundtrack: normalizeSoundtrack(
+        next.soundtrack ??
+          profile.soundtrack ??
+          EMPTY_PROFILE_SOUNDTRACK,
+      ),
+    };
+
+    try {
+      if (
+        mergedNext.avatarSrc?.startsWith(
+          "blob:",
+        )
+      ) {
+        const avatarBlob =
+          await blobFromSource(
+            mergedNext.avatarSrc,
+          );
+
+        /*
+         * New global asset store.
+         */
+        await saveAvatarAsset(
+          avatarBlob,
+          mergedNext.avatarTransform,
+        );
+
+        /*
+         * Legacy mirror during Sprint 16A migration.
+         * This will be removed after verification.
+         */
+        await saveProfileMedia(
+          "profile-avatar",
+          avatarBlob,
+        );
+      } else if (!mergedNext.avatarSrc) {
+        await Promise.all([
+          ProfileAssetStore.remove("avatar"),
+          deleteProfileMedia(
+            "profile-avatar",
+          ),
+        ]);
+      } else {
+        /*
+         * The image did not change, but the user may
+         * have adjusted crop, zoom, rotation, or brightness.
+         */
+        await updateStoredAvatarTransform(
+          mergedNext.avatarTransform,
+        );
+      }
+
+      for (
+        const track of
+        mergedNext.soundtrack?.tracks ?? []
+      ) {
+        if (
+          track.sourceType === "upload" &&
+          track.source.startsWith("blob:")
+        ) {
+          await saveProfileMedia(
+            `profile-track:${track.id}`,
+            await blobFromSource(
+              track.source,
+            ),
+          );
+        }
+      }
+    } catch (error) {
+      console.error(
+        "Could not permanently save profile media:",
+        error,
+      );
+    }
+
+    setProfile(mergedNext);
+    persistProfile(mergedNext);
+    setEditorOpen(false);
+  };
+
+  const hiddenAutoplay =
+    soundtrack.tracks.length > 0 &&
+    !profile.showMusicPlayer &&
+    soundtrack.autoplay;
+
+  return (
+    <>
+      <ExperienceRenderer
+        themeId={activeTheme.id}
+        className={activeTheme.className}
+        style={getThemeStyle(activeTheme)}
+        profile={{
+          displayName:
+            profile.displayName,
+          username: profile.username,
+          bio: profile.bio,
+          avatarSrc: profile.avatarSrc,
+          avatarTransform:
+            activeAvatarTransform,
+        }}
+        posts={children}
+        postCount={postCount}
+        followerCount={followerCount}
+        followingCount={followingCount}
+        soundtrack={soundtrack}
+        showMusicPlayer={
+          profile.showMusicPlayer
+        }
+        hiddenAutoplay={hiddenAutoplay}
+        onEdit={() =>
+          setEditorOpen(true)
+        }
+      />
+
+      {editorOpen && (
+        <EditProfile
+          profile={profile}
+          onCancel={() =>
+            setEditorOpen(false)
+          }
+          onSave={saveProfile}
+        />
+      )}
+    </>
+  );
+}

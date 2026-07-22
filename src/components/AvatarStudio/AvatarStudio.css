@@ -202,7 +202,6 @@ body.avatar-studio-open {
   pointer-events: none;
   user-select: none;
 
-  will-change: transform, filter;
 }
 
 .avatar-studio__grid {

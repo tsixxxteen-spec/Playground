@@ -1,0 +1,7 @@
+src/personalization/widgets/types.ts
+src/personalization/widgets/registry.ts
+src/personalization/widgets/WidgetStudio.tsx
+src/personalization/widgets/WidgetStudio.css
+src/personalization/widgets/WidgetLayer.tsx
+src/personalization/widgets/WidgetLayer.css
+src/personalization/widgets/index.ts

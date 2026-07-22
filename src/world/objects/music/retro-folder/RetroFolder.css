@@ -1,0 +1,116 @@
+.retro-folder {
+  position: relative;
+  display: block;
+  width: 108px;
+  height: 82px;
+  filter: drop-shadow(0 13px 16px rgba(0, 0, 0, 0.24));
+  transform-origin: center bottom;
+}
+
+.retro-folder__tab,
+.retro-folder__back,
+.retro-folder__front,
+.retro-folder__paper {
+  position: absolute;
+  display: block;
+}
+
+.retro-folder__tab {
+  left: 7px;
+  top: 3px;
+  width: 43px;
+  height: 20px;
+  border-radius: 8px 8px 2px 2px;
+  background: linear-gradient(180deg, #f6cb66 0%, #d99a31 100%);
+}
+
+.retro-folder__back {
+  inset: 14px 2px 4px;
+  border-radius: 8px 9px 12px 12px;
+  background: linear-gradient(145deg, #f4c65a 0%, #cf8926 100%);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.55),
+    inset 0 -7px 12px rgba(111, 57, 4, 0.12);
+}
+
+.retro-folder__paper {
+  left: 15px;
+  right: 13px;
+  top: 24px;
+  height: 40px;
+  padding: 8px 10px;
+  border-radius: 4px;
+  background: #f3efe2;
+  transform: rotate(-2deg);
+  box-shadow: 0 2px 5px rgba(75, 46, 13, 0.18);
+  transition: transform 180ms ease;
+}
+
+.retro-folder__paper span {
+  display: block;
+  height: 3px;
+  margin-bottom: 5px;
+  border-radius: 999px;
+  background: rgba(81, 73, 63, 0.22);
+}
+
+.retro-folder__paper span:nth-child(2) {
+  width: 72%;
+}
+
+.retro-folder__paper span:nth-child(3) {
+  width: 48%;
+}
+
+.retro-folder__front {
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  height: 53px;
+  border-radius: 7px 8px 12px 12px;
+  background:
+    linear-gradient(155deg, rgba(255, 255, 255, 0.34), transparent 34%),
+    linear-gradient(145deg, #ffd56b 0%, #dea036 100%);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.55),
+    inset 0 -9px 14px rgba(113, 61, 8, 0.13);
+  transform-origin: center bottom;
+  transition: transform 180ms ease;
+}
+
+.retro-folder__label {
+  position: absolute;
+  left: 50%;
+  bottom: 13px;
+  padding: 3px 8px 2px;
+  border: 1px solid rgba(82, 48, 13, 0.2);
+  border-radius: 3px;
+  background: rgba(255, 248, 218, 0.72);
+  color: rgba(69, 43, 17, 0.78);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  transform: translateX(-50%);
+}
+
+[data-retro-folder-state="hovered"] .retro-folder__paper {
+  transform: translateY(-7px) rotate(-2deg);
+}
+
+[data-retro-folder-state="opening"] .retro-folder__front,
+[data-retro-folder-state="open"] .retro-folder__front {
+  transform: perspective(180px) rotateX(-13deg);
+}
+
+[data-retro-folder-state="opening"] .retro-folder__paper,
+[data-retro-folder-state="open"] .retro-folder__paper {
+  transform: translateY(-12px) rotate(-2deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .retro-folder__paper,
+  .retro-folder__front {
+    transition: none;
+  }
+}

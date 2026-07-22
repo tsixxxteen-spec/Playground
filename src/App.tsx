@@ -3,7 +3,11 @@ import "./App.css";
 import YourPlayground from "./components/YourPlayground";
 
 type Theme = "light" | "dark" | "system";
-type AppView = "home" | "profile";
+type AppView =
+  | "home"
+  | "profile"
+  | "world-library"
+  | "world-workspace";
 type Weight = "standard" | "wide" | "tall" | "hero" | "panorama";
 
 type MediaType = "image" | "video" | "audio";
@@ -2094,7 +2098,7 @@ function App() {
           musicTrack={{
             title: "FREE",
             artist: "Terry Presume",
-            audioSrc: "/music/FREE.mp3",
+            audioSrc: "",
           }}
           showMusicPlayer={true}
         >

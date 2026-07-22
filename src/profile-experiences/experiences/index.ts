@@ -8,3 +8,7 @@ export { default as MusicEditorial } from "./MusicEditorial";
 export { default as PressKit } from "./PressKit";
 export { default as Stardust } from "./Stardust";
 export { default as EditorialClassic } from "./EditorialClassic";
+export { StudioWindow, Sidecar, DesktopDaydream } from "./ThemeLibraryV1";
+export { GalleryOne, Monograph, ContactGrid, MosaicArchive } from "./EditorialCollectionI";
+export { Canvas, Storyboard, Notebook, Signals, PortfolioSplit } from "./CreatorCollection";
+export { Orbit, InfiniteDesk, MemoryWall, SplitReality, TerminalDream } from "./ExperimentalCollection";

@@ -1,0 +1,611 @@
+.playground-session-launcher {
+  position: fixed;
+  right: 18px;
+  bottom: 72px;
+  z-index: 9998;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 13px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.13);
+  border-radius: 12px;
+  background:
+    rgba(18, 18, 20, 0.94);
+  color:
+    rgba(255, 255, 255, 0.9);
+  font:
+    650 12px/1
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  box-shadow:
+    0 12px 36px
+    rgba(0, 0, 0, 0.32);
+  backdrop-filter:
+    blur(18px);
+}
+
+.playground-session-launcher:hover {
+  background:
+    rgba(28, 28, 31, 0.98);
+  transform:
+    translateY(-1px);
+}
+
+.playground-session-launcher__icon {
+  font-size: 16px;
+  opacity: 0.76;
+}
+
+.playground-session-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  background:
+    rgba(0, 0, 0, 0.54);
+  backdrop-filter:
+    blur(16px);
+  animation:
+    playground-session-fade-in
+    160ms ease-out;
+}
+
+.playground-session-manager {
+  width:
+    min(1040px, 96vw);
+  height:
+    min(720px, 88vh);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid
+    rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+  background:
+    rgba(14, 14, 16, 0.975);
+  color: #fff;
+  box-shadow:
+    0 36px 100px
+    rgba(0, 0, 0, 0.58);
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  animation:
+    playground-session-rise
+    210ms
+    cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    );
+}
+
+.playground-session-manager__header {
+  min-height: 92px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px 24px;
+  border-bottom: 1px solid
+    rgba(255, 255, 255, 0.08);
+}
+
+.playground-session-manager__eyebrow {
+  margin: 0 0 4px;
+  color:
+    rgba(255, 255, 255, 0.4);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.playground-session-manager__title {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 680;
+  letter-spacing: -0.035em;
+}
+
+.playground-session-manager__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.playground-session-manager__save-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 32px;
+  padding: 0 11px;
+  border-radius: 999px;
+  background:
+    rgba(255, 255, 255, 0.055);
+  color:
+    rgba(255, 255, 255, 0.56);
+  font-size: 11px;
+}
+
+.playground-session-manager__status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background:
+    rgba(255, 255, 255, 0.32);
+}
+
+.playground-session-manager__save-status--saved {
+  color: #a8efbb;
+  background:
+    rgba(62, 180, 95, 0.12);
+}
+
+.playground-session-manager__save-status--saved
+.playground-session-manager__status-dot {
+  background: #75da91;
+}
+
+.playground-session-manager__save-status--saving
+.playground-session-manager__status-dot {
+  background: #f4c76a;
+}
+
+.playground-session-manager__save-status--error {
+  color: #ffb4b4;
+  background:
+    rgba(221, 70, 70, 0.13);
+}
+
+.playground-session-manager__save-status--error
+.playground-session-manager__status-dot {
+  background: #f07b7b;
+}
+
+.playground-session-manager__close {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background:
+    rgba(255, 255, 255, 0.07);
+  color:
+    rgba(255, 255, 255, 0.72);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.playground-session-manager__close:hover {
+  background:
+    rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.playground-session-manager__toolbar {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  border-bottom: 1px solid
+    rgba(255, 255, 255, 0.07);
+}
+
+.playground-session-manager__primary-button,
+.playground-session-manager__secondary-button,
+.playground-session-manager__open-button {
+  min-height: 34px;
+  padding: 0 13px;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.playground-session-manager__primary-button,
+.playground-session-manager__open-button {
+  border: 1px solid
+    rgba(255, 255, 255, 0.18);
+  background: #f4f4f4;
+  color: #111;
+}
+
+.playground-session-manager__secondary-button {
+  border: 1px solid
+    rgba(255, 255, 255, 0.1);
+  background:
+    rgba(255, 255, 255, 0.055);
+  color:
+    rgba(255, 255, 255, 0.82);
+}
+
+.playground-session-manager__secondary-button:disabled {
+  opacity: 0.36;
+  cursor: default;
+}
+
+.playground-session-manager__shortcut {
+  margin-left: auto;
+  color:
+    rgba(255, 255, 255, 0.35);
+  font-size: 11px;
+}
+
+.playground-session-manager__hidden-input {
+  display: none;
+}
+
+.playground-session-manager__content {
+  min-height: 0;
+  flex: 1;
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    280px;
+}
+
+.playground-session-manager__list {
+  min-width: 0;
+  overflow-y: auto;
+  padding: 14px;
+}
+
+.playground-session-card {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 9px;
+  border: 1px solid
+    transparent;
+  border-radius: 15px;
+  background:
+    rgba(255, 255, 255, 0.026);
+  transition:
+    border-color 140ms ease,
+    background 140ms ease,
+    transform 140ms ease;
+}
+
+.playground-session-card:hover {
+  background:
+    rgba(255, 255, 255, 0.05);
+}
+
+.playground-session-card--selected {
+  border-color:
+    rgba(255, 255, 255, 0.15);
+  background:
+    rgba(255, 255, 255, 0.075);
+}
+
+.playground-session-card__main {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.playground-session-card__preview {
+  width: 58px;
+  height: 48px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border: 1px solid
+    rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background:
+    radial-gradient(
+      circle at 30% 25%,
+      rgba(255, 255, 255, 0.12),
+      transparent 46%
+    ),
+    rgba(255, 255, 255, 0.035);
+  color:
+    rgba(255, 255, 255, 0.35);
+  font-size: 20px;
+}
+
+.playground-session-card__content {
+  min-width: 0;
+}
+
+.playground-session-card__name {
+  margin: 0 0 7px;
+  overflow: hidden;
+  color:
+    rgba(255, 255, 255, 0.91);
+  font-size: 13px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playground-session-card__metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  color:
+    rgba(255, 255, 255, 0.4);
+  font-size: 10px;
+}
+
+.playground-session-card__rename-input {
+  width:
+    min(280px, 100%);
+  height: 29px;
+  margin-bottom: 5px;
+  padding: 0 8px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.22);
+  border-radius: 7px;
+  outline: none;
+  background:
+    rgba(0, 0, 0, 0.28);
+  color: #fff;
+  font: inherit;
+  font-size: 12px;
+}
+
+.playground-session-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  transition:
+    opacity 120ms ease;
+}
+
+.playground-session-card:hover
+.playground-session-card__actions,
+.playground-session-card--selected
+.playground-session-card__actions {
+  opacity: 1;
+}
+
+.playground-session-card__actions button {
+  min-height: 28px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 7px;
+  background:
+    transparent;
+  color:
+    rgba(255, 255, 255, 0.48);
+  font: inherit;
+  font-size: 9px;
+  cursor: pointer;
+}
+
+.playground-session-card__actions button:hover {
+  background:
+    rgba(255, 255, 255, 0.07);
+  color:
+    rgba(255, 255, 255, 0.9);
+}
+
+.playground-session-card__actions
+.playground-session-card__delete:hover {
+  color: #ff9b9b;
+  background:
+    rgba(219, 73, 73, 0.12);
+}
+
+.playground-session-manager__details {
+  min-width: 0;
+  padding: 22px;
+  border-left: 1px solid
+    rgba(255, 255, 255, 0.07);
+  background:
+    rgba(255, 255, 255, 0.016);
+}
+
+.playground-session-manager__detail-preview {
+  height: 145px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 18px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  background:
+    radial-gradient(
+      circle at 34% 24%,
+      rgba(255, 255, 255, 0.12),
+      transparent 43%
+    ),
+    rgba(255, 255, 255, 0.025);
+  color:
+    rgba(255, 255, 255, 0.28);
+  font-size: 34px;
+}
+
+.playground-session-manager__details h3 {
+  margin: 0 0 18px;
+  font-size: 16px;
+  font-weight: 650;
+}
+
+.playground-session-manager__details dl {
+  margin: 0 0 20px;
+}
+
+.playground-session-manager__details dl div {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 9px 0;
+  border-bottom: 1px solid
+    rgba(255, 255, 255, 0.055);
+}
+
+.playground-session-manager__details dt {
+  color:
+    rgba(255, 255, 255, 0.38);
+  font-size: 10px;
+}
+
+.playground-session-manager__details dd {
+  margin: 0;
+  color:
+    rgba(255, 255, 255, 0.73);
+  font-size: 10px;
+  text-align: right;
+}
+
+.playground-session-manager__open-button {
+  width: 100%;
+}
+
+.playground-session-manager__details-empty,
+.playground-session-manager__empty {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  height: 100%;
+  color:
+    rgba(255, 255, 255, 0.38);
+  text-align: center;
+}
+
+.playground-session-manager__empty {
+  min-height: 380px;
+}
+
+.playground-session-manager__empty-icon {
+  margin-bottom: 12px;
+  font-size: 30px;
+  opacity: 0.55;
+}
+
+.playground-session-manager__empty h3 {
+  margin: 0 0 8px;
+  color:
+    rgba(255, 255, 255, 0.72);
+  font-size: 14px;
+}
+
+.playground-session-manager__empty p {
+  max-width: 300px;
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+@keyframes playground-session-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes playground-session-rise {
+  from {
+    opacity: 0;
+    transform:
+      translateY(16px)
+      scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@media (max-width: 860px) {
+  .playground-session-manager__content {
+    grid-template-columns: 1fr;
+  }
+
+  .playground-session-manager__details {
+    display: none;
+  }
+
+  .playground-session-card {
+    grid-template-columns: 1fr;
+  }
+
+  .playground-session-card__actions {
+    opacity: 1;
+    padding-left: 71px;
+  }
+}
+
+@media (max-width: 620px) {
+  .playground-session-overlay {
+    padding: 10px;
+  }
+
+  .playground-session-manager {
+    width: 100%;
+    height: 94vh;
+    border-radius: 18px;
+  }
+
+  .playground-session-manager__header {
+    min-height: 78px;
+    padding: 16px;
+  }
+
+  .playground-session-manager__toolbar {
+    padding: 10px 16px;
+  }
+
+  .playground-session-manager__save-status {
+    display: none;
+  }
+
+  .playground-session-card__metadata {
+    display: grid;
+    gap: 3px;
+  }
+
+  .playground-session-card__actions {
+    padding-left: 0;
+    flex-wrap: wrap;
+  }
+
+  .playground-session-launcher {
+    right: 10px;
+    bottom: 64px;
+  }
+}

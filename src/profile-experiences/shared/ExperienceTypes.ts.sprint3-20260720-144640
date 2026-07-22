@@ -1,0 +1,36 @@
+import type { CSSProperties, ReactNode } from "react";
+import type { AvatarTransform } from "../../components/AvatarStudio";
+import type { ProfileSoundtrack } from "../../lib/profileSoundtrack";
+
+export type AccountVisibility = "public" | "private";
+
+export type FollowRelationship =
+  | "none"
+  | "requested"
+  | "following";
+
+export type ExperienceProfile = {
+  displayName: string;
+  username: string;
+  bio: string;
+  avatarSrc?: string;
+  avatarTransform: AvatarTransform;
+};
+
+export type ExperienceProps = {
+  themeId: string;
+  className?: string;
+  style?: CSSProperties;
+  profile: ExperienceProfile;
+  posts: ReactNode;
+  postCount: number;
+  followerCount: number;
+  followingCount: number;
+  isOwner?: boolean;
+  accountVisibility?: AccountVisibility;
+  followRelationship?: FollowRelationship;
+  soundtrack: ProfileSoundtrack;
+  showMusicPlayer: boolean;
+  hiddenAutoplay: boolean;
+  onEdit: () => void;
+};

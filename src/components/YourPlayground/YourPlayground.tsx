@@ -1,5 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
+import FollowDrawer from "../FollowDrawer";
+import ProfileActionBar from "../ProfileActionBar";
+import { PresenceProvider } from "../../presence/PresenceContext";
+import PresenceLayer from "../../presence/PresenceLayer";
+import PresenceSettings from "../../presence/PresenceSettings";
+import type {
+  FollowDrawerMode,
+  FollowUser,
+} from "../FollowDrawer";
 import type { ReactNode } from "react";
+import type {
+  AccountVisibility,
+  FollowRelationship,
+} from "../../profile-experiences/shared/ExperienceTypes";
 import EditProfile from "../EditProfile";
 import type { EditableProfile } from "../EditProfile";
 import type { ProfileTrack } from "../ProfileMusicPlayer";
@@ -10,12 +23,35 @@ import { DEFAULT_THEME_ID, getTheme, getThemeStyle } from "../../themes";
 import { EMPTY_PROFILE_SOUNDTRACK, normalizeSoundtrack } from "../../lib/profileSoundtrack";
 import type { ProfileSoundtrack, SoundtrackTrack } from "../../lib/profileSoundtrack";
 import { ExperienceRenderer } from "../../profile-experiences";
+import {
+  EMPTY_PLAYGROUND,
+  normalizePlayground,
+} from "../../world/types/playground";
+import type { PlaygroundData } from "../../world/types/playground";
+import { DEFAULT_ENVIRONMENT_SETTINGS, normalizeEnvironmentSettings } from "../../personalization/environments";
+import type { EnvironmentSettings } from "../../personalization/environments";
+import { DEFAULT_COMPANION_SETTINGS, normalizeCompanionSettings } from "../../personalization/companions";
+import type { CompanionSettings } from "../../personalization/companions";
+import { DEFAULT_WIDGET_SETTINGS, normalizeWidgetSettings } from "../../personalization/widgets";
+import type { WidgetSettings } from "../../personalization/widgets";
 import "./YourPlayground.css";
 
 type Props = {
-  displayName: string; username: string; bio: string; avatarSrc?: string;
-  postCount: number; followerCount: number; followingCount: number;
-  musicTrack: ProfileTrack | null; showMusicPlayer: boolean; children?: ReactNode;
+  displayName: string;
+  username: string;
+  bio: string;
+  avatarSrc?: string;
+  postCount: number;
+  followerCount: number;
+  followingCount: number;
+  isOwner?: boolean;
+  accountVisibility?: AccountVisibility;
+  followRelationship?: FollowRelationship;
+  followers?: FollowUser[];
+  following?: FollowUser[];
+  musicTrack: ProfileTrack | null;
+  showMusicPlayer: boolean;
+  children?: ReactNode;
 };
 
 const PROFILE_STORAGE_KEY = "playground.profile.settings.v2";
@@ -24,6 +60,10 @@ type StoredProfile = {
   displayName: string; username: string; bio: string; avatarSrc?: string | null;
   avatarTransform?: AvatarTransform; avatarTransforms?: Record<string, AvatarTransform>;
   soundtrack?: ProfileSoundtrack; showMusicPlayer: boolean; themeId: string;
+  playground?: PlaygroundData;
+  environment?: EnvironmentSettings;
+  companions?: CompanionSettings;
+  widgets?: WidgetSettings;
 };
 
 function canPersistSource(source?: string): boolean {
@@ -71,12 +111,13 @@ function readStoredProfile(fallback: EditableProfile): EditableProfile {
           ? parsed.avatarTransform
           : fallback.avatarTransform ?? DEFAULT_AVATAR_TRANSFORM,
       ),
-      avatarTransforms: parsed.avatarTransforms && typeof parsed.avatarTransforms === "object"
-        ? parsed.avatarTransforms
-        : fallback.avatarTransforms,
       soundtrack: normalizeSoundtrack(migratedSoundtrack ?? EMPTY_PROFILE_SOUNDTRACK),
       showMusicPlayer: typeof parsed.showMusicPlayer === "boolean" ? parsed.showMusicPlayer : fallback.showMusicPlayer,
       themeId: typeof parsed.themeId === "string" ? parsed.themeId : fallback.themeId || DEFAULT_THEME_ID,
+      playground: normalizePlayground(parsed.playground ?? fallback.playground),
+      environment: normalizeEnvironmentSettings(parsed.environment ?? fallback.environment),
+      companions: normalizeCompanionSettings(parsed.companions ?? fallback.companions),
+      widgets: normalizeWidgetSettings(parsed.widgets ?? fallback.widgets),
     };
   } catch (error) {
     console.error("Could not read saved profile settings:", error);
@@ -92,16 +133,35 @@ function persistProfile(profile: EditableProfile): void {
     bio: profile.bio,
     avatarSrc: canPersistSource(profile.avatarSrc) ? profile.avatarSrc : null,
     avatarTransform: profile.avatarTransform ?? DEFAULT_AVATAR_TRANSFORM,
-    avatarTransforms: profile.avatarTransforms,
     soundtrack: soundtrackForStorage(soundtrack),
     showMusicPlayer: soundtrack.tracks.length > 0 && profile.showMusicPlayer,
     themeId: profile.themeId || DEFAULT_THEME_ID,
+    playground: normalizePlayground(profile.playground),
+    environment: normalizeEnvironmentSettings(profile.environment),
+    companions: normalizeCompanionSettings(profile.companions),
+    widgets: normalizeWidgetSettings(profile.widgets),
   };
   window.localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(stored));
 }
 
 export default function YourPlayground(props: Props) {
-  const { displayName, username, bio, avatarSrc, postCount, followerCount, followingCount, musicTrack, showMusicPlayer, children } = props;
+  const {
+    displayName,
+    username,
+    bio,
+    avatarSrc,
+    postCount,
+    followerCount,
+    followingCount,
+    isOwner = true,
+    accountVisibility = "public",
+    followRelationship = "none",
+    followers = [],
+    following = [],
+    musicTrack,
+    showMusicPlayer,
+    children,
+  } = props;
   const fallbackProfile = useMemo<EditableProfile>(() => ({
     displayName, username, bio, avatarSrc,
     avatarTransform: DEFAULT_AVATAR_TRANSFORM,
@@ -118,16 +178,50 @@ export default function YourPlayground(props: Props) {
     } : EMPTY_PROFILE_SOUNDTRACK,
     showMusicPlayer: Boolean(musicTrack) && showMusicPlayer,
     themeId: DEFAULT_THEME_ID,
+    environment: DEFAULT_ENVIRONMENT_SETTINGS,
+    companions: DEFAULT_COMPANION_SETTINGS,
+    widgets: DEFAULT_WIDGET_SETTINGS,
+    playground: {
+      enabled: true,
+      objects: [
+        {
+          id: "profile-retro-folder",
+          objectId: "retro-folder",
+          lane: "music",
+          enabled: true,
+          position: { x: 84, y: 32 },
+          rotation: -3,
+          scale: 1,
+          zIndex: 1,
+          action: { type: "open-music" },
+        },
+      ],
+    },
   }), [avatarSrc, bio, displayName, musicTrack, showMusicPlayer, username]);
 
   const [profile, setProfile] = useState<EditableProfile>(() => readStoredProfile(fallbackProfile));
   const [editorOpen, setEditorOpen] = useState(false);
+  const [followDrawerMode, setFollowDrawerMode] =
+    useState<FollowDrawerMode | null>(null);
+  const [activeFollowRelationship, setActiveFollowRelationship] =
+    useState<FollowRelationship>(followRelationship);
+
+  useEffect(() => {
+    setActiveFollowRelationship(followRelationship);
+  }, [followRelationship]);
 
   useEffect(() => {
     let active = true;
     const objectUrls: string[] = [];
     void (async () => {
       try {
+        const avatarMigrationKey = "worlds-avatar-hd-migration-v1";
+
+        if (!localStorage.getItem(avatarMigrationKey)) {
+          await deleteProfileMedia("profile-avatar");
+          localStorage.setItem(avatarMigrationKey, "complete");
+        }
+
         const avatarBlob = await readProfileMedia("profile-avatar");
         const currentSoundtrack = normalizeSoundtrack(profile.soundtrack ?? EMPTY_PROFILE_SOUNDTRACK);
         const restoredTracks = await Promise.all(currentSoundtrack.tracks.map(async (track): Promise<SoundtrackTrack> => {
@@ -161,7 +255,7 @@ export default function YourPlayground(props: Props) {
 
   const activeTheme = getTheme(profile.themeId || DEFAULT_THEME_ID);
   const activeAvatarTransform = normalizeAvatarTransform(
-    profile.avatarTransforms?.[activeTheme.id] ?? profile.avatarTransform ?? DEFAULT_AVATAR_TRANSFORM,
+    profile.avatarTransform ?? DEFAULT_AVATAR_TRANSFORM,
   );
   const soundtrack = normalizeSoundtrack(profile.soundtrack ?? EMPTY_PROFILE_SOUNDTRACK);
 
@@ -169,8 +263,11 @@ export default function YourPlayground(props: Props) {
     const mergedNext: EditableProfile = {
       ...next,
       avatarSrc: next.avatarSrc ?? profile.avatarSrc,
-      avatarTransforms: next.avatarTransforms ?? profile.avatarTransforms,
       soundtrack: normalizeSoundtrack(next.soundtrack ?? profile.soundtrack),
+      playground: normalizePlayground(next.playground ?? profile.playground),
+      environment: normalizeEnvironmentSettings(next.environment ?? profile.environment),
+      companions: normalizeCompanionSettings(next.companions ?? profile.companions),
+      widgets: normalizeWidgetSettings(next.widgets ?? profile.widgets),
     };
     try {
       if (mergedNext.avatarSrc?.startsWith("blob:")) {
@@ -191,9 +288,85 @@ export default function YourPlayground(props: Props) {
     setEditorOpen(false);
   };
 
+  const handleFollowAction = () => {
+    setActiveFollowRelationship((current) => {
+      if (current === "following") {
+        return "none";
+      }
+
+      if (current === "requested") {
+        return "none";
+      }
+
+      return accountVisibility === "private"
+        ? "requested"
+        : "following";
+    });
+  };
+
+  const handleMessage = () => {
+    window.dispatchEvent(
+      new CustomEvent("playground:open-message", {
+        detail: {
+          username: profile.username,
+          displayName: profile.displayName,
+        },
+      }),
+    );
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: `${profile.displayName} on Playground`,
+      text: `Explore ${profile.displayName}'s Playground.`,
+      url: window.location.href,
+    };
+
+    try {
+      if (typeof navigator.share === "function") {
+        await navigator.share(shareData);
+        return;
+      }
+
+      await navigator.clipboard.writeText(window.location.href);
+    } catch (error) {
+      if (
+        error instanceof DOMException &&
+        error.name === "AbortError"
+      ) {
+        return;
+      }
+
+      console.error("Could not share this profile:", error);
+    }
+  };
+
+
+  const copyProfileLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+    } catch (error) {
+      console.error("Could not copy profile link:", error);
+    }
+  };
+
   const hiddenAutoplay = soundtrack.tracks.length > 0 && !profile.showMusicPlayer && soundtrack.autoplay;
 
-  return <>
+  return (
+    <PresenceProvider>
+      <div className="your-playground-presence-shell">
+        <PresenceLayer />
+        {isOwner && <PresenceSettings />}
+    <ProfileActionBar
+      isOwner={isOwner}
+      accountVisibility={accountVisibility}
+      followRelationship={activeFollowRelationship}
+      onEdit={() => setEditorOpen(true)}
+      onFollowToggle={handleFollowAction}
+      onMessage={handleMessage}
+      onShare={handleShare}
+      onCopyLink={copyProfileLink}
+    />
     <ExperienceRenderer
       themeId={activeTheme.id}
       className={activeTheme.className}
@@ -209,11 +382,47 @@ export default function YourPlayground(props: Props) {
       postCount={postCount}
       followerCount={followerCount}
       followingCount={followingCount}
+      isOwner={isOwner}
+      accountVisibility={accountVisibility}
+      followRelationship={activeFollowRelationship}
+      onFollowersClick={
+        isOwner
+          ? () => setFollowDrawerMode("followers")
+          : undefined
+      }
+      onFollowingClick={
+        isOwner
+          ? () => setFollowDrawerMode("following")
+          : undefined
+      }
       soundtrack={soundtrack}
       showMusicPlayer={profile.showMusicPlayer}
       hiddenAutoplay={hiddenAutoplay}
+      playground={profile.playground ?? EMPTY_PLAYGROUND}
+      environment={profile.environment}
+      companions={profile.companions}
+      widgets={profile.widgets}
       onEdit={() => setEditorOpen(true)}
     />
-    {editorOpen && <EditProfile profile={profile} onCancel={() => setEditorOpen(false)} onSave={saveProfile} />}
-  </>;
+    {editorOpen && (
+      <EditProfile
+        profile={profile}
+        onCancel={() => setEditorOpen(false)}
+        onSave={saveProfile}
+      />
+    )}
+
+    <FollowDrawer
+      open={isOwner && followDrawerMode !== null}
+      mode={followDrawerMode ?? "followers"}
+      users={
+        followDrawerMode === "following"
+          ? following
+          : followers
+      }
+      onClose={() => setFollowDrawerMode(null)}
+    />
+      </div>
+    </PresenceProvider>
+  );
 }

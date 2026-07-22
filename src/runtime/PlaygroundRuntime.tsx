@@ -1,0 +1,91 @@
+import { useEffect } from "react";
+
+import {
+  PLAYGROUND_RUNTIME_CONFIG,
+} from "./runtime-config";
+
+import {
+  announcePlaygroundBuildMetadata,
+} from "./build-metadata";
+
+
+import PersistentSessionBridge from "../collaboration/persistence/PersistentSessionBridge";
+import SharedRecoveryBridge from "../collaboration/recovery/SharedRecoveryBridge";
+import EditorMutationAdapter from "../collaboration/mutations/EditorMutationAdapter";
+import SharedMutationBridge from "../collaboration/mutations/SharedMutationBridge";
+import SessionControls from "../collaboration/persistence/SessionControls";
+import SessionManager from "../collaboration/session-manager/SessionManager";
+import VisualHistoryPanel from "../collaboration/history/VisualHistoryPanel";
+import CollaborationDashboard from "../collaboration/dashboard/CollaborationDashboard";
+import ObjectInspectorPanel from "../collaboration/inspector/ObjectInspectorPanel";
+import CollaborationCommandCenter from "../collaboration/command-center/CollaborationCommandCenter";
+import CollaborationDiagnosticsPanel from "../collaboration/diagnostics/CollaborationDiagnosticsPanel";
+import ReleaseReadinessPanel from "../collaboration/release-readiness/ReleaseReadinessPanel";
+import ProfileExperiencePolishBridge from "../profile-experience/polish/ProfileExperiencePolishBridge";
+import { ReleaseCenter } from "./release-center";
+
+import {
+  announcePlaygroundRuntimeReady,
+} from "./runtime-events";
+
+export const PLAYGROUND_RUNTIME_SYSTEMS = [
+  "PersistentSessionBridge",
+  "SharedRecoveryBridge",
+  "EditorMutationAdapter",
+  "SharedMutationBridge",
+  "SessionControls",
+  "SessionManager",
+  "VisualHistoryPanel",
+  "CollaborationDashboard",
+  "ObjectInspectorPanel",
+  "CollaborationCommandCenter",
+  "CollaborationDiagnosticsPanel",
+  "ReleaseReadinessPanel",
+  "ProfileExperiencePolishBridge",
+] as const;
+
+export type PlaygroundRuntimeSystem =
+  typeof PLAYGROUND_RUNTIME_SYSTEMS[number];
+
+export default function PlaygroundRuntime() {
+  useEffect(() => {
+    announcePlaygroundRuntimeReady(
+      PLAYGROUND_RUNTIME_SYSTEMS,
+    );
+
+    announcePlaygroundBuildMetadata();
+  }, []);
+
+  return (
+    <>
+      <PersistentSessionBridge />
+      <SharedRecoveryBridge />
+      <EditorMutationAdapter />
+      <SharedMutationBridge />
+      <SessionControls />
+      <SessionManager />
+      <VisualHistoryPanel />
+      <CollaborationDashboard />
+      <ObjectInspectorPanel />
+      <CollaborationCommandCenter />
+      {PLAYGROUND_RUNTIME_CONFIG
+        .diagnostics
+        .mountPanel && (
+          <CollaborationDiagnosticsPanel />
+        )}
+      {PLAYGROUND_RUNTIME_CONFIG
+        .releaseReadiness
+        .mountPanel && (
+          <ReleaseReadinessPanel />
+        )}
+      <ProfileExperiencePolishBridge />
+      {PLAYGROUND_RUNTIME_CONFIG
+        .releaseReadiness
+        .mountPanel && (
+          <ReleaseCenter
+            systems={PLAYGROUND_RUNTIME_SYSTEMS}
+          />
+        )}
+    </>
+  );
+}

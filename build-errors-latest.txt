@@ -1,0 +1,8 @@
+
+> worlds@0.1.0 build
+> tsc && vite build
+
+src/profile-experiences/shared/Stats.tsx(51,9): error TS2322: Type '(() => void) | undefined' is not assignable to type 'undefined'.
+  Type '() => void' is not assignable to type 'undefined'.
+src/profile-experiences/shared/Stats.tsx(78,13): error TS2349: This expression is not callable.
+  Type 'never' has no call signatures.

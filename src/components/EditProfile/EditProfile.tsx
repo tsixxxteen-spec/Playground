@@ -16,11 +16,28 @@ import type {
   AvatarTransform,
 } from "../AvatarStudio";
 
-import ThemeSelector from "../ThemeSelector";
+import BannerStudio, {
+  DEFAULT_BANNER_TRANSFORM,
+  getBannerImageStyle,
+} from "../BannerStudio";
+import type {
+  BannerTransform,
+} from "../BannerStudio";
+
+import { AppearanceEditor } from "../../personalization/appearance";
+import type { AppearanceValue } from "../../personalization/appearance";
 import ProfileSoundtrackEditor from "../ProfileSoundtrackEditor";
 import { EMPTY_PROFILE_SOUNDTRACK, normalizeSoundtrack } from "../../lib/profileSoundtrack";
 import type { ProfileSoundtrack } from "../../lib/profileSoundtrack";
 import { DEFAULT_THEME_ID } from "../../themes";
+import { normalizePlayground } from "../../world/types/playground";
+import type { PlaygroundData } from "../../world/types/playground";
+import { DEFAULT_ENVIRONMENT_SETTINGS, normalizeEnvironmentSettings } from "../../personalization/environments";
+import type { EnvironmentSettings } from "../../personalization/environments";
+import { DEFAULT_COMPANION_SETTINGS, normalizeCompanionSettings } from "../../personalization/companions";
+import type { CompanionSettings } from "../../personalization/companions";
+import { DEFAULT_WIDGET_SETTINGS, normalizeWidgetSettings } from "../../personalization/widgets";
+import type { WidgetSettings } from "../../personalization/widgets";
 
 import "./EditProfile.css";
 
@@ -28,12 +45,26 @@ export type EditableProfile = {
   displayName: string;
   username: string;
   bio: string;
+
   avatarSrc?: string;
   avatarTransform: AvatarTransform;
-  avatarTransforms?: Record<string, AvatarTransform>;
+
+  bannerSrc?: string;
+  bannerTransform?: BannerTransform;
+
   soundtrack?: ProfileSoundtrack;
+
   showMusicPlayer: boolean;
+
   themeId: string;
+
+  playground: PlaygroundData;
+
+  environment: EnvironmentSettings;
+
+  companions: CompanionSettings;
+
+  widgets: WidgetSettings;
 };
 
 type EditProfileProps = {
@@ -85,6 +116,12 @@ export default function EditProfile({
   const temporaryAvatarUrlRef =
     useRef<string | null>(null);
 
+  const bannerInputRef =
+    useRef<HTMLInputElement | null>(null);
+
+  const temporaryBannerUrlRef =
+    useRef<string | null>(null);
+
   const [displayName, setDisplayName] =
     useState(profile.displayName);
 
@@ -113,11 +150,46 @@ export default function EditProfile({
   const [avatarStudioOpen, setAvatarStudioOpen] =
     useState(false);
 
+  const [bannerSrc, setBannerSrc] =
+    useState(profile.bannerSrc);
+
+  const [
+    bannerTransform,
+    setBannerTransform,
+  ] = useState<BannerTransform>(
+    profile.bannerTransform ??
+      DEFAULT_BANNER_TRANSFORM,
+  );
+
+  const [
+    pendingBannerSrc,
+    setPendingBannerSrc,
+  ] = useState<string | null>(null);
+
+  const [bannerStudioOpen, setBannerStudioOpen] =
+    useState(false);
+
   const [showMusicPlayer, setShowMusicPlayer] =
     useState(profile.showMusicPlayer);
 
   const [themeId, setThemeId] = useState(
     profile.themeId || DEFAULT_THEME_ID,
+  );
+
+  const [playground, setPlayground] = useState(() =>
+    normalizePlayground(profile.playground),
+  );
+
+  const [environment, setEnvironment] = useState(() =>
+    normalizeEnvironmentSettings(profile.environment ?? DEFAULT_ENVIRONMENT_SETTINGS),
+  );
+
+  const [companions, setCompanions] = useState(() =>
+    normalizeCompanionSettings(profile.companions ?? DEFAULT_COMPANION_SETTINGS),
+  );
+
+  const [widgets, setWidgets] = useState(() =>
+    normalizeWidgetSettings(profile.widgets ?? DEFAULT_WIDGET_SETTINGS),
   );
 
   const [soundtrack, setSoundtrack] = useState<ProfileSoundtrack>(() =>
@@ -127,9 +199,12 @@ export default function EditProfile({
   const [error, setError] = useState("");
 
   const activeAvatarTransform =
-    profile.avatarTransforms?.[themeId] ??
     avatarTransform ??
     DEFAULT_AVATAR_TRANSFORM;
+
+  const activeBannerTransform =
+    bannerTransform ??
+    DEFAULT_BANNER_TRANSFORM;
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -164,6 +239,11 @@ export default function EditProfile({
         );
       }
 
+      if (temporaryBannerUrlRef.current) {
+        URL.revokeObjectURL(
+          temporaryBannerUrlRef.current,
+        );
+      }
     };
   }, []);
 
@@ -199,6 +279,38 @@ export default function EditProfile({
     setError("");
   };
 
+  const loadBanner = (
+    event: ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      setError(
+        "Please choose an image for your profile banner.",
+      );
+      event.target.value = "";
+      return;
+    }
+
+    if (temporaryBannerUrlRef.current) {
+      URL.revokeObjectURL(
+        temporaryBannerUrlRef.current,
+      );
+    }
+
+    const nextUrl = URL.createObjectURL(file);
+
+    temporaryBannerUrlRef.current = nextUrl;
+
+    setPendingBannerSrc(nextUrl);
+    setBannerStudioOpen(true);
+    setError("");
+  };
+
   const submit = (
     event: FormEvent<HTMLFormElement>,
   ) => {
@@ -228,21 +340,30 @@ export default function EditProfile({
       temporaryAvatarUrlRef.current = null;
     }
 
+    if (
+      temporaryBannerUrlRef.current ===
+      bannerSrc
+    ) {
+      temporaryBannerUrlRef.current = null;
+    }
+
     onSave({
       displayName: nextDisplayName,
       username: nextUsername,
       bio: bio.trim(),
       avatarSrc: avatarSrc ?? profile.avatarSrc,
       avatarTransform: activeAvatarTransform,
-      avatarTransforms: {
-        ...(profile.avatarTransforms ?? {}),
-        [themeId]: activeAvatarTransform,
-      },
+      bannerSrc: bannerSrc ?? profile.bannerSrc,
+      bannerTransform: activeBannerTransform,
       soundtrack,
       showMusicPlayer:
         soundtrack.tracks.length > 0 &&
         showMusicPlayer,
       themeId,
+      playground,
+      environment,
+      companions,
+      widgets,
     });
   };
 
@@ -285,6 +406,75 @@ export default function EditProfile({
         </header>
 
         <div className="edit-profile__content">
+          <section className="edit-profile__banner-section">
+            <div
+              className="edit-profile__banner-preview"
+              aria-label="Profile banner preview"
+            >
+              {bannerSrc ? (
+                <img
+                  src={bannerSrc}
+                  alt=""
+                  draggable={false}
+                  style={getBannerImageStyle(
+                    activeBannerTransform,
+                  )}
+                />
+              ) : (
+                <div
+                  className="edit-profile__banner-placeholder"
+                  aria-hidden="true"
+                >
+                  <span>Profile Banner</span>
+                </div>
+              )}
+            </div>
+
+            <div className="edit-profile__banner-meta">
+              <div>
+                <strong>Profile banner</strong>
+
+                <p>
+                  Choose a wide JPG, PNG, WEBP, or
+                  another image format.
+                </p>
+              </div>
+
+              <div className="edit-profile__banner-buttons">
+                <button
+                  type="button"
+                  onClick={() =>
+                    bannerInputRef.current?.click()
+                  }
+                >
+                  Change banner
+                </button>
+
+                {bannerSrc && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPendingBannerSrc(
+                        bannerSrc,
+                      );
+                      setBannerStudioOpen(true);
+                    }}
+                  >
+                    Adjust position
+                  </button>
+                )}
+              </div>
+
+              <input
+                ref={bannerInputRef}
+                type="file"
+                accept="image/*"
+                onChange={loadBanner}
+                hidden
+              />
+            </div>
+          </section>
+
           <section className="edit-profile__identity">
             <div
               className="edit-profile__avatar"
@@ -405,9 +595,15 @@ export default function EditProfile({
             </label>
           </section>
 
-          <ThemeSelector
-            value={themeId}
-            onChange={setThemeId}
+          <AppearanceEditor
+            value={{ themeId, playground, environment, companions, widgets }}
+            onChange={(appearance: AppearanceValue) => {
+              setThemeId(appearance.themeId);
+              setPlayground(appearance.playground);
+              setEnvironment(appearance.environment);
+              setCompanions(appearance.companions);
+              setWidgets(appearance.widgets);
+            }}
           />
 
           <ProfileSoundtrackEditor
@@ -539,6 +735,64 @@ export default function EditProfile({
               );
               setPendingAvatarSrc(null);
               setAvatarStudioOpen(false);
+            }}
+          />
+        )}
+
+      {bannerStudioOpen &&
+        pendingBannerSrc && (
+          <BannerStudio
+            imageSrc={pendingBannerSrc}
+            initialTransform={
+              pendingBannerSrc === bannerSrc
+                ? activeBannerTransform
+                : DEFAULT_BANNER_TRANSFORM
+            }
+            onCancel={() => {
+              if (
+                pendingBannerSrc !==
+                  bannerSrc &&
+                pendingBannerSrc.startsWith(
+                  "blob:",
+                )
+              ) {
+                URL.revokeObjectURL(
+                  pendingBannerSrc,
+                );
+
+                if (
+                  temporaryBannerUrlRef.current ===
+                  pendingBannerSrc
+                ) {
+                  temporaryBannerUrlRef.current =
+                    null;
+                }
+              }
+
+              setPendingBannerSrc(null);
+              setBannerStudioOpen(false);
+
+              if (bannerInputRef.current) {
+                bannerInputRef.current.value =
+                  "";
+              }
+            }}
+            onSave={(
+              nextTransform: BannerTransform,
+            ) => {
+              setBannerSrc(
+                pendingBannerSrc,
+              );
+              setBannerTransform(
+                nextTransform,
+              );
+              setPendingBannerSrc(null);
+              setBannerStudioOpen(false);
+
+              if (bannerInputRef.current) {
+                bannerInputRef.current.value =
+                  "";
+              }
             }}
           />
         )}

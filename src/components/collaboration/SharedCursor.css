@@ -1,0 +1,59 @@
+.shared-cursor {
+  position: fixed;
+  z-index: 10000;
+  top: 0;
+  left: 0;
+  display: flex;
+  pointer-events: none;
+  align-items: flex-start;
+  color: #ffffff;
+  will-change: transform;
+}
+
+.shared-cursor__pointer {
+  flex: 0 0 auto;
+  filter:
+    drop-shadow(
+      0 3px 7px
+      rgba(0, 0, 0, 0.35)
+    );
+}
+
+.shared-cursor__label {
+  display: inline-flex;
+  min-height: 23px;
+  align-items: center;
+  gap: 6px;
+  margin: 17px 0 0 -1px;
+  padding: 0 8px;
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background:
+    rgba(18, 18, 20, 0.88);
+  box-shadow:
+    0 5px 16px
+    rgba(0, 0, 0, 0.2);
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 650;
+  white-space: nowrap;
+  backdrop-filter: blur(12px);
+}
+
+.shared-cursor__label span {
+  color:
+    rgba(255, 255, 255, 0.45);
+  font-size: 8px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.shared-cursor[data-activity="idle"] {
+  opacity: 0.7;
+}
+
+.shared-cursor[data-activity="away"] {
+  opacity: 0.42;
+}
