@@ -34,6 +34,8 @@ import { DEFAULT_COMPANION_SETTINGS, normalizeCompanionSettings } from "../../pe
 import type { CompanionSettings } from "../../personalization/companions";
 import { DEFAULT_WIDGET_SETTINGS, normalizeWidgetSettings } from "../../personalization/widgets";
 import type { WidgetSettings } from "../../personalization/widgets";
+import { DEFAULT_TUMBLR_THEME, normalizeTumblrTheme } from "../../profile-experiences/custom/TumblrTheme";
+import type { TumblrThemeSettings } from "../../profile-experiences/custom/TumblrTheme";
 import "./YourPlayground.css";
 
 type Props = {
@@ -64,6 +66,7 @@ type StoredProfile = {
   environment?: EnvironmentSettings;
   companions?: CompanionSettings;
   widgets?: WidgetSettings;
+  tumblrTheme?: TumblrThemeSettings;
 };
 
 function canPersistSource(source?: string): boolean {
@@ -118,6 +121,7 @@ function readStoredProfile(fallback: EditableProfile): EditableProfile {
       environment: normalizeEnvironmentSettings(parsed.environment ?? fallback.environment),
       companions: normalizeCompanionSettings(parsed.companions ?? fallback.companions),
       widgets: normalizeWidgetSettings(parsed.widgets ?? fallback.widgets),
+      tumblrTheme: normalizeTumblrTheme(parsed.tumblrTheme ?? fallback.tumblrTheme),
     };
   } catch (error) {
     console.error("Could not read saved profile settings:", error);
@@ -140,6 +144,7 @@ function persistProfile(profile: EditableProfile): void {
     environment: normalizeEnvironmentSettings(profile.environment),
     companions: normalizeCompanionSettings(profile.companions),
     widgets: normalizeWidgetSettings(profile.widgets),
+    tumblrTheme: normalizeTumblrTheme(profile.tumblrTheme),
   };
   window.localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(stored));
 }
@@ -181,6 +186,7 @@ export default function YourPlayground(props: Props) {
     environment: DEFAULT_ENVIRONMENT_SETTINGS,
     companions: DEFAULT_COMPANION_SETTINGS,
     widgets: DEFAULT_WIDGET_SETTINGS,
+    tumblrTheme: DEFAULT_TUMBLR_THEME,
     playground: {
       enabled: true,
       objects: [
@@ -268,6 +274,7 @@ export default function YourPlayground(props: Props) {
       environment: normalizeEnvironmentSettings(next.environment ?? profile.environment),
       companions: normalizeCompanionSettings(next.companions ?? profile.companions),
       widgets: normalizeWidgetSettings(next.widgets ?? profile.widgets),
+      tumblrTheme: normalizeTumblrTheme(next.tumblrTheme ?? profile.tumblrTheme),
     };
     try {
       if (mergedNext.avatarSrc?.startsWith("blob:")) {
@@ -402,6 +409,7 @@ export default function YourPlayground(props: Props) {
       environment={profile.environment}
       companions={profile.companions}
       widgets={profile.widgets}
+      tumblrTheme={profile.tumblrTheme}
       onEdit={() => setEditorOpen(true)}
     />
     {editorOpen && (

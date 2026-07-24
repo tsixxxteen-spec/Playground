@@ -38,6 +38,8 @@ import { DEFAULT_COMPANION_SETTINGS, normalizeCompanionSettings } from "../../pe
 import type { CompanionSettings } from "../../personalization/companions";
 import { DEFAULT_WIDGET_SETTINGS, normalizeWidgetSettings } from "../../personalization/widgets";
 import type { WidgetSettings } from "../../personalization/widgets";
+import { DEFAULT_TUMBLR_THEME, normalizeTumblrTheme } from "../../profile-experiences/custom/TumblrTheme";
+import type { TumblrThemeSettings } from "../../profile-experiences/custom/TumblrTheme";
 
 import "./EditProfile.css";
 
@@ -65,6 +67,8 @@ export type EditableProfile = {
   companions: CompanionSettings;
 
   widgets: WidgetSettings;
+
+  tumblrTheme: TumblrThemeSettings;
 };
 
 type EditProfileProps = {
@@ -194,6 +198,10 @@ export default function EditProfile({
 
   const [soundtrack, setSoundtrack] = useState<ProfileSoundtrack>(() =>
     normalizeSoundtrack(profile.soundtrack ?? EMPTY_PROFILE_SOUNDTRACK),
+  );
+
+  const [tumblrTheme, setTumblrTheme] = useState<TumblrThemeSettings>(() =>
+    normalizeTumblrTheme(profile.tumblrTheme ?? DEFAULT_TUMBLR_THEME),
   );
 
   const [error, setError] = useState("");
@@ -364,6 +372,7 @@ export default function EditProfile({
       environment,
       companions,
       widgets,
+      tumblrTheme: normalizeTumblrTheme(tumblrTheme),
     });
   };
 
@@ -605,6 +614,57 @@ export default function EditProfile({
               setWidgets(appearance.widgets);
             }}
           />
+
+          <section className="edit-profile__tumblr-theme">
+            <div className="edit-profile__section-title">
+              <div>
+                <span>CUSTOM HTML</span>
+                <h3>Tumblr theme</h3>
+              </div>
+
+              <label className="edit-profile__tumblr-toggle">
+                <input
+                  type="checkbox"
+                  checked={tumblrTheme.enabled}
+                  onChange={(event) =>
+                    setTumblrTheme((current) => ({
+                      ...current,
+                      enabled: event.target.checked,
+                    }))
+                  }
+                />
+                <span>Use custom theme</span>
+              </label>
+            </div>
+
+            <p className="edit-profile__tumblr-help">
+              Paste a Tumblr HTML theme. Profile tokens and basic post blocks are translated inside an isolated preview. Scripts are blocked for safety.
+            </p>
+
+            <textarea
+              className="edit-profile__tumblr-code"
+              value={tumblrTheme.html}
+              rows={16}
+              spellCheck={false}
+              autoCapitalize="none"
+              autoCorrect="off"
+              placeholder={'<!doctype html>\n<html>\n<head>...\n</head>\n<body>\n  <h1>{Title}</h1>\n  <p>{Description}</p>\n</body>\n</html>'}
+              onChange={(event) =>
+                setTumblrTheme((current) => ({
+                  enabled: current.enabled,
+                  html: event.target.value,
+                }))
+              }
+            />
+
+            <div className="edit-profile__tumblr-tokens">
+              <code>{'{Title}'}</code>
+              <code>{'{Username}'}</code>
+              <code>{'{Description}'}</code>
+              <code>{'{PortraitURL-128}'}</code>
+              <code>{'{block:Posts}...{/block:Posts}'}</code>
+            </div>
+          </section>
 
           <ProfileSoundtrackEditor
             value={soundtrack}

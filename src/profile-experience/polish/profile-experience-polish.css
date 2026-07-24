@@ -347,3 +347,165 @@
       48px;
   }
 }
+
+/* PLAYGROUND COMPACT VERTICAL UTILITY DOCK — START */
+
+/*
+  Active explorers:
+  compact first item in the vertical stack.
+*/
+.presence-settings {
+  right: 14px !important;
+  bottom: 102px !important;
+  width: 112px !important;
+  min-height: 32px !important;
+  padding: 4px 6px !important;
+  justify-content: space-between !important;
+  gap: 4px !important;
+  border-radius: 9px !important;
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.22) !important;
+}
+
+.presence-settings__title {
+  max-width: 62px;
+  overflow: hidden;
+  padding-left: 4px !important;
+  font-size: 8px !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.presence-settings__options {
+  gap: 1px !important;
+}
+
+.presence-settings__button {
+  width: 20px;
+  height: 20px;
+  padding: 0 !important;
+  display: grid !important;
+  place-items: center;
+  overflow: hidden;
+  font-size: 0 !important;
+}
+
+.presence-settings__button::after {
+  font-size: 8px;
+  line-height: 1;
+}
+
+.presence-settings__button:nth-child(1)::after {
+  content: "×";
+}
+
+.presence-settings__button:nth-child(2)::after {
+  content: "✦";
+}
+
+.presence-settings__button:nth-child(3)::after {
+  content: "●";
+}
+
+/*
+  Session:
+  compact second item in the vertical stack.
+*/
+.playground-session-controls {
+  right: 14px !important;
+  bottom: 62px !important;
+  width: 112px !important;
+}
+
+.playground-session-controls--expanded {
+  width: 210px !important;
+}
+
+.playground-session-controls__toggle {
+  min-height: 32px !important;
+  height: 32px !important;
+  padding: 0 9px !important;
+  border-radius: 9px !important;
+  font-size: 9px !important;
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.22) !important;
+}
+
+.playground-session-controls__chevron {
+  font-size: 12px !important;
+}
+
+/*
+  Command-center ellipsis:
+  compact final item in the stack.
+*/
+.playground-command-center-launcher--discreet {
+  right: 14px !important;
+  bottom: 22px !important;
+  min-width: 112px !important;
+  width: 112px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 9px !important;
+  justify-content: flex-start !important;
+  border-radius: 9px !important;
+  opacity: 0.86 !important;
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.22) !important;
+}
+
+.playground-command-center-launcher--discreet
+.playground-command-center-launcher__mark {
+  width: 18px !important;
+  height: 18px !important;
+  display: grid !important;
+  place-items: center !important;
+  font-size: 11px !important;
+}
+
+.playground-active-explorers-safe-zone {
+  margin-right: 0 !important;
+}
+
+/*
+  Prevent a release button from sitting directly on top
+  of the utility stack if that development tool is mounted.
+*/
+.release-center-launcher {
+  right: 14px !important;
+  bottom: 142px !important;
+  width: 32px !important;
+  height: 32px !important;
+  font-size: 8px !important;
+}
+
+@media (max-width: 700px) {
+  .presence-settings {
+    right: 10px !important;
+    bottom:
+      calc(
+        96px +
+        env(safe-area-inset-bottom, 0px)
+      ) !important;
+  }
+
+  .playground-session-controls {
+    right: 10px !important;
+    bottom:
+      calc(
+        57px +
+        env(safe-area-inset-bottom, 0px)
+      ) !important;
+  }
+
+  .playground-command-center-launcher--discreet {
+    right: 10px !important;
+    bottom:
+      calc(
+        18px +
+        env(safe-area-inset-bottom, 0px)
+      ) !important;
+  }
+}
+
+/* PLAYGROUND COMPACT VERTICAL UTILITY DOCK — END */

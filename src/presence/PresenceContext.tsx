@@ -41,37 +41,8 @@ export function PresenceProvider({
 
   useEffect(() => {
     presenceManager.connect();
-
-    Presence.addUser({
-      id: "maya",
-      username: "@maya",
-      displayName: "Maya",
-      x: 18,
-      y: 24,
-      color: "#67b4ff",
-      status: "exploring",
-      activity: "Exploring",
-      joinedAt: Date.now(),
-      themeVariant: "minimal",
-    });
-
-    Presence.addUser({
-      id: "chris",
-      username: "@chris",
-      displayName: "Chris",
-      x: 74,
-      y: 38,
-      color: "#6ee7b7",
-      status: "editing",
-      activity: "Editing",
-      joinedAt: Date.now(),
-      themeVariant: "minimal",
-    });
-
-    return () => {
-      Presence.removeUser("maya");
-      Presence.removeUser("chris");
-      presenceManager.disconnect();
+return () => {
+presenceManager.disconnect();
     };
   }, []);
 

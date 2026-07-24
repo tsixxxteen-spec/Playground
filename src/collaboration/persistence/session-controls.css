@@ -143,3 +143,19 @@
       min(224px, calc(100vw - 20px));
   }
 }
+
+/* Compact utility-dock compatibility */
+.playground-session-controls__panel {
+  transform-origin: bottom right;
+}
+
+@media (min-width: 701px) {
+  .playground-session-controls--expanded
+  .playground-session-controls__panel {
+    position: absolute;
+    right: 0;
+    bottom: 40px;
+    width: 210px;
+    margin-top: 0;
+  }
+}
