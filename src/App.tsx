@@ -713,13 +713,20 @@ function PostTile({
   pushed,
   onPush,
   onOpen,
+  canManage = false,
+  onArchive,
+  onDelete,
 }: {
   post: Post;
   pushed: boolean;
   onPush: () => void;
   onOpen: () => void;
+  canManage?: boolean;
+  onArchive?: () => void;
+  onDelete?: () => void;
 }) {
   const [pushAnimating, setPushAnimating] = useState(false);
+  const [managementOpen, setManagementOpen] = useState(false);
 
   const desktopOpenTimer = useRef<number | null>(null);
   const touchOpenTimer = useRef<number | null>(null);
@@ -832,7 +839,11 @@ function PostTile({
   const handleDesktopClick = (
     event: React.MouseEvent<HTMLElement>,
   ) => {
-    if ((event.target as HTMLElement).closest(".tile-push")) {
+    if (
+      (event.target as HTMLElement).closest(
+        ".tile-push, .post-management",
+      )
+    ) {
       return;
     }
 
@@ -869,7 +880,11 @@ function PostTile({
       return;
     }
 
-    if ((event.target as HTMLElement).closest(".tile-push")) {
+    if (
+      (event.target as HTMLElement).closest(
+        ".tile-push, .post-management",
+      )
+    ) {
       return;
     }
 
@@ -953,6 +968,64 @@ function PostTile({
           )}
         </div>
       </div>
+
+      {canManage && (
+        <div
+          className="post-management"
+          onClick={(event) => event.stopPropagation()}
+          onDoubleClick={(event) => event.stopPropagation()}
+          onPointerUp={(event) => event.stopPropagation()}
+        >
+          <button
+            className="post-management__trigger"
+            type="button"
+            aria-label="Post options"
+            aria-haspopup="menu"
+            aria-expanded={managementOpen}
+            onClick={() =>
+              setManagementOpen((current) => !current)
+            }
+          >
+            •••
+          </button>
+
+          {managementOpen && (
+            <div
+              className="post-management__menu"
+              role="menu"
+            >
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  setManagementOpen(false);
+                  onArchive?.();
+                }}
+              >
+                Archive
+              </button>
+
+              <button
+                type="button"
+                role="menuitem"
+                className="post-management__delete"
+                onClick={() => {
+                  if (
+                    window.confirm(
+                      "Delete this post permanently? This cannot be undone.",
+                    )
+                  ) {
+                    setManagementOpen(false);
+                    onDelete?.();
+                  }
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       <button
         className={`tile-push ${
@@ -1856,6 +1929,29 @@ function App() {
   const [currentView, setCurrentView] =
     useState<AppView>("home");
   const [feedPosts, setFeedPosts] = useState<Post[]>(posts);
+  const [archivedPostIds, setArchivedPostIds] = useState<number[]>(() => {
+    try {
+      const stored = window.localStorage.getItem(
+        "playground-archived-posts",
+      );
+      const parsed = stored ? JSON.parse(stored) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
+  const [deletedPostIds, setDeletedPostIds] = useState<number[]>(() => {
+    try {
+      const stored = window.localStorage.getItem(
+        "playground-deleted-posts",
+      );
+      const parsed = stored ? JSON.parse(stored) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
+  const [showArchivedPosts, setShowArchivedPosts] = useState(false);
   const [selectedPostIndex, setSelectedPostIndex] = useState<number | null>(null);
   const [pushedPostIds, setPushedPostIds] = useState<number[]>(() => {
     try {
@@ -1915,19 +2011,101 @@ function App() {
     });
   };
 
+  const visibleFeedPosts = feedPosts.filter(
+    (post) =>
+      !archivedPostIds.includes(post.id) &&
+      !deletedPostIds.includes(post.id),
+  );
+
+  const visibleOwnerPosts = visibleFeedPosts.filter(
+    (post) => post.username === "@terry",
+  );
+
+  const archivedOwnerPosts = feedPosts.filter(
+    (post) =>
+      post.username === "@terry" &&
+      archivedPostIds.includes(post.id) &&
+      !deletedPostIds.includes(post.id),
+  );
+
+  const archivePost = (postId: number) => {
+    setArchivedPostIds((current) => {
+      const next = current.includes(postId)
+        ? current
+        : [...current, postId];
+
+      window.localStorage.setItem(
+        "playground-archived-posts",
+        JSON.stringify(next),
+      );
+
+      return next;
+    });
+
+    setSelectedPostIndex(null);
+  };
+
+  const restorePost = (postId: number) => {
+    setArchivedPostIds((current) => {
+      const next = current.filter((id) => id !== postId);
+
+      window.localStorage.setItem(
+        "playground-archived-posts",
+        JSON.stringify(next),
+      );
+
+      return next;
+    });
+  };
+
+  const deletePost = (postId: number) => {
+    setDeletedPostIds((current) => {
+      const next = current.includes(postId)
+        ? current
+        : [...current, postId];
+
+      window.localStorage.setItem(
+        "playground-deleted-posts",
+        JSON.stringify(next),
+      );
+
+      return next;
+    });
+
+    setArchivedPostIds((current) => {
+      const next = current.filter((id) => id !== postId);
+      window.localStorage.setItem(
+        "playground-archived-posts",
+        JSON.stringify(next),
+      );
+      return next;
+    });
+
+    setPushedPostIds((current) => {
+      const next = current.filter((id) => id !== postId);
+      window.localStorage.setItem(
+        "playground-pushed-posts",
+        JSON.stringify(next),
+      );
+      return next;
+    });
+
+    setSelectedPostIndex(null);
+  };
+
   const closeViewer = () => setSelectedPostIndex(null);
 
   const showPreviousPost = () => {
     setSelectedPostIndex((current) => {
       if (current === null) return null;
-      return current === 0 ? feedPosts.length - 1 : current - 1;
+      return current === 0 ? visibleFeedPosts.length - 1 : current - 1;
     });
   };
 
   const showNextPost = () => {
     setSelectedPostIndex((current) => {
       if (current === null) return null;
-      return current === feedPosts.length - 1 ? 0 : current + 1;
+      return current === visibleFeedPosts.length - 1 ? 0 : current + 1;
     });
   };
 
@@ -1946,9 +2124,9 @@ function App() {
 
       {selectedPostIndex !== null && (
         <ImmersiveViewer
-          post={feedPosts[selectedPostIndex]}
-          pushed={pushedPostIds.includes(feedPosts[selectedPostIndex].id)}
-          onPush={() => togglePush(feedPosts[selectedPostIndex].id)}
+          post={visibleFeedPosts[selectedPostIndex]}
+          pushed={pushedPostIds.includes(visibleFeedPosts[selectedPostIndex].id)}
+          onPush={() => togglePush(visibleFeedPosts[selectedPostIndex].id)}
           onClose={closeViewer}
           onPrevious={showPreviousPost}
           onNext={showNextPost}
@@ -2073,13 +2251,16 @@ function App() {
 
       {currentView === "home" ? (
         <section className="weighted-wall" aria-label="Slide">
-          {feedPosts.map((post, index) => (
+          {visibleFeedPosts.map((post, index) => (
             <PostTile
               post={post}
               key={post.id}
               pushed={pushedPostIds.includes(post.id)}
               onPush={() => togglePush(post.id)}
               onOpen={() => setSelectedPostIndex(index)}
+              canManage={post.username === "@terry"}
+              onArchive={() => archivePost(post.id)}
+              onDelete={() => deletePost(post.id)}
             />
           ))}
         </section>
@@ -2088,11 +2269,7 @@ function App() {
           displayName="Terry Presume"
           username="@terry"
           bio="Building worlds."
-          postCount={
-            feedPosts.filter(
-              (post) => post.username === "@terry",
-            ).length
-          }
+          postCount={visibleOwnerPosts.length}
           followerCount={0}
           followingCount={0}
           musicTrack={{
@@ -2102,42 +2279,106 @@ function App() {
           }}
           showMusicPlayer={true}
         >
-          {feedPosts.some(
-            (post) => post.username === "@terry",
-          ) ? (
-            <section
-              className="weighted-wall weighted-wall--profile"
-              aria-label="Your posts"
-            >
-              {feedPosts
-                .filter(
-                  (post) => post.username === "@terry",
-                )
-                .map((post) => {
-                  const feedIndex = feedPosts.findIndex(
-                    (candidate) =>
-                      candidate.id === post.id,
-                  );
+          {(visibleOwnerPosts.length > 0 || archivedOwnerPosts.length > 0) ? (
+            <div className="profile-post-management-shell">
+              <div className="profile-post-management-bar">
+                <span>
+                  {visibleOwnerPosts.length} published
+                </span>
 
-                  return (
-                    <PostTile
-                      post={post}
-                      key={post.id}
-                      pushed={pushedPostIds.includes(
-                        post.id,
-                      )}
-                      onPush={() =>
-                        togglePush(post.id)
-                      }
-                      onOpen={() =>
-                        setSelectedPostIndex(
-                          feedIndex,
-                        )
-                      }
-                    />
-                  );
-                })}
-            </section>
+                <button
+                  type="button"
+                  className={showArchivedPosts ? "active" : ""}
+                  onClick={() =>
+                    setShowArchivedPosts((current) => !current)
+                  }
+                >
+                  Archived ({archivedOwnerPosts.length})
+                </button>
+              </div>
+
+              {showArchivedPosts ? (
+                <section
+                  className="archived-posts"
+                  aria-label="Archived posts"
+                >
+                  {archivedOwnerPosts.length === 0 ? (
+                    <p className="archived-posts__empty">
+                      No archived posts.
+                    </p>
+                  ) : (
+                    archivedOwnerPosts.map((post) => (
+                      <article
+                        className="archived-post-row"
+                        key={post.id}
+                      >
+                        <FeedMedia post={post} />
+
+                        <div className="archived-post-row__copy">
+                          <strong>{post.caption}</strong>
+                          <span>Hidden from your public profile</span>
+                        </div>
+
+                        <div className="archived-post-row__actions">
+                          <button
+                            type="button"
+                            onClick={() => restorePost(post.id)}
+                          >
+                            Restore
+                          </button>
+
+                          <button
+                            type="button"
+                            className="danger"
+                            onClick={() => {
+                              if (
+                                window.confirm(
+                                  "Delete this archived post permanently?",
+                                )
+                              ) {
+                                deletePost(post.id);
+                              }
+                            }}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </article>
+                    ))
+                  )}
+                </section>
+              ) : visibleOwnerPosts.length > 0 ? (
+                <section
+                  className="weighted-wall weighted-wall--profile"
+                  aria-label="Your posts"
+                >
+                  {visibleOwnerPosts.map((post) => {
+                    const visibleIndex = visibleFeedPosts.findIndex(
+                      (candidate) => candidate.id === post.id,
+                    );
+
+                    return (
+                      <PostTile
+                        post={post}
+                        key={post.id}
+                        pushed={pushedPostIds.includes(post.id)}
+                        onPush={() => togglePush(post.id)}
+                        onOpen={() =>
+                          setSelectedPostIndex(visibleIndex)
+                        }
+                        canManage
+                        onArchive={() => archivePost(post.id)}
+                        onDelete={() => deletePost(post.id)}
+                      />
+                    );
+                  })}
+                </section>
+              ) : (
+                <p className="archived-posts__empty">
+                  All of your posts are archived.
+                </p>
+              )}
+            </div>
           ) : undefined}
         </YourPlayground>
       )}
