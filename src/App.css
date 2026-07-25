@@ -6006,3 +6006,145 @@ body.composer-open {
 }
 
 /* PLAYGROUND UPLOAD COVER PREVIEW — END */
+
+/* PLAYGROUND TRUE ORIGINAL MEDIA DIMENSIONS — START */
+
+/*
+  Published photos and videos display at their own aspect ratio.
+  The post wrapper no longer creates a black letterbox canvas.
+*/
+.post-tile--native-media {
+  position: relative !important;
+
+  width: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+
+  aspect-ratio: auto !important;
+
+  overflow: visible !important;
+
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/*
+  Undo the older absolute-position rule that stretches feed media
+  across the full tile.
+*/
+.post-tile--native-media > .feed-media {
+  position: relative !important;
+  inset: auto !important;
+
+  display: block !important;
+
+  width: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+
+  aspect-ratio: auto !important;
+
+  overflow: visible !important;
+
+  background: transparent !important;
+}
+
+/*
+  Preserve the original width-to-height relationship.
+
+  max-width: 100% prevents oversized uploads from overflowing
+  the available profile column, while height: auto preserves the
+  image's natural proportions.
+*/
+.post-tile--native-media > img,
+.post-tile--native-media > .feed-media > img,
+.post-tile--native-media > .feed-media > video {
+  position: relative !important;
+  inset: auto !important;
+
+  display: block !important;
+
+  width: auto !important;
+  height: auto !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  max-width: 100% !important;
+  max-height: none !important;
+
+  margin: 0 !important;
+
+  aspect-ratio: auto !important;
+
+  object-fit: initial !important;
+  object-position: initial !important;
+
+  background: transparent !important;
+
+  transform: none !important;
+}
+
+/*
+  Do not enlarge a smaller source image beyond its real pixel width.
+*/
+.post-tile--native-media > .feed-media {
+  max-width: 100% !important;
+  width: fit-content !important;
+}
+
+/*
+  Keep hover behavior without zooming or changing dimensions.
+*/
+.post-tile--native-media:hover > img,
+.post-tile--native-media:hover > .feed-media > img,
+.post-tile--native-media:hover > .feed-media > video {
+  object-fit: initial !important;
+  transform: none !important;
+  filter: brightness(0.82) !important;
+}
+
+/*
+  Remove dark pseudo-elements that can resemble a black media frame.
+*/
+.post-tile--native-media::before,
+.post-tile--native-media::after,
+.post-tile--native-media > .feed-media::before,
+.post-tile--native-media > .feed-media::after {
+  background: transparent !important;
+}
+
+/*
+  The Create preview also displays the uploaded file without a
+  fake surrounding black canvas.
+*/
+.composer-dropzone--filled {
+  min-height: 0 !important;
+  height: auto !important;
+  padding: 0 !important;
+
+  background: transparent !important;
+}
+
+.composer-dropzone--filled > img,
+.composer-dropzone--filled > video {
+  position: relative !important;
+  inset: auto !important;
+
+  display: block !important;
+
+  width: auto !important;
+  height: auto !important;
+
+  max-width: 100% !important;
+  max-height: none !important;
+
+  margin: 0 auto !important;
+
+  object-fit: initial !important;
+  object-position: initial !important;
+
+  background: transparent !important;
+}
+
+/* PLAYGROUND TRUE ORIGINAL MEDIA DIMENSIONS — END */
