@@ -1,7 +1,24 @@
+.profile-experience-root--tumblr {
+  width: 100%;
+  min-height: 100vh;
+  padding: 0 !important;
+  overflow: visible;
+  background: #0b0b0c;
+}
+
 .tumblr-theme-frame {
   display: block;
   width: 100%;
+  height: 100vh;
   min-height: 100vh;
   border: 0;
+  outline: 0;
   background: #0b0b0c;
+}
+
+@media (max-width: 760px) {
+  .tumblr-theme-frame {
+    height: 100dvh;
+    min-height: 100dvh;
+  }
 }

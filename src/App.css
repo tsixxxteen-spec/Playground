@@ -5935,3 +5935,74 @@ body.composer-open {
     min-width: 100%;
   }
 }
+
+/* PLAYGROUND UPLOAD COVER PREVIEW — START */
+
+/*
+  This intentionally sits at the end of App.css so it overrides
+  older composer rules that force uploaded media to use contain,
+  auto sizing, margins, and a black letterbox background.
+*/
+.composer-dropzone--filled {
+  position: relative !important;
+  display: block !important;
+  min-height: 480px !important;
+  overflow: hidden !important;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.035),
+      rgba(255, 255, 255, 0.012)
+    ) !important;
+}
+
+.composer-dropzone--filled > img,
+.composer-dropzone--filled > video {
+  position: absolute !important;
+  inset: 0 !important;
+
+  display: block !important;
+
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+
+  margin: 0 !important;
+
+  object-fit: cover !important;
+  object-position: center center !important;
+
+  background: transparent !important;
+  transform: none;
+}
+
+/*
+  Videos retain their controls without allowing the media element
+  to shrink and reveal a black border around the frame.
+*/
+.composer-dropzone--filled > video {
+  pointer-events: auto;
+}
+
+/*
+  Companion artwork should fill its preview for the same reason.
+*/
+.companion-preview > img,
+.companion-preview > video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  background: transparent !important;
+}
+
+@media (max-width: 760px) {
+  .composer-dropzone--filled {
+    min-height: 43vh !important;
+  }
+}
+
+/* PLAYGROUND UPLOAD COVER PREVIEW — END */
